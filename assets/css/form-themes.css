@@ -1,0 +1,328 @@
+.nl4wp-form input[name^="_nl4wp_honey"] {
+  display: none !important; }
+
+/* Newsletter for WP - Default Form Styles */
+.nl4wp-form-basic,
+.nl4wp-form-theme {
+  margin: 1em 0;
+  /* Form Elements */
+  /* Remove font-weight bold from nested elements */
+  /* Alert */ }
+  .nl4wp-form-basic,
+  .nl4wp-form-basic label,
+  .nl4wp-form-basic input,
+  .nl4wp-form-theme,
+  .nl4wp-form-theme label,
+  .nl4wp-form-theme input {
+    width: auto;
+    display: block;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: auto;
+    height: auto;
+    vertical-align: baseline;
+    line-height: normal; }
+  .nl4wp-form-basic:after,
+  .nl4wp-form-theme:after {
+    content: "";
+    display: table;
+    clear: both; }
+  .nl4wp-form-basic label,
+  .nl4wp-form-theme label {
+    font-weight: bold;
+    margin-bottom: 6px;
+    display: block; }
+  .nl4wp-form-basic input.placeholdersjs,
+  .nl4wp-form-theme input.placeholdersjs {
+    color: #aaa !important; }
+  .nl4wp-form-basic input[type="text"],
+  .nl4wp-form-basic input[type="email"],
+  .nl4wp-form-basic input[type="tel"],
+  .nl4wp-form-basic input[type="url"],
+  .nl4wp-form-basic input[type="date"],
+  .nl4wp-form-basic textarea,
+  .nl4wp-form-basic select,
+  .nl4wp-form-theme input[type="text"],
+  .nl4wp-form-theme input[type="email"],
+  .nl4wp-form-theme input[type="tel"],
+  .nl4wp-form-theme input[type="url"],
+  .nl4wp-form-theme input[type="date"],
+  .nl4wp-form-theme textarea,
+  .nl4wp-form-theme select {
+    min-height: 32px;
+    width: 100%;
+    max-width: 480px; }
+  .nl4wp-form-basic input[type="number"],
+  .nl4wp-form-theme input[type="number"] {
+    min-width: 40px; }
+  .nl4wp-form-basic input[type="checkbox"],
+  .nl4wp-form-basic input[type="radio"],
+  .nl4wp-form-theme input[type="checkbox"],
+  .nl4wp-form-theme input[type="radio"] {
+    position: relative;
+    margin: 0 6px 0 0;
+    padding: 0;
+    height: 13px;
+    width: 13px;
+    display: inline-block;
+    border: 0; }
+  .nl4wp-form-basic input[type="checkbox"],
+  .nl4wp-form-theme input[type="checkbox"] {
+    -webkit-appearance: checkbox;
+    -moz-appearance: checkbox;
+    appearance: checkbox; }
+  .nl4wp-form-basic input[type="radio"],
+  .nl4wp-form-theme input[type="radio"] {
+    -webkit-appearance: radio;
+    -moz-appearance: radio;
+    appearance: radio; }
+  .nl4wp-form-basic input[type="submit"],
+  .nl4wp-form-basic button,
+  .nl4wp-form-basic input[type="button"],
+  .nl4wp-form-theme input[type="submit"],
+  .nl4wp-form-theme button,
+  .nl4wp-form-theme input[type="button"] {
+    cursor: pointer;
+    display: inline-block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none; }
+  .nl4wp-form-basic label > span,
+  .nl4wp-form-basic li > label,
+  .nl4wp-form-theme label > span,
+  .nl4wp-form-theme li > label {
+    font-weight: normal; }
+  .nl4wp-form-basic .nl4wp-alert,
+  .nl4wp-form-theme .nl4wp-alert {
+    color: #c09853;
+    clear: both; }
+  .nl4wp-form-basic .nl4wp-success,
+  .nl4wp-form-theme .nl4wp-success {
+    color: #468847; }
+  .nl4wp-form-basic .nl4wp-notice,
+  .nl4wp-form-theme .nl4wp-notice {
+    color: #3a87ad; }
+  .nl4wp-form-basic .nl4wp-error,
+  .nl4wp-form-theme .nl4wp-error {
+    color: #CD5C5C; }
+
+/* Right-To-Left specific styles */
+.rtl .nl4wp-form-reset input[type="checkbox"],
+.rtl .nl4wp-form-reset input[type="radio"] {
+  margin: 0 0 0 6px; }
+
+/* Form base theme */
+.nl4wp-form-theme input[type="text"],
+.nl4wp-form-theme input[type="email"],
+.nl4wp-form-theme input[type="tel"],
+.nl4wp-form-theme input[type="url"],
+.nl4wp-form-theme input[type="date"],
+.nl4wp-form-theme input[type="number"],
+.nl4wp-form-theme textarea,
+.nl4wp-form-theme select {
+  height: auto;
+  padding: 8px 16px;
+  line-height: 1.428571429;
+  color: #555555 !important;
+  vertical-align: middle;
+  background: none;
+  background-color: #ffffff;
+  border: 1px solid #cccccc;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  text-shadow: none; }
+
+.nl4wp-form-theme input:focus,
+.nl4wp-form-theme textarea:focus,
+.nl4wp-form-theme select:focus,
+.nl4wp-form-theme button:focus {
+  outline: 0;
+  background-image: none; }
+
+.nl4wp-form-theme textarea {
+  height: auto; }
+
+.nl4wp-form-theme input[readonly],
+.nl4wp-form-theme input[disabled] {
+  background-color: #eeeeee; }
+
+.nl4wp-form-theme input[type="submit"],
+.nl4wp-form-theme input[type="button"],
+.nl4wp-form-theme button {
+  display: inline-block;
+  padding: 8px 16px;
+  font-weight: normal;
+  line-height: 1.428571429;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  background: none;
+  text-shadow: none;
+  filter: none;
+  height: auto;
+  width: auto; }
+
+.nl4wp-form-theme input[type="submit"]:hover,
+.nl4wp-form-theme input[type="button"]:hover,
+.nl4wp-form-theme button:hover,
+.nl4wp-form-theme input[type="submit"]:focus,
+.nl4wp-form-theme input[type="button"]:focus,
+.nl4wp-form-theme button:focus {
+  outline: 0;
+  color: #333333;
+  text-decoration: none;
+  background: none; }
+
+.nl4wp-form-theme-dark input[type="submit"],
+.nl4wp-form-theme-dark button {
+  color: #ffffff !important;
+  background-color: #444444 !important;
+  border-color: #1e1e1e; }
+
+.nl4wp-form-theme-dark input[type="submit"]:hover,
+.nl4wp-form-theme-dark button:hover,
+.nl4wp-form-theme-dark input[type="submit"]:active,
+.nl4wp-form-theme-dark button:active,
+.nl4wp-form-theme-dark input[type="submit"]:focus,
+.nl4wp-form-theme-dark button:focus {
+  color: #ffffff !important;
+  background-color: #1e1e1e !important;
+  border-color: black; }
+
+.nl4wp-form-theme-dark input[type="text"]:focus,
+.nl4wp-form-theme-dark input[type="email"]:focus,
+.nl4wp-form-theme-dark input[type="tel"]:focus,
+.nl4wp-form-theme-dark input[type="url"]:focus,
+.nl4wp-form-theme-dark input[type="date"]:focus,
+.nl4wp-form-theme-dark textarea:focus,
+.nl4wp-form-theme-dark select:focus {
+  border-color: #6a6a6a;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(68, 68, 68, 0.15);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(68, 68, 68, 0.15);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(68, 68, 68, 0.15); }
+
+.nl4wp-form-theme-light input[type="submit"],
+.nl4wp-form-theme-light button {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  border-color: #d9d9d9; }
+
+.nl4wp-form-theme-light input[type="submit"]:hover,
+.nl4wp-form-theme-light button:hover,
+.nl4wp-form-theme-light input[type="submit"]:active,
+.nl4wp-form-theme-light button:active,
+.nl4wp-form-theme-light input[type="submit"]:focus,
+.nl4wp-form-theme-light button:focus {
+  color: #000000 !important;
+  background-color: #d9d9d9 !important;
+  border-color: #b3b3b3; }
+
+.nl4wp-form-theme-light input[type="text"]:focus,
+.nl4wp-form-theme-light input[type="email"]:focus,
+.nl4wp-form-theme-light input[type="tel"]:focus,
+.nl4wp-form-theme-light input[type="url"]:focus,
+.nl4wp-form-theme-light input[type="date"]:focus,
+.nl4wp-form-theme-light textarea:focus,
+.nl4wp-form-theme-light select:focus {
+  border-color: #d9d9d9;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 255, 255, 0.15);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 255, 255, 0.15); }
+
+.nl4wp-form-theme-red input[type="submit"],
+.nl4wp-form-theme-red button {
+  color: #ffffff !important;
+  background-color: #d9534f !important;
+  border-color: #b52b27; }
+
+.nl4wp-form-theme-red input[type="submit"]:hover,
+.nl4wp-form-theme-red button:hover,
+.nl4wp-form-theme-red input[type="submit"]:active,
+.nl4wp-form-theme-red button:active,
+.nl4wp-form-theme-red input[type="submit"]:focus,
+.nl4wp-form-theme-red button:focus {
+  color: #ffffff !important;
+  background-color: #b52b27 !important;
+  border-color: #761c19; }
+
+.nl4wp-form-theme-red input[type="text"]:focus,
+.nl4wp-form-theme-red input[type="email"]:focus,
+.nl4wp-form-theme-red input[type="tel"]:focus,
+.nl4wp-form-theme-red input[type="url"]:focus,
+.nl4wp-form-theme-red input[type="date"]:focus,
+.nl4wp-form-theme-red textarea:focus,
+.nl4wp-form-theme-red select:focus {
+  border-color: #e7908e;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(217, 83, 79, 0.15);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(217, 83, 79, 0.15);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(217, 83, 79, 0.15); }
+
+.nl4wp-form-theme-blue input[type="submit"],
+.nl4wp-form-theme-blue button {
+  color: #ffffff !important;
+  background-color: #428bca !important;
+  border-color: #2a6496; }
+
+.nl4wp-form-theme-blue input[type="submit"]:hover,
+.nl4wp-form-theme-blue button:hover,
+.nl4wp-form-theme-blue input[type="submit"]:active,
+.nl4wp-form-theme-blue button:active,
+.nl4wp-form-theme-blue input[type="submit"]:focus,
+.nl4wp-form-theme-blue button:focus {
+  color: #ffffff !important;
+  background-color: #2a6496 !important;
+  border-color: #193c5a; }
+
+.nl4wp-form-theme-blue input[type="text"]:focus,
+.nl4wp-form-theme-blue input[type="email"]:focus,
+.nl4wp-form-theme-blue input[type="tel"]:focus,
+.nl4wp-form-theme-blue input[type="url"]:focus,
+.nl4wp-form-theme-blue input[type="date"]:focus,
+.nl4wp-form-theme-blue textarea:focus,
+.nl4wp-form-theme-blue select:focus {
+  border-color: #7eb0db;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(66, 139, 202, 0.15);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(66, 139, 202, 0.15);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(66, 139, 202, 0.15); }
+
+.nl4wp-form-theme-green input[type="submit"],
+.nl4wp-form-theme-green button {
+  color: #ffffff !important;
+  background-color: #5cb85c !important;
+  border-color: #3d8b3d; }
+
+.nl4wp-form-theme-green input[type="submit"]:hover,
+.nl4wp-form-theme-green button:hover,
+.nl4wp-form-theme-green input[type="submit"]:active,
+.nl4wp-form-theme-green button:active,
+.nl4wp-form-theme-green input[type="submit"]:focus,
+.nl4wp-form-theme-green button:focus {
+  color: #ffffff !important;
+  background-color: #3d8b3d !important;
+  border-color: #255625; }
+
+.nl4wp-form-theme-green input[type="text"]:focus,
+.nl4wp-form-theme-green input[type="email"]:focus,
+.nl4wp-form-theme-green input[type="tel"]:focus,
+.nl4wp-form-theme-green input[type="url"]:focus,
+.nl4wp-form-theme-green input[type="date"]:focus,
+.nl4wp-form-theme-green textarea:focus,
+.nl4wp-form-theme-green select:focus {
+  border-color: #91cf91;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(92, 184, 92, 0.15);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(92, 184, 92, 0.15);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(92, 184, 92, 0.15); }
