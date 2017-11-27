@@ -3,7 +3,7 @@
 Plugin Name: Newsletter for WordPress
 Plugin URI: https://github.com/mailrouter/Newsletter-for-Wordpress
 Description: Newsletter for WordPress by mailrouter. Aggiunge vari metodi di iscrizione newsletter al tuo sito.
-Version: 4.1.11
+Version: 4.1.11.1
 Author: mailrouter
 Text Domain: newsletter-for-wp
 Domain Path: /languages
@@ -63,11 +63,11 @@ function _nl4wp_load_plugin() {
 	}
 
 	// bootstrap the core plugin
-	define( 'NL4WP_VERSION', '4.1.11');
+	define( 'NL4WP_VERSION', '4.1.11.1');
 /* NL_CHANGED - start
 * imposta la versione pro
 */
-define ('NL4WP_PREMIUM_VERSION', '4.1.11');
+define ('NL4WP_PREMIUM_VERSION', '4.1.11.1');
 /* NL_CHANGED - end */
 	define( 'NL4WP_PLUGIN_DIR', dirname( __FILE__ ) . '/' );
 	define( 'NL4WP_PLUGIN_URL', plugins_url( '/' , __FILE__ ) );
