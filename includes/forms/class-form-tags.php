@@ -50,6 +50,12 @@ class NL4WP_Form_Tags {
      * @return array
      */
     public function register( array $tags ) {
+
+        /**
+         * @var NL4WP_Request
+         */
+        $request = nl4wp('request');
+
         $tags['response'] = array(
             'description'   => __( 'Replaced with the form response (error or success messages).', 'newsletter-for-wp' ),
             'callback'      => array( $this, 'get_form_response' )
@@ -79,12 +85,12 @@ class NL4WP_Form_Tags {
 
         $tags['current_url']  = array(
             'description' => __( 'The URL of the page.', 'newsletter-for-wp' ),
-            'callback'    => 'nl4wp_get_request_url',
+            'callback'    => 'nl4wp_get_current_url',
         );
 
         $tags['current_path'] = array(
             'description' => __( 'The path of the page.', 'newsletter-for-wp' ),
-            'callback'    => 'nl4wp_get_request_path',
+            'callback'    => array( $request, 'get_url' ),
         );
 
         $tags['date']         = array(
@@ -104,7 +110,7 @@ class NL4WP_Form_Tags {
 
         $tags['ip']           = array(
             'description' => sprintf( __( 'The visitor\'s IP address. Example: %s.', 'newsletter-for-wp' ), '<strong>' . nl4wp('request')->get_client_ip() . '</strong>' ),
-            'callback'    => 'nl4wp_get_request_ip_address',
+            'callback'    => array( $request, 'get_client_ip' )
         );
 
         $tags['user']      = array(
@@ -193,14 +199,15 @@ class NL4WP_Form_Tags {
         }
 
         $default = isset( $args['default'] ) ? $args['default'] : '';
-        $key = $args['key'];
 
-        $data = array_merge( $_GET, $_POST );
-        $value = isset( $data[$key] ) ? $data[$key] : $default;
+        /**
+         * @var NL4WP_Request $request
+         */
+        $request = nl4wp('request');
+        $value = $request->params->get( $args['key'], $default );
 
         // turn array into readable value
         if( is_array( $value ) ) {
-            $value = array_filter( $value );
             $value = join( ', ', $value );
         }
 

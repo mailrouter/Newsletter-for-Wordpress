@@ -354,6 +354,7 @@ abstract class NL4WP_Integration {
 		$slug = $this->slug;
 		$newsletter = new NL4WP_Newsletter();
 		$log = $this->get_log();
+		$request= $this->get_request();
 		$list_ids = $this->get_lists();
 
 		/** @var NL4WP_Newsletter_Subscriber $subscriber */
@@ -411,7 +412,7 @@ abstract class NL4WP_Integration {
 		foreach( $map as $list_id => $subscriber ) {
 			$subscriber->status = $this->options['double_optin'] ? 'pending' : 'subscribed';
 			$subscriber->email_type = $email_type;
-			$subscriber->ip_signup = nl4wp_get_request_ip_address();
+			$subscriber->ip_signup = $request->get_client_ip();
 
 			/** @ignore (documented elsewhere) */
 			$subscriber = apply_filters( 'nl4wp_subscriber_data', $subscriber );
@@ -523,7 +524,8 @@ abstract class NL4WP_Integration {
 	 * @return array
 	 */
 	public function get_data() {
-		$data = array_merge( $_GET, $_POST );
+		$request = nl4wp('request');
+		$data = $request->params->all();
 		return $data;
 	}
 
@@ -540,4 +542,12 @@ abstract class NL4WP_Integration {
 	protected function get_api() {
 		return nl4wp('api');
 	}
+
+	/**
+	 * @return NL4WP_Request
+	 */
+	protected function get_request() {
+		return nl4wp('request');
+	}
+
 }

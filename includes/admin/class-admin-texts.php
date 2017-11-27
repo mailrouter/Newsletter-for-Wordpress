@@ -81,7 +81,7 @@ class NL4WP_Admin_Texts {
 			return $links;
 		}
 
-		//$links[] = '<a href="https://kb.mc4wp.com/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=plugins-page">'. __( 'Documentation', 'newsletter-for-wp' ) . '</a>';
+		// $links[] = '<a href="https://kb.mc4wp.com/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=plugins-page">'. __( 'Documentation', 'newsletter-for-wp' ) . '</a>';
 
 		/**
 		 * Filters meta links shown on the Plugins overview page

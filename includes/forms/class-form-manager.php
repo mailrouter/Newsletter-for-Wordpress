@@ -82,8 +82,9 @@ class NL4WP_Form_Manager {
 	 * @hooked `init`
 	 */
 	public function init_form_listener() {
+		$request = $this->get_request();
 		$this->listener = new NL4WP_Form_Listener();
-		$this->listener->listen();
+		$this->listener->listen( $request );
 	}
 
 	/**
@@ -134,5 +135,12 @@ class NL4WP_Form_Manager {
 	 */
 	public function get_tags() {
 		return $this->tags->get();
+	}
+
+	/**
+	 * @return NL4WP_Request
+	 */
+	private function get_request() {
+		return nl4wp('request');
 	}
 }

@@ -46,11 +46,3 @@ function nl4wp_form( $id = 0, $attributes = array() ) {
 	return nl4wp_show_form( $id, $attributes );
 }
 
-/**
- * @deprecated 4.1.12
- * @return string
- */
-function nl4wp_get_current_url()
-{
-   return $nl4wp_get_current_url();
-}

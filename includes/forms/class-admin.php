@@ -25,6 +25,8 @@ class NL4WP_Forms_Admin {
 	public function __construct( NL4WP_Admin_Messages $messages, NL4WP_Newsletter $newsletter ) {
 		$this->messages = $messages;
 		$this->newsletter = $newsletter;
+
+		require dirname( __FILE__ ) . '/admin-functions.php';
 	}
 
 	/**
