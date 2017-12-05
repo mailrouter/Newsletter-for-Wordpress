@@ -3,7 +3,7 @@ Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, ibericode, newsletter forms, newsletter integrations
 Requires at least: 4.1
 Tested up to: 4.8.3
-Stable tag: 4.1.11.2
+Stable tag: 4.1.11.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.2.4
@@ -42,8 +42,6 @@ Newsletter for WordPress ti aiuta a aumentare il numero degli iscritti alla tua 
 L'ESP, acronimo di Email Service Provider. E' una società che gestisce campagne di email marketing. 
 Gli ESP sono nati come risposta alla difficoltà di invio email a grandi numeri di destinatari. Tale gestione include infatti la semplificazione di importazione/esportazione degli iscritti, la fornitura di procedure semplici di iscrizione e disiscrizione, la gestione del contatto con gli inbox providers (Feedback Loop, Whitelist), il monitoring delle blacklist, l'analisi del Bounce, l'integrazione di tecniche di autenticazione della posta elettronica. 
 Newsletter for Worpress facilita l'implementazione della procedura di iscrizione degli utenti, collegandosi direttamente al tuo account presso l'ESP, consentendo una integrazione completa fra ESP e sito Wordpress.
-
-Attualmente gli ESP compatibili con Newsletter for Wordpress sono: VOXmail, Mailrouter e Mymailer.
 
 == Installation ==
 
