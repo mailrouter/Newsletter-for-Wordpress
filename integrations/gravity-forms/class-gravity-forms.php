@@ -52,7 +52,7 @@ class NL4WP_Gravity_Forms_Integration extends NL4WP_Integration {
             }
         }
 
-        if( ! $subscribe || empty( $email_address ) || empty( $newsletter_list_id ) ) {
+        if( ! $subscribe || empty( $email_address ) ) {
             return;
         }
 
@@ -84,7 +84,10 @@ class NL4WP_Gravity_Forms_Integration extends NL4WP_Integration {
     }
 
     public function settings_fields( $pos, $form_id ) {
-        if( $pos !== 0 ) { return; }
+        if( $pos !== 0 ) { 
+            return; 
+        }
+        
         $newsletter = new NL4WP_Newsletter();
         $lists = $newsletter->get_cached_lists();
         ?>

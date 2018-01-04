@@ -20,58 +20,58 @@ class NL4WP_Form_Listener {
 
 	/**
 	 * Listen for submitted forms
-	 *
-	 * @param NL4WP_Request $request
 	 * @return bool
 	 */
-		public function listen( NL4WP_Request $request ) {
+	public function listen() {
 
-			$form_id = $request->post->get( '_nl4wp_form_id' );
-			if( empty( $form_id ) ) {
-				return false;
-			}
-
-			// get form instance
-			try {
-				$form = nl4wp_get_form( $form_id );
-			} catch( Exception $e ) {
-				return false;
-			}
-
-			// where the magic happens
-			$form->handle_request( $request );
-			$form->validate();
-
-			// store submitted form
-			$this->submitted_form = $form;
-
-			// did form have errors?
-			if( ! $form->has_errors() ) {
-
-				// form was valid, do something
-				$method = 'process_' . $form->get_action() . '_form';
-				call_user_func( array( $this, $method ), $form, $request );
-			} else {
-				$this->get_log()->info( sprintf( "Form %d > Submitted with errors: %s", $form->ID, join( ', ', $form->errors ) ) );
-			}
-
-			$this->respond( $form );
-
-			return true;
+		$request = array_merge( $_GET, $_POST );
+		if( empty( $request['_nl4wp_form_id'] ) ) {
+			return false;
 		}
+
+		// get form instance
+		try {
+			$form_id = (int) $request['_nl4wp_form_id'];
+			$form = nl4wp_get_form( $form_id );
+		} catch( Exception $e ) {
+			return false;
+		}
+
+		// where the magic happens
+		$form->handle_request( $_POST );
+		$form->validate();
+
+		// store submitted form
+		$this->submitted_form = $form;
+
+		// did form have errors?
+		if( ! $form->has_errors() ) {
+			// form was valid, do something
+			$method = 'process_' . $form->get_action() . '_form';
+			call_user_func( array( $this, $method ), $form );
+		} else {
+			foreach( $form->errors as $error_code ) {
+				$form->add_notice( $form->get_message( $error_code ), 'error' );
+			}
+
+			$this->get_log()->info( sprintf( "Form %d > Submitted with errors: %s", $form->ID, join( ', ', $form->errors ) ) );
+		}
+
+		$this->respond( $form );
+		return true;
+	}
 
 	/**
 	 * Process a subscribe form.
 	 *
 	 * @param NL4WP_Form $form
-	 * @param NL4WP_Request $request
 	 */
-	public function process_subscribe_form( NL4WP_Form $form, NL4WP_Request $request ) {
+	public function process_subscribe_form( NL4WP_Form $form ) {
 		$result = false;
 		$newsletter = new NL4WP_Newsletter();
 		$email_type = $form->get_email_type();
 		$data = $form->get_data();
-		$client_ip = $request->get_client_ip();
+		$ip_address = nl4wp_get_request_ip_address();
 
 		/** @var NL4WP_Newsletter_Subscriber $subscriber */
 		$subscriber = null;
@@ -96,10 +96,9 @@ class NL4WP_Form_Listener {
 
 		// loop through lists
 		foreach( $map as $list_id => $subscriber ) {
-
 			$subscriber->status = $form->settings['double_optin'] ? 'pending' : 'subscribed';
 			$subscriber->email_type = $email_type;
-			$subscriber->ip_signup = $client_ip;
+			$subscriber->ip_signup = $ip_address;
 
 			/**
 			 * Filters subscriber data before it is sent to Newsletter. Fires for both form & integration requests.
@@ -128,10 +127,10 @@ class NL4WP_Form_Listener {
 			$error_message = $newsletter->get_error_message();
 
 			if( $newsletter->get_error_code() == 214 ) {
-				$form->add_error('already_subscribed');
+				$form->add_notice( $form->messages['already_subscribed'], 'notice' );
 				$log->warning( sprintf( "Form %d > %s is already subscribed to the selected list(s)", $form->ID, $data['EMAIL'] ) );
 			} else {
-				$form->add_error('error');
+				$form->add_notice( $form->messages['error'], 'error' );
 				$log->error( sprintf( 'Form %d > Newsletter API error: %s %s', $form->ID, $error_code, $error_message ) );
 
 				/**
@@ -149,8 +148,8 @@ class NL4WP_Form_Listener {
 
 		// Success! Did we update or newly subscribe?
 		if( $result->status === 'subscribed' && $result->was_already_on_list ) {
-			$form->add_message( 'updated' );
-
+			$form->last_event = 'updated_subscriber';
+			$form->add_notice( $form->messages['updated'], 'success' );
 			$log->info( sprintf( "Form %d > Successfully updated %s", $form->ID, $data['EMAIL'] ) );
 
 			/**
@@ -164,8 +163,8 @@ class NL4WP_Form_Listener {
 			 */
 			do_action( 'nl4wp_form_updated_subscriber', $form, $subscriber->email_address, $data );
 		} else {
-			$form->add_message( 'subscribed' );
-
+			$form->last_event = 'subscribed';
+			$form->add_notice( $form->messages['subscribed'], 'success' );
 			$log->info( sprintf( "Form %d > Successfully subscribed %s", $form->ID, $data['EMAIL'] ) );
 		}
 
@@ -184,9 +183,8 @@ class NL4WP_Form_Listener {
 
 	/**
 	 * @param NL4WP_Form $form
-	 * @param NL4WP_Request $request
 	 */
-	public function process_unsubscribe_form( NL4WP_Form $form, NL4WP_Request $request = null ) {
+	public function process_unsubscribe_form( NL4WP_Form $form ) {
 
 		$newsletter = new NL4WP_Newsletter();
 		$log = $this->get_log();
@@ -199,7 +197,7 @@ class NL4WP_Form_Listener {
 		}
 
 		if( ! $result ) {
-			$form->add_error( 'error' );
+			$form->add_notice( $form->messages['error'], 'error' );
 			$log->error( sprintf( 'Form %d > Newsletter API error: %s', $form->ID, $newsletter->get_error_message() ) );
 
 			// bail
@@ -207,7 +205,8 @@ class NL4WP_Form_Listener {
 		}
 
 		// Success! Unsubscribed.
-		$form->add_message('unsubscribed');
+		$form->last_event = 'unsubscribed';
+		$form->add_notice( $form->messages['unsubscribed'], 'notice' );
 		$log->info( sprintf( "Form %d > Successfully unsubscribed %s", $form->ID, $data['EMAIL'] ) );
 
 
@@ -217,8 +216,9 @@ class NL4WP_Form_Listener {
 		 * @since 3.0
 		 *
 		 * @param NL4WP_Form $form Instance of the submitted form.
+		 * @param string $email
 		 */
-		do_action( 'nl4wp_form_unsubscribed', $form );
+		do_action( 'nl4wp_form_unsubscribed', $form, $data['EMAIL'] );
 	}
 
 	/**

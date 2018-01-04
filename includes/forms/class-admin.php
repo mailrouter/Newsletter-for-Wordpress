@@ -25,8 +25,6 @@ class NL4WP_Forms_Admin {
 	public function __construct( NL4WP_Admin_Messages $messages, NL4WP_Newsletter $newsletter ) {
 		$this->messages = $messages;
 		$this->newsletter = $newsletter;
-
-		require dirname( __FILE__ ) . '/admin-functions.php';
 	}
 
 	/**
@@ -225,6 +223,9 @@ class NL4WP_Forms_Admin {
 
 		// strip <form> tags from content
 		$data['content'] =  preg_replace( '/<\/?form(.|\s)*?>/i', '', $data['content'] );
+
+		// replace lowercased name="name" to prevent 404
+		$data['content'] = str_ireplace( ' name=\"name\"', ' name=\"NAME\"', $data['content'] );
 
 		// sanitize text fields
 		$data['settings']['redirect'] = sanitize_text_field( $data['settings']['redirect'] );

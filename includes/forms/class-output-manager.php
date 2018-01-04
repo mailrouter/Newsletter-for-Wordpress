@@ -46,7 +46,7 @@ class NL4WP_Form_Output_Manager {
 	public function __construct() {}
 
 	/**
-	 *
+	 * Add hooks
 	 */
 	public function add_hooks() {
 		// enable shortcodes in text widgets

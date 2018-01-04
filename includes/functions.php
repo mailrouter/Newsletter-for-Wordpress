@@ -126,18 +126,14 @@ function nl4wp_get_debug_log()
     return new NL4WP_Debug_Log($file, $level);
 }
 
-/**
- * Retrieves the URL of the current WordPress page
- *
- * @access public
- * @since 2.0
- *
- * @return  string  The current URL (escaped)
- */
-function nl4wp_get_current_url()
-{
 
-    global $wp;
+/**
+ * Get current URL (full)
+ *
+ * @return string
+ */
+function nl4wp_get_request_url() {
+     global $wp;
 
     // get requested url from global $wp object
     $site_request_uri = $wp->request;
@@ -152,6 +148,36 @@ function nl4wp_get_current_url()
     $url = trailingslashit($url);
 
     return esc_url($url);
+}
+
+/**
+ * Get current URL path.
+ * 
+ * @return string
+ */
+function nl4wp_get_request_path() 
+{
+    return $_SERVER['REQUEST_URI'];
+}
+
+/**
+* Get IP address for client making current request
+*
+* @return string
+*/
+function nl4wp_get_request_ip_address() 
+{
+    $headers = ( function_exists( 'apache_request_headers' ) ) ? apache_request_headers() : $_SERVER;
+
+    if ( array_key_exists( 'X-Forwarded-For', $headers ) && filter_var( $headers['X-Forwarded-For'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+        return $headers['X-Forwarded-For'];
+    }
+
+    if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers ) && filter_var( $headers['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+        return $headers['HTTP_X_FORWARDED_FOR'];
+    }
+
+    return $_SERVER['REMOTE_ADDR'];
 }
 
 /**
@@ -400,3 +426,4 @@ function nl4wp_refresh_newsletter_lists()
     $newsletter = new NL4WP_Newsletter();
     $newsletter->fetch_lists();
 }
+

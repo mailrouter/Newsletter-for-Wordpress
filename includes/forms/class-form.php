@@ -17,7 +17,6 @@ class NL4WP_Form {
      */
     public static $instances = array();
 
-
     /**
      * Get a shared form instance.
      *
@@ -82,24 +81,14 @@ class NL4WP_Form {
     public $settings = array();
 
     /**
-     * @var array Array of message codes that will show when this form renders
+     * @var array Array of messages
      */
     public $messages = array();
 
     /**
-     * @var array
+     * @var array Array of notices to be shown when this form is rendered
      */
-    private $message_objects = array();
-
-    /**
-     * @var WP_Post The internal post object that represents this form.
-     */
-    public $post;
-
-    /**
-     * @var array Raw array of post_meta values.
-     */
-    protected $post_meta = array();
+    public $notices = array();
 
     /**
      * @var array Array of error codes
@@ -134,17 +123,21 @@ class NL4WP_Form {
     );
 
     /**
+    * @var string
+    */
+    public $last_event = '';
+
+    /**
      * @param int $id The post ID
      * @param WP_Post $post
      * @param array $post_meta
      */
     public function __construct( $id, $post, $post_meta = array() ) {
         $this->ID = $id = (int) $id;
-        $this->post = $post;
-        $this->post_meta = $post_meta;
         $this->name = $post->post_title;
         $this->content = $post->post_content;
-        $this->settings = $this->load_settings();
+        $this->settings = $this->load_settings( $post_meta );
+        $this->messages = $this->load_messages( $post_meta );
 
         // update config from settings
         $this->config['lists'] = $this->settings['lists'];
@@ -206,22 +199,22 @@ class NL4WP_Form {
      * @staticvar $defaults
      * @return array
      */
-    protected function load_settings() {
+    protected function load_settings( $post_meta = array() ) {
 
         $form = $this;
-        static $defaults;
+        static $default_settings;
 
         // get default settings
-        if( ! $defaults ) {
-            $defaults = include NL4WP_PLUGIN_DIR . 'config/default-form-settings.php';
+        if( ! $default_settings ) {
+            $default_settings = include NL4WP_PLUGIN_DIR . 'config/default-form-settings.php';
         }
 
         // start with defaults
-        $settings = $defaults;
+        $settings = $default_settings;
 
         // get custom settings from meta
-        if( ! empty( $this->post_meta['_nl4wp_settings'] ) ) {
-            $meta = $this->post_meta['_nl4wp_settings'][0];
+        if( ! empty( $post_meta['_nl4wp_settings'] ) ) {
+            $meta = $post_meta['_nl4wp_settings'][0];
             $meta = (array) maybe_unserialize( $meta );
 
             // ensure lists is an array
@@ -250,7 +243,7 @@ class NL4WP_Form {
      * @staticvar $default_messages
      * @return array
      */
-    protected function load_messages() {
+    protected function load_messages( $post_meta = array() ) {
 
         $form = $this;
 
@@ -273,18 +266,14 @@ class NL4WP_Form {
          */
         $messages = (array) apply_filters( 'nl4wp_form_messages', $messages, $form );
 
-        foreach( $messages as $key => $message ) {
-
-            $type = ! empty( $message['type'] ) ? $message['type'] : '';
-            $text = isset( $message['text'] ) ? $message['text'] : $message;
+        foreach( $messages as $key => $message_text ) {
 
             // overwrite default text with text in form meta.
-            if( isset( $this->post_meta[ 'text_' . $key ][0] ) ) {
-                $text = $this->post_meta[ 'text_' . $key ][0];
+            if( isset( $post_meta[ 'text_' . $key ][0] ) ) {
+                $message_text = $post_meta[ 'text_' . $key ][0];
             }
 
-            $message = new NL4WP_Form_Message( $text, $type );
-            $messages[ $key ] = $message;
+            $messages[ $key ] = $message_text;
         }
 
         return $messages;
@@ -313,32 +302,12 @@ class NL4WP_Form {
     }
 
     /**
-     * @param $key
-     */
-    public function add_message( $key ) {
-        $this->messages[] = $key;
-    }
-
-    /**
-     * Get message object
-     *
-     * @param string $key
-     *
-     * @return NL4WP_Form_Message
-     */
-    public function get_message( $key ) {
-
-        // load messages once
-        if( empty( $this->message_objects ) ) {
-            $this->message_objects = $this->load_messages();
-        }
-
-        if( isset( $this->message_objects[ $key ] ) ) {
-            return $this->message_objects[ $key ];
-        }
-
-        // default to general error message
-        return $this->message_objects['error'];
+    * Add notice to this form when it is rendered
+    * @param string $text
+    * @param string $type
+    */
+    public function add_notice( $text, $type = 'notice' ) {
+        $this->notices[] = new NL4WP_Form_Notice( $text, $type );
     }
 
     /**
@@ -386,35 +355,32 @@ class NL4WP_Form {
         }
 
         $form = $this;
+        $errors = array();
 
-        // validate config
-        $validator = new NL4WP_Validator( $this->config );
-        $validator->add_rule( 'lists', 'not_empty', 'no_lists_selected' );
-        $valid = $validator->validate();
-
-        // validate internal fields
-        if( $valid ) {
-            $validator = new NL4WP_Validator( $this->raw_data );
-            $validator->add_rule( '_nl4wp_timestamp', 'range', 'spam', array( 'max' => time() - 2 ) );
-            $validator->add_rule( '_nl4wp_honeypot', 'empty', 'spam' );
-            $valid = $validator->validate();
-
-            // validate actual (visible) fields
-            if( $valid ) {
-                $validator = new NL4WP_Validator( $this->data );
-
-                $validator->add_rule( 'EMAIL', 'email', 'invalid_email' );
-
-                foreach( $this->get_required_fields() as $field ) {
-                    $validator->add_rule( $field, 'not_empty', 'required_field_missing' );
-                }
-
-                $valid = $validator->validate();
-            }
+        if( empty( $this->config['lists'] ) ) {
+            $errors[] = 'no_lists_selected';
         }
 
-        // get validation errors
-        $errors = $validator->get_errors();
+        if( ! isset( $this->raw_data['_nl4wp_timestamp'] ) || $this->raw_data['_nl4wp_timestamp'] > ( time() - 2 ) ) {
+            $errors[] = 'spam';
+        } else if( ! isset( $this->raw_data['_nl4wp_honeypot'] ) || ! empty( $this->raw_data['_nl4wp_honeypot'] ) ) {
+            $errors[] = 'spam';
+        }
+
+        if( empty( $errors ) ) {
+            // validate email field
+            if( empty( $this->data['EMAIL'] ) || ! is_email( $this->data['EMAIL'] ) ) {
+                $errors[] = 'invalid_email';
+            }
+
+            // validate other required fields
+            foreach( $this->get_required_fields() as $field ) {
+                if( empty( $this->data[ $field] ) ) {
+                    $errors[] = 'required_field_missing';
+                    break;
+                }
+            }
+        }
 
         /**
          * Filters whether this form has errors. Runs only when a form is submitted.
@@ -441,8 +407,8 @@ class NL4WP_Form {
         // filter out all non-string values
         $errors = array_filter( $errors, 'is_string' );
 
-        // add each error to this form
-        array_map( array( $this, 'add_error' ), $errors );
+        // set property on self
+        $this->errors = $errors;
 
         // return whether we have errors
         return ! $this->has_errors();
@@ -452,13 +418,14 @@ class NL4WP_Form {
      * Handle an incoming request. Should be called before calling validate() method.
      *
      * @see NL4WP_Form::validate
-     * @param NL4WP_Request $request
+     * @param array $data
      * @return void
      */
-    public function handle_request( NL4WP_Request $request ) {
+    public function handle_request( array $data ) {
         $this->is_submitted = true;
-        $this->raw_data = $request->post->all();
-        $this->data = $this->parse_request_data( $request );
+        $this->raw_data = $data;
+        $this->data = $this->parse_request_data( $data );
+        $this->last_event = '';
 
         // update form configuration from given data
         $config = array();
@@ -472,7 +439,12 @@ class NL4WP_Form {
         // use isset here to allow empty lists (which should show a notice)
         foreach( $map as $param_key => $config_key ) {
             if( isset( $this->raw_data[ $param_key ] ) ) {
-                $config[ $config_key ] = $this->raw_data[ $param_key ];
+                $value = $this->raw_data[ $param_key ];
+                if( is_array( $value ) ) {
+                    $value = array_filter( $value );
+                }
+
+                $config[ $config_key ] = $value;
             }
         }
 
@@ -490,20 +462,17 @@ class NL4WP_Form {
      * - Remove fields which are set to be ignored.
      * - Uppercase all field names
      *
-     * @param NL4WP_Request $request
+     * @param array $data
      *
      * @return array
      */
-    protected function parse_request_data( NL4WP_Request $request ) {
+    protected function parse_request_data( array $data ) {
         $form = $this;
+        $filtered = array();
 
-        // get all fields that do NOT start with an underscore.
-        $data = $request->post->all_without_prefix( '_' );
-
-        // get rid of ignored field names
         $ignored_field_names = array();
 
-        /**
+         /**
          * Filters field names which should be ignored when showing data.
          *
          * @since 3.0
@@ -512,12 +481,30 @@ class NL4WP_Form {
          * @param NL4WP_Form $form The form instance.
          */
         $ignored_field_names = apply_filters( 'nl4wp_form_ignored_field_names', $ignored_field_names, $form );
-        $data = array_diff_key( $data, array_flip( $ignored_field_names ) );
 
-        // uppercase all field keys
-        $data = array_change_key_case( $data, CASE_UPPER );
+        foreach( $data as $key => $value ) {
+            // skip fields that start with underscore
+            if( $key[0] === '_' ) {
+                continue;
+            }
 
-        return $data;
+            // skip fields in ignored field names
+            if( in_array( $key, $ignored_field_names) ) {
+                continue;
+            }
+
+            // uppercase key
+            $key = strtoupper( $key );
+
+            // filter empty array values
+            if( is_array( $value ) ) {
+                $value = array_filter( $value );
+            }
+
+            $filtered[ $key ] = $value;
+        }
+
+        return $filtered;
     }
 
     /**
@@ -599,7 +586,6 @@ class NL4WP_Form {
         // only add each error once
         if( ! in_array( $error_code, $this->errors ) ) {
             $this->errors[] = $error_code;
-            $this->add_message( $error_code );
         }
     }
 
@@ -711,6 +697,20 @@ class NL4WP_Form {
     }
 
     /**
+    * @param string $key
+    * @return string
+    */
+    public function get_message( $key ) {
+        $message = isset( $this->messages[ $key] ) ? $this->messages[ $key ] : $this->messages['error'] ;
+
+        if( $key === 'no_lists_selected' && current_user_can( 'manage_options' ) ) {
+            $message .= sprintf( ' (<a href="%s">%s</a>)', nl4wp_get_edit_form_url( $this->ID ), 'edit form settings' );
+        }
+
+        return $message;
+    }
+
+    /**
      * Get HTML string for a message, including wrapper element.
      *
      * @deprecated 3.1
@@ -722,6 +722,14 @@ class NL4WP_Form {
     public function get_message_html( $key ) {
         _deprecated_function( __METHOD__, '3.2' );
         return '';
+    }
+
+    /**
+    * Add a notice to this form
+    */
+    public function add_message( $key ) {
+        _deprecated_function( __METHOD__, '3.3' );
+        $this->add_notice( $this->get_message( $key ) );
     }
 
 }
