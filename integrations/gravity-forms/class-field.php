@@ -45,7 +45,8 @@ class NL4WP_Gravity_Forms_Field extends GF_Field {
             'description_setting',
             'css_class_setting',
             'newsletter_list_setting',
-            'newsletter_double_optin'
+            'newsletter_double_optin',
+            'rules_setting',
         );
     }
 

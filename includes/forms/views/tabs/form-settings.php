@@ -120,7 +120,13 @@
 		<th scope="row"><label for="nl4wp_form_redirect"><?php _e( 'Redirect to URL after successful sign-ups', 'newsletter-for-wp' ); ?></label></th>
 		<td>
 			<input type="text" class="widefat" name="nl4wp_form[settings][redirect]" id="nl4wp_form_redirect" placeholder="<?php printf( __( 'Example: %s', 'newsletter-for-wp' ), esc_attr( site_url( '/thank-you/' ) ) ); ?>" value="<?php echo esc_attr( $opts['redirect'] ); ?>" />
-			<p class="help"><?php _e( 'Leave empty or enter <code>0</code> for no redirect. Otherwise, use complete (absolute) URLs, including <code>http://</code>.', 'newsletter-for-wp' ); ?></p>
+			<p class="help">
+				<?php _e( 'Leave empty or enter <code>0</code> for no redirect. Otherwise, use complete (absolute) URLs, including <code>http://</code>.', 'newsletter-for-wp' ); ?>
+			</p>
+			<p class="help">
+				<?php _e( 'Your "subscribed" message will not show when redirecting to another page, so make sure to let your visitors know they were successfully subscribed.', 'newsletter-for-wp' ); ?>
+			</p>		
+				
 		</td>
 	</tr>
 

@@ -1,5 +1,5 @@
 <?php
-// API Wrapper v1.22(20170209)
+// API Wrapper v1.23(20180116)
 //
 // Compatible with PHP4+ with HASH Cryptography extension (PHP >5.1.2)
 // or the MHASH Cryptography extension.
@@ -78,7 +78,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
 
   function service_version() {
-    return 1022;
+    return 1023;
   }
 
   function service_init($hostoruniquekey, $api_key = false, $secret = false) {
@@ -237,7 +237,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
 }
 
-if (!isset($GLOBALS['voxmail_wrapper_uaprefix']))
+if (!isset($GLOBALS['service_wrapper_uaprefix']))
   $GLOBALS['service_wrapper_uaprefix'] = "service-wrapper/".service_version()." ";
 function service_info() {
   return service_invoke('service.info');

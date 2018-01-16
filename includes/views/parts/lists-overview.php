@@ -103,7 +103,7 @@
 							<td><?php echo esc_html( $interest_category->field_type ); ?></td>
 							<td>
 								<div class="row" style="margin-bottom: 4px;">
-									<div class="col col-3"><strong style="display: block; border-bottom: 1px solid #eee;"><?php _e('Name', 'newsletter-for-wp');?></strong></div>
+									<div class="col col-3"><strong style="display: block; border-bottom: 1px solid #eee;">Name</strong></div>
 									<div class="col col-3"><strong style="display: block; border-bottom: 1px solid #eee;">ID</strong></div>
 								</div>
 								<?php

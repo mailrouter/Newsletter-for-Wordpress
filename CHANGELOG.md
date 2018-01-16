@@ -1,6 +1,30 @@
 Changelog
 =========
 
+#### 4.1.14 - January 8, 2018
+
+**Fixes**
+
+- Validate method was incorrectly checking required array fields.
+
+**Improvements**
+
+- Wrap some missing strings in translate calls. Thanks [morlor](https://github.com/morloi).
+- Make it clear that redirecting after successful form submissions will not show the "subscribed" message.
+
+
+
+#### 4.1.13 - December 28, 2017
+
+**Fixes**
+
+- Array to string conversion in default form messages.
+
+**Additions**
+
+- Allow marking Gravity Forms sign-up checkbox as a required field.
+
+
 #### 4.1.12 - December 11, 2017
 
 **Fixes**

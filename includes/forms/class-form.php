@@ -248,11 +248,8 @@ class NL4WP_Form {
         $form = $this;
 
         // get default messages
-        static $default_messages;
-        if( ! $default_messages ) {
-            $default_messages = include NL4WP_PLUGIN_DIR . 'config/default-form-messages.php';
-        }
-
+        $default_messages = include NL4WP_PLUGIN_DIR . 'config/default-form-messages.php';
+    
         // start with default messages
         $messages = $default_messages;
 
@@ -266,6 +263,13 @@ class NL4WP_Form {
          */
         $messages = (array) apply_filters( 'nl4wp_form_messages', $messages, $form );
 
+        // for backwards compatiblity, grab text of each message (if is array)
+        foreach( $messages as $key => $message ) {
+            if( is_array( $message ) && isset( $message['text'] ) ) {
+                $messages[$key] = $message['text'];
+            }
+        }
+
         foreach( $messages as $key => $message_text ) {
 
             // overwrite default text with text in form meta.
@@ -273,7 +277,7 @@ class NL4WP_Form {
                 $message_text = $post_meta[ 'text_' . $key ][0];
             }
 
-            $messages[ $key ] = $message_text;
+            $messages[$key] = $message_text;
         }
 
         return $messages;
@@ -375,12 +379,13 @@ class NL4WP_Form {
 
             // validate other required fields
             foreach( $this->get_required_fields() as $field ) {
-                if( empty( $this->data[ $field] ) ) {
+                $value = nl4wp_array_get( $this->data, $field );
+                if( empty( $value ) ) {
                     $errors[] = 'required_field_missing';
                     break;
                 }
             }
-        }
+        }   
 
         /**
          * Filters whether this form has errors. Runs only when a form is submitted.
@@ -469,7 +474,6 @@ class NL4WP_Form {
     protected function parse_request_data( array $data ) {
         $form = $this;
         $filtered = array();
-
         $ignored_field_names = array();
 
          /**
@@ -483,13 +487,8 @@ class NL4WP_Form {
         $ignored_field_names = apply_filters( 'nl4wp_form_ignored_field_names', $ignored_field_names, $form );
 
         foreach( $data as $key => $value ) {
-            // skip fields that start with underscore
-            if( $key[0] === '_' ) {
-                continue;
-            }
-
             // skip fields in ignored field names
-            if( in_array( $key, $ignored_field_names) ) {
+            if( $key[0] === '_' || in_array( $key, $ignored_field_names) ) {
                 continue;
             }
 
@@ -501,7 +500,7 @@ class NL4WP_Form {
                 $value = array_filter( $value );
             }
 
-            $filtered[ $key ] = $value;
+            $filtered[$key] = $value;
         }
 
         return $filtered;
@@ -634,16 +633,22 @@ class NL4WP_Form {
         $required_fields_string = preg_replace( '/\[\w+\]/', '', $required_fields_string );
 
         // turn into an array
-        $required_fields = explode( ',', $required_fields_string );
-
-        // We only need unique values here.
-        $required_fields = array_unique( $required_fields );
+        $required_fields = explode( ',', $required_fields_string );    
 
         // EMAIL is not a required field as it has its own validation rules
         $required_fields = array_diff( $required_fields, array( 'EMAIL' ) );
 
-        // filter empty values
+        // filter duplicate & empty values
+        $required_fields = array_unique( $required_fields );
         $required_fields = array_filter( $required_fields );
+
+        // fix uppercased subkeys, see https://github.com/ibericode/newsletter-for-wordpress/issues/516
+        foreach( $required_fields as $key => $value ) {
+            $pos = strpos( $value, '.');
+            if($pos > 0) {
+                 $required_fields[$key] = substr( $value, 0, $pos) . strtolower( substr( $value, $pos ) );
+            }
+        }
 
         /**
          * Filters the required fields for a form
