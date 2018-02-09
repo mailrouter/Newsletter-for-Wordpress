@@ -25,8 +25,22 @@ class NL4WP_Admin_Ads {
 		add_action( 'nl4wp_admin_footer', array( $this, 'admin_footer' ) );
 		add_action( 'nl4wp_admin_other_settings', array( $this, 'ecommerce' ), 90 );
 
+		add_filter( 'nl4wp_admin_menu_items', array( $this, 'add_menu_item' ) );
+
 		add_action( 'nl4wp_admin_after_woocommerce_integration_settings', array( $this, 'ecommerce' ) );
 		return true;
+	}
+
+	public function add_menu_item( $items ) {
+		$items['extensions'] = array(
+			'title' => __( 'Add-ons', 'newsletter-for-wp' ),
+			'text' => '<span style="color: #c44;">' . __( 'Add-ons', 'newsletter-for-wp' ) . '</span>',
+			'slug' => 'extensions',
+			'callback' => array( $this, 'show_extensions_page' ),
+			'position' => 100
+		);
+
+		return $items;
 	}
 
 	/**
@@ -155,6 +169,10 @@ class NL4WP_Admin_Ads {
 		echo sprintf( __( '<a href="%s">Upgrade to Newsletter for WordPress Premium</a> or <a href="%s">read more about Newsletter\'s E-Commerce features</a>.', 'newsletter-for-wp' ) . '</p>', 'https://mc4wp.com/premium-features/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=other-settings-link', 'https://kb.mc4wp.com/what-is-ecommerce360/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=other-settings-link' );
 		echo '</p>';
 		echo '</div>';
+	}
+
+	public function show_extensions_page() {
+		require NL4WP_PLUGIN_DIR . 'includes/views/extensions.php';
 	}
 
 }

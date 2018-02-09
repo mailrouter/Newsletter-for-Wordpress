@@ -2,8 +2,8 @@
 Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, ibericode, newsletter forms, newsletter integrations
 Requires at least: 4.1
-Tested up to: 4.8.3
-Stable tag: 4.1.14
+Tested up to: 4.9.4
+Stable tag: 4.1.15
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.2.4
@@ -113,6 +113,20 @@ Per ogni questione relativa al plugin e al suo funzionamento, fate riferimento a
 
 Changelog
 =========
+
+#### 4.1.15 - February 7, 2018
+
+**Fixes**
+
+- Dropdown fields with special characters were not properly passed to Newsletter.
+- Interest groups with an all-numeric ID were not properly passed to Newsletter.
+
+**Improvements**
+
+- Various minor code optimizations
+- Do not redirect when showing "already subscribed" warning.
+- Improved scroll to form handling after a form is submitted without AJAX.
+
 
 #### 4.1.14 - January 8, 2018
 

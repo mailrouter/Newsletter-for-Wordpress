@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Takes care of requests to the Newsletter API
+ * Takes care of requests to the Newsletter API (version 2.0, deprecated)
  *
  * @access public
  * @uses WP_HTTP

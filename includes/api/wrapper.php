@@ -1,5 +1,5 @@
 <?php
-// API Wrapper v1.23(20180116)
+// API Wrapper v1.24(20180209)
 //
 // Compatible with PHP4+ with HASH Cryptography extension (PHP >5.1.2)
 // or the MHASH Cryptography extension.
@@ -78,7 +78,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
 
   function service_version() {
-    return 1023;
+    return 1024;
   }
 
   function service_init($hostoruniquekey, $api_key = false, $secret = false) {
@@ -300,18 +300,22 @@ function service_user_login($uid_mail, $pass, $fields = array ()) {
 }
 
 function service_user_subscribe($data, $ip = false) {
+  if (empty($ip)) $ip = $_SERVER['REMOTE_ADDR'];
   return service_invoke('service.user.subscribe', $data, $ip);
 }
 
 function service_user_unsubscribe($uid_mail, $ip = false) {
+  if (empty($ip)) $ip = $_SERVER['REMOTE_ADDR'];
   return service_invoke('service.user.unsubscribe', $uid_mail, $ip);
 }
 
 function service_user_disable_mail($uid_mail, $type = 'admin', $ip = '') {
+  if (empty($ip)) $ip = $_SERVER['REMOTE_ADDR'];
   return service_invoke('service.user.disable_mail', $uid_mail, $type, $ip);
 }
 
 function service_user_enable_mail($uid_mail, $ip = '') {
+  if (empty($ip)) $ip = $_SERVER['REMOTE_ADDR'];
   return service_invoke('service.user.enable_mail', $uid_mail, $ip);
 }
 

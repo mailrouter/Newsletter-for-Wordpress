@@ -12,8 +12,7 @@
 	do_action( 'nl4wp_admin_form_before_messages_settings_rows', $opts, $form );
 	?>
 
-	<?php $config = array( 'element' => 'nl4wp_form[settings][redirect]', 'value' => '', 'hide' => false ); ?>
-	<tr valign="top" data-showif="<?php echo esc_attr( json_encode( $config ) ); ?>">
+	<tr valign="top">
 		<th scope="row"><label for="nl4wp_form_subscribed"><?php _e( 'Successfully subscribed', 'newsletter-for-wp' ); ?></label></th>
 		<td>
 			<input type="text" class="widefat" id="nl4wp_form_subscribed" name="nl4wp_form[messages][subscribed]" value="<?php echo esc_attr( $form->messages['subscribed'] ); ?>" required />
