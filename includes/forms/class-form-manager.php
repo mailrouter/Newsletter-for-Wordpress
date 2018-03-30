@@ -27,11 +27,18 @@ class NL4WP_Form_Manager {
 	protected $tags;
 
 	/**
+	* @var NL4WP_Form_Previewer
+	*/
+	protected $previewer;
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		$this->output_manager = new NL4WP_Form_Output_Manager();
 		$this->tags = new NL4WP_Form_Tags();
+		$this->listener = new NL4WP_Form_Listener();
+		$this->previewer = new NL4WP_Form_Previewer();
 	}
 
 	/**
@@ -39,16 +46,13 @@ class NL4WP_Form_Manager {
 	 */
 	public function add_hooks() {
 		add_action( 'init', array( $this, 'initialize' ) );
-
-		// forms
-		add_action( 'template_redirect', array( $this, 'init_asset_manager' ), 1 );
-		add_action( 'template_redirect', array( 'NL4WP_Form_Previewer', 'init' ) );
-
-		// widget
+		add_action( 'wp', array( $this, 'init_asset_manager' ), 90 );
 		add_action( 'widgets_init', array( $this, 'register_widget' ) );
 
+		$this->listener->add_hooks();
 		$this->output_manager->add_hooks();
 		$this->tags->add_hooks();
+		$this->previewer->add_hooks();
 	}
 
 	/**
@@ -56,7 +60,6 @@ class NL4WP_Form_Manager {
 	 */
 	public function initialize() {
 		$this->register_post_type();
-		$this->init_form_listener();
 	}
 
 
@@ -64,7 +67,6 @@ class NL4WP_Form_Manager {
 	 * Register post type "nl4wp-form"
 	 */
 	public function register_post_type() {
-
 		// register post type
 		register_post_type( 'nl4wp-form', array(
 				'labels' => array(
@@ -74,16 +76,6 @@ class NL4WP_Form_Manager {
 				'public' => false
 			)
 		);
-	}
-
-	/**
-	 * Initialise the form listener
-	 *
-	 * @hooked `init`
-	 */
-	public function init_form_listener() {
-		$this->listener = new NL4WP_Form_Listener();
-		$this->listener->listen();
 	}
 
 	/**

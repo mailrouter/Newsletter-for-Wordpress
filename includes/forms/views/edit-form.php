@@ -30,7 +30,7 @@ $tabs = apply_filters('nl4wp_admin_edit_form_tabs', $tabs);
     <div class="row">
 
         <!-- Main Content -->
-        <div class="main-content col col-4">
+        <div class="main-content col col-5">
 
             <h1 class="page-title">
                 <?php _e("Edit Form", 'newsletter-for-wp'); ?>
@@ -65,27 +65,11 @@ $tabs = apply_filters('nl4wp_admin_edit_form_tabs', $tabs);
                                placeholder="<?php echo __("Enter the title of your sign-up form", 'newsletter-for-wp'); ?>"
                                style="line-height: initial;">
                     </div>
-                    <div class="inside" style="margin-top: 3px;">
-
-                        <input id="shortcode" type="hidden"
-                               value="<?php echo esc_attr(sprintf('[nl4wp_form id="%d"]', $form->ID)); ?>">
-
-                        <a href="#" class="button-secondary"
-                           onclick="prompt('<?php echo esc_attr__('Shortcode', 'newsletter-for-wp'); ?>', document.getElementById('shortcode').value); return false;">
-                            <span class="dashicons dashicons-editor-code"></span>
-                            <?php _e('Get shortcode', 'newsletter-for-wp'); ?>
-                        </a>
-
-                        <button type="submit" name="_nl4wp_action" value="preview_form"
-                                onblur="this.form.removeAttribute('target');"
-                                onfocus="this.form.setAttribute('target','_form_preview');" class="button-secondary"
-                                tabindex="-1">
-                            <span class="dashicons dashicons-welcome-view-site" style=""></span>
-                            <?php _e('Preview this form', 'newsletter-for-wp'); ?>
-                        </button>
-
+                    <div>
+                        <?php printf( __( 'Use the shortcode %s to display this form inside a post, page or text widget.' ,'newsletter-for-wp' ), '<input type="text" onfocus="this.select();" readonly="readonly" value="'. esc_attr( sprintf( '[nl4wp_form id="%d"]', $form->ID ) ) .'" size="'. ( strlen( $form->ID ) + 18 ) .'">' ); ?>
                     </div>
                 </div>
+
 
                 <div>
                     <h2 class="nav-tab-wrapper" id="nl4wp-tabs-nav">
@@ -133,7 +117,7 @@ $tabs = apply_filters('nl4wp_admin_edit_form_tabs', $tabs);
         </div>
 
         <!-- Sidebar -->
-        <div class="sidebar col col-2">
+        <div class="sidebar col col-1">
             <?php include NL4WP_PLUGIN_DIR . 'includes/views/parts/admin-sidebar.php'; ?>
         </div>
 

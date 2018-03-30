@@ -380,7 +380,9 @@ class NL4WP_Form {
             // validate other required fields
             foreach( $this->get_required_fields() as $field ) {
                 $value = nl4wp_array_get( $this->data, $field );
-                if( empty( $value ) ) {
+
+                // check for empty string or array here instead of empty() since we want to allow for "0" values.
+                if( $value === "" || $value === array() ) {
                     $errors[] = 'required_field_missing';
                     break;
                 }
