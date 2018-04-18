@@ -321,19 +321,19 @@ msgstr ""
 msgid "Form"
 msgstr ""
 
-#: includes/forms/class-admin.php:147, includes/forms/class-admin.php:272
+#: includes/forms/class-admin.php:147, includes/forms/class-admin.php:271
 msgid "<strong>Success!</strong> Form successfully saved."
 msgstr ""
 
-#: includes/forms/class-admin.php:366
+#: includes/forms/class-admin.php:365
 msgid "Form not found."
 msgstr ""
 
-#: includes/forms/class-admin.php:426, includes/forms/class-widget.php:30
+#: includes/forms/class-admin.php:425, includes/forms/class-widget.php:30
 msgid "Newsletter Sign-Up Form"
 msgstr ""
 
-#: includes/forms/class-admin.php:430
+#: includes/forms/class-admin.php:429
 msgid "Select the form to show"
 msgstr ""
 
@@ -561,7 +561,7 @@ msgstr ""
 msgid "Enter the title of your sign-up form"
 msgstr ""
 
-#: includes/forms/views/edit-form.php:69, includes/forms/views/tabs/form-fields.php:36
+#: includes/forms/views/edit-form.php:69, includes/forms/views/tabs/form-fields.php:40
 msgid "Use the shortcode %s to display this form inside a post, page or text widget."
 msgstr ""
 
@@ -593,71 +593,79 @@ msgstr ""
 msgid "Implicit?"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:80
-msgid "Select \"no\" if you want to ask your visitors before they are subscribed (recommended)."
+#: includes/integrations/views/integration-settings.php:79, includes/integrations/views/integration-settings.php:138
+msgid "(recommended)"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:90
+#: includes/integrations/views/integration-settings.php:82
+msgid "Select \"yes\" if you want to subscribe people without asking them explicitly."
+msgstr ""
+
+#: includes/integrations/views/integration-settings.php:85, includes/integrations/views/integration-settings.php:142
+msgid "<strong>Warning: </strong> enabling this may affect your <a href=\"%s\">GDPR compliance</a>."
+msgstr ""
+
+#: includes/integrations/views/integration-settings.php:96
 msgid "Newsletter Lists"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:103
+#: includes/integrations/views/integration-settings.php:109
 msgid "Select the list(s) to which people who check the checkbox should be subscribed."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:107, includes/forms/views/tabs/form-settings.php:18
+#: includes/integrations/views/integration-settings.php:113, includes/forms/views/tabs/form-settings.php:18
 msgid "No lists found, <a href=\"%s\">are you connected to Newsletter</a>?"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:116
+#: includes/integrations/views/integration-settings.php:122
 msgid "Checkbox label text"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:119
+#: includes/integrations/views/integration-settings.php:125
 msgid "HTML tags like %s are allowed in the label text."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:129
+#: includes/integrations/views/integration-settings.php:135
 msgid "Pre-check the checkbox?"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:133
+#: includes/integrations/views/integration-settings.php:140
 msgid "Select \"yes\" if the checkbox should be pre-checked."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:141
+#: includes/integrations/views/integration-settings.php:151
 msgid "Load some default CSS?"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:145
+#: includes/integrations/views/integration-settings.php:155
 msgid "Select \"yes\" if the checkbox appears in a weird place."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:152
+#: includes/integrations/views/integration-settings.php:162
 msgid "Double opt-in?"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:163
+#: includes/integrations/views/integration-settings.php:173
 msgid "Select \"yes\" if you want people to confirm their email address before being subscribed (recommended)"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:171, includes/forms/views/tabs/form-settings.php:52
+#: includes/integrations/views/integration-settings.php:181, includes/forms/views/tabs/form-settings.php:52
 msgid "Update existing subscribers?"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:181, includes/forms/views/tabs/form-settings.php:62
+#: includes/integrations/views/integration-settings.php:191, includes/forms/views/tabs/form-settings.php:62
 msgid "Select \"yes\" if you want to update existing subscribers with the data that is sent."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:190, includes/forms/views/tabs/form-settings.php:68
+#: includes/integrations/views/integration-settings.php:200, includes/forms/views/tabs/form-settings.php:68
 msgid "Replace interest groups?"
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:201, includes/forms/views/tabs/form-settings.php:79
+#: includes/integrations/views/integration-settings.php:211, includes/forms/views/tabs/form-settings.php:79
 msgid "Select \"no\" if you want to add the selected interests to any previously selected interests when updating a subscriber."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:202, includes/forms/views/tabs/form-settings.php:80
+#: includes/integrations/views/integration-settings.php:212, includes/forms/views/tabs/form-settings.php:80
 msgid "What does this do?"
 msgstr ""
 
@@ -889,11 +897,11 @@ msgstr ""
 msgid "Enter the HTML code for your form fields.."
 msgstr ""
 
-#: includes/forms/views/tabs/form-fields.php:25
+#: includes/forms/views/tabs/form-fields.php:26
 msgid "Form preview"
 msgstr ""
 
-#: includes/forms/views/tabs/form-fields.php:25
+#: includes/forms/views/tabs/form-fields.php:27
 msgid "The form may look slightly different than this when shown in a post, page or widget area."
 msgstr ""
 

@@ -13,7 +13,7 @@ class NL4WP_Form_Previewer {
 
         try {
             $form = nl4wp_get_form( $_GET['nl4wp_preview_form'] );
-        } catch( \Exception $e ) {
+        } catch( Exception $e ) {
             return;
         }  
 

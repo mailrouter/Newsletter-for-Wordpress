@@ -22,7 +22,11 @@
 		<textarea class="widefat" cols="160" rows="20" id="nl4wp-form-content" name="nl4wp_form[content]" placeholder="<?php _e( 'Enter the HTML code for your form fields..', 'newsletter-for-wp' ); ?>" autocomplete="false" autocorrect="false" autocapitalize="false" spellcheck="false"><?php echo htmlspecialchars( $form->content, ENT_QUOTES, get_option( 'blog_charset' ) ); ?></textarea>
 	</div>
 	<div class="nl4wp-col nl4wp-col-3 nl4wp-form-preview-wrap">
-		<h4 style="margin: 0;"><label><?php _e( 'Form preview', 'newsletter-for-wp' ); ?> <span class="dashicons dashicons-editor-help hf-tooltip" title="<?php esc_attr_e( 'The form may look slightly different than this when shown in a post, page or widget area.', 'newsletter-for-wp' ); ?>"></span></label></h4>
+		<h4 style="margin: 0;">
+			<label><?php _e( 'Form preview', 'newsletter-for-wp' ); ?> 
+			<span class="nl4wp-tooltip dashicons dashicons-editor-help" title="<?php esc_attr_e( 'The form may look slightly different than this when shown in a post, page or widget area.', 'newsletter-for-wp' ); ?>"></span>
+			</label>
+		</h4>
 		<iframe id="nl4wp-form-preview" src="<?php echo esc_attr( $form_preview_url ); ?>"></iframe>
 	</div>
 </div>

@@ -156,8 +156,7 @@ class NL4WP_Forms_Admin {
 	 * @return int
 	 */
 	public function save_form( $data ) {
-
-		static $keys = array(
+		$keys = array(
 			'settings' => array(),
 			'messages' => array(),
 			'name' => '',

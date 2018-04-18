@@ -3,7 +3,7 @@ Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, ibericode, newsletter forms, newsletter integrations
 Requires at least: 4.1
 Tested up to: 4.9.4
-Stable tag: 4.2
+Stable tag: 4.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.2.4
@@ -113,6 +113,20 @@ Per ogni questione relativa al plugin e al suo funzionamento, fate riferimento a
 
 Changelog
 =========
+
+#### 4.2.1 - April 11, 2018
+
+**Fixes**
+
+- Namespace usage warning when running PHP 5.2
+
+**Improvements**
+
+- Remove obsolete `type` attribute from all `<script>` tags printed by the plugin.
+- Improved tooltips on settings pages.
+- Do not pre-check integration checkboxes by default. 
+- Add textual warnings to settings that may affect [GDPR compliance](https://kb.mc4wp.com/gdpr-compliance/).
+- Update translation files.
 
 #### 4.2 - March 5, 2018
 
