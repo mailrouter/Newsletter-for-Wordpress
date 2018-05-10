@@ -56,7 +56,7 @@ class NL4WP_API_v3 {
 	 * @return string
 	 */
 	public function get_subscriber_hash( $email_address ) {
-		return md5( strtolower( trim( $email_address ) ) );
+		return base64_encode( strtolower( trim( $email_address ) ) );
 	}
 
 	/**
