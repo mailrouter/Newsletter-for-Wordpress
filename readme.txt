@@ -2,8 +2,8 @@
 Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, ibericode, newsletter forms, newsletter integrations
 Requires at least: 4.1
-Tested up to: 4.9.5
-Stable tag: 4.2.1.1
+Tested up to: 4.9.6
+Stable tag: 4.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.2.4
@@ -113,6 +113,23 @@ Per ogni questione relativa al plugin e al suo funzionamento, fate riferimento a
 
 Changelog
 =========
+
+#### 4.2.2 - May 22, 2018
+
+**Fixes**
+
+- Events Manager integration was not working with logged-in users.
+- Form preview URL should respect admin HTTP(S) scheme.
+- Removed use of PHP 5.4 function.
+
+**Improvements**
+
+- Add "agree to terms" checkbox to field helper.
+
+**Additions**
+
+- Add filter `nl4wp_http_request_args`.
+
 
 #### 4.2.1 - April 11, 2018
 

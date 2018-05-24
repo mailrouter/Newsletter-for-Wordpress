@@ -237,7 +237,7 @@ class NL4WP_API_v3_Client {
                         { 
                             $status=$result['mail_disable']==0?'subscribed':'';
                             // gestione gruppi
-                            $interests=split(',',$result['audiences']);
+                            $interests=explode(',',$result['audiences']);
                             foreach ($interests as $value) $inter[$value]=1;
                             $data= (object) array('id' => $result['uid'], 'email_address' => $result['mail'], 'unique_email_id' => $result['uid'], 'status' => $status, 'interests' => (object) $inter);
                         }
