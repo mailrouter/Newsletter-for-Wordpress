@@ -279,7 +279,7 @@ class NL4WP_API_v3_Client {
                         
                         if (!$result) 
                         {
-                            if (service_errorcode()==302) //se arriva qui, vuol dire che l'utente è da aggiornare
+                            if ($data['status']=='subscribed') //se arriva qui, vuol dire che l'utente è da aggiornare
                             {
                                 // gestione degli interessi da togliere
                                 foreach ($data['interests'] as $key => $value) 
@@ -289,7 +289,7 @@ class NL4WP_API_v3_Client {
                                 }
 
                                 $result=service_user_update($data_to["mail"],$data_to);
-                                if (!result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data ); // verificare
+                                if (!$result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data ); // verificare
                             }
                             else throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data ); // verificare
                         }
@@ -367,6 +367,8 @@ class NL4WP_API_v3_Client {
         }
 
         // unable to decode response
+        $message = service_errormessage();
+        $code = (int) service_errorcode();
         throw new NL4WP_API_Exception( $message, $code, $response );
     }
 
