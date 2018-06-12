@@ -1,6 +1,12 @@
 Changelog
 =========
 
+#### 4.2.2.1 - June 12, 2018
+
+**Fixes**
+
+- Error code bugs
+
 #### 4.2.2 - May 22, 2018
 
 **Fixes**
