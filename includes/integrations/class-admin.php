@@ -75,7 +75,7 @@ class NL4WP_Integration_Admin {
 	 * @return array
 	 */
 	public function add_menu_item( $items ) {
-		$items['integrations'] = array(
+		$items[] = array(
 			'title' => __( 'Integrations', 'newsletter-for-wp' ),
 			'text' => __( 'Integrations', 'newsletter-for-wp' ),
 			'slug' => 'integrations',

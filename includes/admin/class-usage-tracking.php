@@ -123,7 +123,7 @@ class NL4WP_Usage_Tracking {
 			'nl4wp_version' => $this->get_nl4wp_version(),
 			'nl4wp_premium_version' => $this->get_nl4wp_premium_version(),
 			'plugins' => (array) get_option( 'active_plugins', array() ),
-			'php_version' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
+			'php_version' => $this->get_php_version(),
 			'curl_version' => $this->get_curl_version(),
 			'wp_version' => $GLOBALS['wp_version'],
 			'wp_language' => get_locale(),
@@ -134,11 +134,19 @@ class NL4WP_Usage_Tracking {
 		return $data;
 	}
 
+	public function get_php_version() {
+		if( ! defined('PHP_MAJOR_VERSION' ) ) { // defined since PHP 5.2.7
+			return null;
+		}
+
+		return PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;
+	}
+
 	/**
 	 * @return string
 	 */
 	public function get_nl4wp_premium_version() {
-		return defined( 'NL4WP_PREMIUM_VERSION' ) ? NL4WP_PREMIUM_VERSION : 0;
+		return defined( 'NL4WP_PREMIUM_VERSION' ) ? NL4WP_PREMIUM_VERSION : null;
 	}
 
 	/**
@@ -164,9 +172,8 @@ class NL4WP_Usage_Tracking {
 	 * @return string
 	 */
 	protected function get_curl_version() {
-
 		if( ! function_exists( 'curl_version' ) ) {
-			return 0;
+			return null;
 		}
 
 		$curl_version_info = curl_version();
@@ -178,16 +185,15 @@ class NL4WP_Usage_Tracking {
 	 */
 	protected function is_site_using_https() {
 		$site_url = site_url();
-		return strpos( $site_url, 'https://' ) === 0;
+		return stripos( $site_url, 'https' ) === 0;
 	}
 
 	/**
 	 * @return string
 	 */
 	protected function get_server_software() {
-
 		if( ! isset( $_SERVER['SERVER_SOFTWARE'] ) ) {
-			return '';
+			return null;
 		}
 
 		return $_SERVER['SERVER_SOFTWARE'];

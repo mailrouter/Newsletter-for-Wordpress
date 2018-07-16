@@ -1,11 +1,32 @@
 Changelog
 =========
 
-#### 4.2.2.1 - June 12, 2018
+#### 4.2.4 - July 9, 2018
+
+**Improvements**
+
+- Ensure type-safety on some global variables.
+- Stop showing trashed forms immediately.
+- Pre-check Newsletter list when creating a new form if there is only 1 list.
+- Send `null` for unknown values in usage tracking data (only when opted-in).
+
+**Additions**
+
+- Add methods for accessing Newsletter's e-commerce promo code endpoints to API class.
+
+
+#### 4.2.3 - June 11, 2018
 
 **Fixes**
 
-- Error code bugs
+- Don't wrap "agree to terms" input in hyperlink element.
+- Allow [ENTER] key again after field helper overlay is closed.
+
+**Improvements**
+
+- Fallback to meta-refresh if redirect fails because of "headers already sent" error.
+
+
 
 #### 4.2.2 - May 22, 2018
 

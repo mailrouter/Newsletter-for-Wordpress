@@ -334,8 +334,13 @@ class NL4WP_Forms_Admin {
 				$redirect_url = nl4wp_get_add_form_url();
 			}
 		}
-		
-		wp_redirect( $redirect_url );
+
+		if( headers_sent() ) {
+			echo sprintf( '<meta http-equiv="refresh" content="0;url=%s" />', $redirect_url );
+		} else {
+			wp_redirect( $redirect_url );
+		}
+
 		exit;
 	}
 

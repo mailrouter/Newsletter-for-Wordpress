@@ -3,7 +3,7 @@
 Plugin Name: Newsletter for WordPress
 Plugin URI: https://github.com/mailrouter/Newsletter-for-Wordpress
 Description: Newsletter for WordPress by mailrouter. Aggiunge vari metodi di iscrizione newsletter al tuo sito.
-Version: 4.2.2.1
+Version: 4.2.4
 Author: mailrouter
 Text Domain: newsletter-for-wp
 Domain Path: /languages
@@ -63,11 +63,11 @@ function _nl4wp_load_plugin() {
 	}
 
 	// bootstrap the core plugin
-	define( 'NL4WP_VERSION', '4.2.2.1');
+	define( 'NL4WP_VERSION', '4.2.4');
 /* NL_CHANGED - start
 * imposta la versione pro
 */
-define ('NL4WP_PREMIUM_VERSION', '4.2.2.1');
+define ('NL4WP_PREMIUM_VERSION', '4.2.4');
 /* NL_CHANGED - end */
 	define( 'NL4WP_PLUGIN_DIR', dirname( __FILE__ ) . '/' );
 	define( 'NL4WP_PLUGIN_URL', plugins_url( '/' , __FILE__ ) );
@@ -96,7 +96,7 @@ define ('NL4WP_PREMIUM_VERSION', '4.2.2.1');
 	$nl4wp['integrations']->add_hooks();
 
 	// Doing cron? Load Usage Tracking class.
-	if( defined( 'DOING_CRON' ) && DOING_CRON ) {
+	if( isset( $_GET['doing_wp_cron'] ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
 		NL4WP_Usage_Tracking::instance()->add_hooks();
 	}
 
