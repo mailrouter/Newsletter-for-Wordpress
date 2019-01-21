@@ -76,8 +76,9 @@ class NL4WP_Newsletter {
 						$args['interests']["{$interest_id}"] = $interest_status;
 					}
 				}
-			} else {
-				// delete list member so we can re-add it...
+			} else if( $args['status']  === 'pending' && $existing_member_data->status === 'pending' ) {
+				// if status is "pending", delete & then re-subscribe
+				// this ensures that a new double opt-in email is send out
 				$this->get_api()->delete_list_member( $list_id, $email_address );
 			}
 		} catch( NL4WP_API_Resource_Not_Found_Exception $e ) {
@@ -291,8 +292,17 @@ class NL4WP_Newsletter {
 	* @return array
 	*/
 	public function fetch_list_ids() {
+		/**
+		 * Filters the amount of Newsletter lists to fetch.
+		 *
+		 * If you increase this, it might be necessary to increase your PHP configuration to allow for a higher max_execution_time.
+		 *
+		 * @param int 
+		 */
+		$limit = apply_filters( 'nl4wp_newsletter_list_limit', 200 );
+
 		try{
-			$lists_data = $this->get_api()->get_lists( array( 'count' => 200, 'fields' => 'lists.id' ) );
+			$lists_data = $this->get_api()->get_lists( array( 'count' => $limit, 'fields' => 'lists.id' ) );
 		} catch( NL4WP_API_Exception $e ) {
 			return array();
 		}

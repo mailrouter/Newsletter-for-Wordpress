@@ -36,7 +36,7 @@ class NL4WP_Gravity_Forms_Field extends GF_Field {
     }
 
     public function get_form_editor_field_title() {
-        return esc_attr__( 'Newsletter', 'newsletter-for-wp' );
+        return esc_attr__( 'Newsletter for WordPress', 'newsletter-for-wp' );
     }
 
     public function get_form_editor_field_settings() {
@@ -63,18 +63,31 @@ class NL4WP_Gravity_Forms_Field extends GF_Field {
         return sprintf( "<div class='ginput_container ginput_container_checkbox'><ul class='gfield_checkbox' id='%s'>%s</ul></div>", esc_attr( $field_id ), $this->get_checkbox_choices( $value, $disabled_text, $form_id ) );
     }
 
+    private function apply_nl4wp_options_filters( $options ) {
+        $options = apply_filters( 'nl4wp_gravity-forms_integration_options', $options );
+        $options = apply_filters( 'nl4wp_integration_gravity-forms_options', $options );
+        return $options;
+    }
+
 
     public function get_checkbox_choices( $value, $disabled_text, $form_id = 0 ) {
         $choices = '';
         $is_entry_detail = $this->is_entry_detail();
         $is_form_editor  = $this->is_form_editor();
 
-        $choice = array(
-            'text' => $this->get_field_label( false, $value ),
-            'value' => "1",
-            'isSelected' => false,
+        $options = array(
+            'label' => $this->get_field_label( false, $value ),
+            'precheck' => false, 
         );
+        $options = $this->apply_nl4wp_options_filters( $options );
 
+        // generate html
+        $choice = array(
+            'text' => $options['label'],
+            'value' => "1",
+            'isSelected' => $options['precheck'],
+        );
+        
         $input_id = $this->id;
         if ( $is_entry_detail || $is_form_editor || $form_id == 0 ){
             $id = $this->id;

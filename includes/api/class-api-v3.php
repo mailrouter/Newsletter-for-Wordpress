@@ -10,10 +10,6 @@ class NL4WP_API_v3 {
 	 */
 	protected $client;
 
-	/**
-	 * @var bool Are we able to talk to the Newsletter API?
-	 */
-	protected $connected;
 
 	/**
 	 * Constructor
@@ -36,19 +32,13 @@ class NL4WP_API_v3 {
 	/**
 	 * Pings the Newsletter API to see if we're connected
 	 *
-	 * The result is cached to ensure a maximum of 1 API call per page load
-	 *
 	 * @return boolean
 	 * @throws NL4WP_API_Exception
 	 */
 	public function is_connected() {
-
-		if( is_null( $this->connected ) ) {
-			$data = $this->client->get( '/' );
-			$this->connected = is_object( $data ) && isset( $data->account_id );
-		}
-
-		return $this->connected;
+		$data = $this->client->get( '/', array( 'fields' => 'account_id' ) );
+		$connected = is_object( $data ) && isset( $data->account_id );
+		return $connected;
 	}
 
 	/**

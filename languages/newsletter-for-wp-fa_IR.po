@@ -1,8 +1,10 @@
 # Copyright (C) 2017 newsletter-for-wp
 # This file is distributed under the same license as the newsletter-for-wp package.
 # Translators:
+# A E <aeb.jan.2006@gmail.com>, 2018
 # A.Mehraban <Mehr.Ban@chmail.ir>, 2015
 # Ardavan Afrasiyabi <abox@usa.com>, 2015
+# farzad Noruzi <farzad.noruzi2@gmail.com>, 2018
 # mahnaz vahedi <mahnazvn@yahoo.com>, 2016
 # rokhiran <rokhiran@gmail.com>, 2017
 # Salar Gholizadeh <salar.g@gmail.com>, 2017
@@ -10,14 +12,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsletter for WordPress\n"
-"PO-Revision-Date: 2017-10-16 19:17+0000\n"
-"Last-Translator: rokhiran <rokhiran@gmail.com>\n"
+"PO-Revision-Date: 2018-08-31 09:35+0000\n"
+"Last-Translator: A E <aeb.jan.2006@gmail.com>\n"
 "Language-Team: Persian (Iran) (http://www.transifex.com/ibericode/newsletter-for-wordpress/language/fa_IR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa_IR\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -93,21 +95,21 @@ msgstr "برای شروع به کار میل چیمپ برای وردپرس لط
 msgid ""
 "Want to customize the style of your form? <a href=\"%s\">Try our Styles "
 "Builder</a> & edit the look of your forms with just a few clicks."
-msgstr ""
+msgstr "آیا میخواهید فرم خود را اختصاصی سازی کنید ؟ از نرم افزار اختصاص ساز ما استفاده کنید.با چند کلیک ویرایش کرده و مشاهده نمایید."
 
 #: includes/admin/class-ads.php:54
 msgid ""
 "Be notified whenever someone subscribes? <a href=\"%s\">Newsletter for "
 "WordPress Premium</a> allows you to set up email notifications for your "
 "forms."
-msgstr ""
+msgstr "آیا میخواهید برای هر ثبت نام کننده اعلان دریافت نمائید؟ میل چیمپ پریمیوم وردپرس به شما این امکان را میدهد تا برای فرم های خود اعلان ایجاد کنید."
 
 #: includes/admin/class-ads.php:56
 msgid ""
 "Increased conversions? <a href=\"%s\">Newsletter for WordPress Premium</a> "
 "submits forms without reloading the entire page, resulting in a much better "
 "experience for your visitors."
-msgstr ""
+msgstr "افزایش مکالمه؟ <a href=\"%s\">Newsletter for WordPress Premium</a>  ارسال فرم بدون بارگزاری مجدد برگه تجربه خوبی را به کاربران می دهد."
 
 #: includes/admin/class-ads.php:70
 msgid "Upgrade to Premium"
@@ -117,19 +119,19 @@ msgstr "بروز رسانی به نسخه حرفه‌ای"
 msgid ""
 "Do you want translated forms for all of your languages? <a href=\"%s\">Try "
 "Newsletter for WordPress Premium</a>, which does just that plus more."
-msgstr ""
+msgstr "آیا می خواهید فرم خود را به تمام زبان ها ترجمه کنید؟  <a href=\"%s\">Try Newsletter for WordPress Premium</a> که فقط به آن اضافه می شود."
 
 #: includes/admin/class-ads.php:88
 msgid ""
 "Do you want to create more than one form? Our Premium add-on does just that!"
 " <a href=\"%s\">Have a look at all Premium benefits</a>."
-msgstr ""
+msgstr "آیا می خواهید بیش از یک فرم ایجاد کنید؟ افزودن حرفه ای ما این کار را انجام می دهد! <a href=\"%s\">نگاهی به تمام مزایای نسخه حرفه ای داشته باشید</a> ."
 
 #: includes/admin/class-ads.php:93
 msgid ""
 "Are you enjoying this plugin? The Premium add-on unlocks several powerful "
 "features. <a href=\"%s\">Find out about all benefits now</a>."
-msgstr ""
+msgstr "آیا این پلاگین برای شما مفید بود ؟ افزونه های پریمیوم چند امکان قدرتمند دیگر برای شما به ارمغان خواهد آورد. در مورد تخفیفات و امکانات فوق العاده بیشتر بدانید."
 
 #: includes/admin/class-ads.php:112
 msgid "More subscribers, better newsletters."
@@ -157,25 +159,25 @@ msgstr "اشتراک"
 msgid ""
 "Do you want to track all WooCommerce orders in Newsletter so you can send "
 "emails based on the purchase activity of your subscribers?"
-msgstr ""
+msgstr "آیا می‌خواهید تمام سفارشات WooCommerce را در Newsletter ردیابی کنید تا بتوانید ایمیل‌ها را بر اساس فعالیت خرید مشترکان خود ارسال کنید؟"
 
 #: includes/admin/class-ads.php:153
 msgid ""
 "<a href=\"%s\">Upgrade to Newsletter for WordPress Premium</a> or <a "
 "href=\"%s\">read more about Newsletter's E-Commerce features</a>."
-msgstr ""
+msgstr "<a href=\"%s\">ارتقا به Newsletter برای وردپرس حرفه ای</a> و یا <a href=\"%s\">خواندن بیشتر در مورد ویژگی های تجارت الکترونیک Newsletter</a> ."
 
 #: includes/admin/class-review-notice.php:68
 msgid ""
 "You've been using Newsletter for WordPress for some time now; we hope you "
 "love it!"
-msgstr ""
+msgstr "گاهی اوقات از Newsletter برای وردپرس استفاده کرده‌اید؛ ما امیدواریم که آن را دوست داشته باشید!"
 
 #: includes/admin/class-review-notice.php:69
 msgid ""
 "If you do, please <a href=\"%s\">leave us a 5★ rating on WordPress.org</a>. "
 "It would be of great help to us."
-msgstr ""
+msgstr "لطفاً به <a href=\"%s\">ما امتیاز 5★ در WordPress.org بدهید</a>. اگر شما انجام دهید، این امر می‌تواند کمک بزرگی به ما باشد."
 
 #: includes/admin/class-review-notice.php:71
 msgid "Dismiss this notice."
@@ -187,7 +189,7 @@ msgstr "درباره خطاهای متداول اتصال می توانید در
 
 #: includes/forms/class-admin.php:62
 msgid "Add to form"
-msgstr "اضافه کردن فرم"
+msgstr "افزودن به فرم"
 
 #: includes/forms/class-admin.php:63
 msgid "City"
@@ -195,7 +197,7 @@ msgstr "شهر"
 
 #: includes/forms/class-admin.php:64
 msgid "Checkboxes"
-msgstr "چک باکس"
+msgstr "چک باکس‌ها"
 
 #: includes/forms/class-admin.php:65
 msgid "Choices"
@@ -231,7 +233,7 @@ msgstr "برچسب فیلد"
 
 #: includes/forms/class-admin.php:73
 msgid "Form action"
-msgstr ""
+msgstr "فرم"
 
 #: includes/forms/class-admin.php:74
 msgid ""
@@ -322,7 +324,7 @@ msgstr "دکمه ارسال"
 
 #: includes/forms/class-admin.php:96
 msgid "Wrap in paragraph tags?"
-msgstr ""
+msgstr "وارپ در برچسب های پاراگراف؟"
 
 #: includes/forms/class-admin.php:97
 msgid "Value"
@@ -330,7 +332,7 @@ msgstr "مقدار"
 
 #: includes/forms/class-admin.php:98
 msgid "Text to prefill this field with."
-msgstr ""
+msgstr "متن جهت از پیش پرکردن این فیلد"
 
 #: includes/forms/class-admin.php:99
 msgid "ZIP"
@@ -371,7 +373,7 @@ msgstr "داده دریافتی از آدرس مشخص یا فرم ثبت نام
 
 #: includes/forms/class-form-tags.php:71
 msgid "Data from a cookie."
-msgstr ""
+msgstr "اطلاعات از کوکی."
 
 #: includes/forms/class-form-tags.php77,
 #: includes/integrations/class-integration-tags.php:45
@@ -509,11 +511,11 @@ msgstr "ثبت وقایع"
 msgid ""
 "Determines what events should be written to <a href=\"%s\">the debug log</a>"
 " (see below)."
-msgstr ""
+msgstr "تعیین می‌کند که چه رویدادهایی باید در <a href=\"%s\"> گزارش عیب‌یابی </a> نوشته شود (نگاه کنید به زیر)."
 
 #: includes/views/other-settings.php:99
 msgid "Debug Log"
-msgstr ""
+msgstr "گزارش عیب‌یابی"
 
 #: includes/views/other-settings.php:99
 msgid "Filter.."
@@ -521,7 +523,7 @@ msgstr "صاقی.."
 
 #: includes/views/other-settings.php:104
 msgid "Log file is not writable."
-msgstr ""
+msgstr "فایل لاگ قابل نوشتن نمی باشد"
 
 #: includes/views/other-settings.php:105
 msgid "Please ensure %s has the proper <a href=\"%s\">file permissions</a>."
@@ -529,15 +531,15 @@ msgstr "لطفا مطمئن شوید %s امکان پذیر است <a href=\"%s\
 
 #: includes/views/other-settings.php:123
 msgid "Nothing here. Which means there are no errors!"
-msgstr ""
+msgstr "هیچی نیست. به این معنی که هیچ خطایی وجود ندارد!"
 
 #: includes/views/other-settings.php:133
 msgid "Empty Log"
-msgstr ""
+msgstr "لاگ را خالی کنید."
 
 #: includes/views/other-settings.php:141
 msgid "Right now, the plugin is configured to only log errors and warnings."
-msgstr ""
+msgstr "در حال حاضر، افزونه پیکربندی شده است تا فقط خطاها و هشدارها را گزارشگیری کند."
 
 #: includes/admin/migrations/3.0.0-form-1-post-type.php:35
 msgid "Default sign-up form"
@@ -638,7 +640,7 @@ msgstr "مجازی؟"
 msgid ""
 "Select \"no\" if you want to ask your visitors before they are subscribed "
 "(recommended)."
-msgstr "در صورتیکه می خواهید از بازدیدکنندگانتان قبل از اشتراک در خبرنامه پرسیده شود این گزینه را روی خیر تنظیم نمایید(پیشنهاد می شود)"
+msgstr "در صورتی‌که می‌خواهید از بازدیدکنندگانتان قبل از اشتراک در خبرنامه پرسیده شود این گزینه را روی خیر تنظیم نمایید (پیشنهاد می‌شود)"
 
 #: includes/integrations/views/integration-settings.php:90
 msgid "Newsletter Lists"
@@ -711,7 +713,7 @@ msgstr "جایگزین گروه‌های مورد علاقه بشود؟"
 msgid ""
 "Select \"no\" if you want to add the selected interests to any previously "
 "selected interests when updating a subscriber."
-msgstr ""
+msgstr "اگر می‌خواهید علایق انتخاب شده را به علایق قبلی در هنگام به‌روزرسانی یک مشترک اضافه کنید، \"no\" را انتخاب کنید."
 
 #: includes/integrations/views/integration-settings.php202,
 #: includes/forms/views/tabs/form-settings.php:80
@@ -732,21 +734,21 @@ msgstr "تنظیم این افزونه"
 
 #: includes/integrations/views/integrations.php:71
 msgid "The table below shows all available integrations."
-msgstr ""
+msgstr "جدول زیر تمامی یکپارچه‌سازی موجود را نشان می‌دهد."
 
 #: includes/integrations/views/integrations.php:72
 msgid ""
 "Click on the name of an integration to edit all settings specific to that "
 "integration."
-msgstr ""
+msgstr "بر روی نام یکپارچه‌سازی کلیک کنید تا تمام تنظیمات مربوط به آن یکپارچه‌سازی را ویرایش کنید."
 
 #: includes/integrations/views/integrations.php:79
 msgid "Enabled integrations"
-msgstr ""
+msgstr "یکپارچگی‌های فعال"
 
 #: includes/integrations/views/integrations.php:84
 msgid "Available integrations"
-msgstr ""
+msgstr "یکپارچگی‌های موجود"
 
 #: includes/views/parts/admin-footer.php:15
 msgid ""
@@ -767,7 +769,7 @@ msgstr "به دنبال کمک هستید؟"
 
 #: includes/views/parts/admin-sidebar.php:12
 msgid "We have some resources available to help you in the right direction."
-msgstr ""
+msgstr "ما منابعی داریم تا به شما در مسیر درست کمک کنیم."
 
 #: includes/views/parts/admin-sidebar.php:14
 msgid "Knowledge Base"
@@ -783,13 +785,13 @@ msgstr "مرجع کد برای توسعه دهنده‌ها"
 
 #: includes/views/parts/admin-sidebar.php:36
 msgid "Looking to improve your sign-up rates?"
-msgstr ""
+msgstr "در جستجوی بهبود نرخ ثبت‌نام؟"
 
 #: includes/views/parts/admin-sidebar.php:37
 msgid ""
 "Our <a href=\"%s\">Boxzilla plugin</a> allows you to create pop-ups or "
 "slide-ins with a subscribe form. A sure way to grow your lists faster."
-msgstr ""
+msgstr "<a href=\"%s\">پلاگین Boxzilla</a> ما اجازه می‌دهد تا شما پاپ‌آپ یا اسلایدی را با یک فرم اشتراک ایجاد کنید. راه مطمئنی برای رشد سریعتر لیست‌های شما."
 
 #: includes/views/parts/lists-overview.php:1
 msgid "Your Newsletter Account"
@@ -1061,13 +1063,13 @@ msgstr "استفاده از قابلیت double opt-in؟"
 
 #: includes/forms/views/tabs/form-settings.php:44
 msgid "Are you sure you want to disable double opt-in?"
-msgstr ""
+msgstr "آیا شما مطمئن هستید که میخواهد ورود دوگانه را غیر فعال کنید ؟ "
 
 #: includes/forms/views/tabs/form-settings.php:47
 msgid ""
 "We strongly suggest keeping double opt-in enabled. Disabling double opt-in "
 "may result in abuse."
-msgstr ""
+msgstr "ما به شدت به شما پیشنهاد می‌کنیم که opt-in را فعال نگه داربد. غیرفعال کردن opt-in ممکن است منجر به سوء استفاده شود."
 
 #: includes/forms/views/tabs/form-settings.php:94
 msgid "Form behaviour"

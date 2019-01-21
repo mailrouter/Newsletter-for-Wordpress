@@ -31,7 +31,7 @@ class NL4WP_WPForms_Integration extends NL4WP_Integration {
      * @return bool
      */
     public function is_installed() {
-        return class_exists( 'WPForms' );
+        return defined( 'WPFORMS_VERSION' );
     }
 
     /**

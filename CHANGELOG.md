@@ -1,6 +1,54 @@
 Changelog
 =========
 
+#### 4.3.3 - December 31, 2018
+
+**Fixes**
+
+- Update WPForms integration to properly detect if the WPForms plugin is activated.
+
+**Improvements**
+
+- Write API request parameters to the debug log in case of connection timeouts. 
+- Update JavaScript dependencies.
+
+
+#### 4.3.2 - December 11, 2018
+
+**Fixes**
+
+- Use of `readonly` function, which is only available in WordPress 4.9 or later.
+
+
+#### 4.3.1 - November 28, 2018
+
+**Fixes**
+
+- Fatal error on PHP versions older than 5.5
+
+
+#### 4.3 - November 28, 2018
+
+**Additions**
+
+- Added `NL4WP_API_KEY` PHP constant which can be used to set your Newsletter API key.
+- Add `nl4wp_newsletter_list_limit` filter hook to modify the maximum number of Newsletter lists to fetch. Defaults to 200.
+
+**Improvements**
+
+- Apply `nl4wp_integration_gravity-forms_options` filter hook on Gravity Forms integration options so the checkbox can be prechecked and the checkbox label text modified.
+- The `updated_subscriber` JS event is now fired forms not using AJAX as well (when applicable).
+
+
+#### 4.2.5 - Sep 11, 2018
+
+**Improvements**
+
+- Only re-add subscriber to list if we want to re-trigger a double opt-in confirmation email.
+- Change Gravity Forms field name to "Newsletter for WordPress"
+- Get rid of cached result of Newsletter API connection.
+
+
 #### 4.2.4 - July 9, 2018
 
 **Improvements**

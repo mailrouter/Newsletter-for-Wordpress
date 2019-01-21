@@ -414,8 +414,9 @@ class NL4WP_Admin {
 	*/
 	public function show_generals_setting_page() {
 		$opts = nl4wp_get_options();
+		$api_key = nl4wp_get_api_key();
 
-		$connected = ! empty( $opts['api_key'] );
+		$connected = ! empty( $api_key );
 		if( $connected ) {
 			try {
 				$connected = $this->get_api()->is_connected();
@@ -437,7 +438,7 @@ class NL4WP_Admin {
 		}
 
 		$lists = $this->newsletter->get_cached_lists();
-		$obfuscated_api_key = nl4wp_obfuscate_string( $opts['api_key'] );
+		$obfuscated_api_key = nl4wp_obfuscate_string( $api_key );
 		require NL4WP_PLUGIN_DIR . 'includes/views/general-settings.php';
 	}
 
@@ -494,8 +495,8 @@ class NL4WP_Admin {
 		}
 
 		// don't show if api key is set already
-		$options = nl4wp_get_options();
-		if( ! empty( $options['api_key'] ) ) {
+		$api_key = nl4wp_get_api_key();
+		if( ! empty( $api_key ) ) {
 			return;
 		}
 

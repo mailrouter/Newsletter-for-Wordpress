@@ -61,6 +61,21 @@ function nl4wp_get_options()
 }
 
 /**
+ * @since 4.2.6
+ * @return string
+ */
+function nl4wp_get_api_key() {
+    // try to get from constant
+    if( defined( 'NL4WP_API_KEY' ) && constant( 'NL4WP_API_KEY' ) !== '' ) {
+        return NL4WP_API_KEY;
+    }
+
+    // get from options
+    $opts = nl4wp_get_options();
+    return $opts['api_key'];
+}
+
+/**
  * Gets the Newsletter for WP API class (v3) and injects it with the API key
  *
  * @since 4.0
@@ -70,8 +85,8 @@ function nl4wp_get_options()
  */
 function nl4wp_get_api_v3()
 {
-    $opts = nl4wp_get_options();
-    $instance = new NL4WP_API_v3($opts['api_key']);
+    $api_key = nl4wp_get_api_key();
+    $instance = new NL4WP_API_v3($api_key);
     return $instance;
 }
 
@@ -89,8 +104,8 @@ function nl4wp_get_api_v3()
 function nl4wp_get_api()
 {
     _deprecated_function(__FUNCTION__, '4.0', 'nl4wp_get_api_v3');
-    $opts = nl4wp_get_options();
-    $instance = new NL4WP_API($opts['api_key']);
+    $api_key = nl4wp_get_api_key();
+    $instance = new NL4WP_API($api_key);
     return $instance;
 }
 

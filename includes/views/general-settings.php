@@ -50,11 +50,15 @@ defined( 'ABSPATH' ) or exit;
 					<tr valign="top">
 						<th scope="row"><label for="newsletter_api_key"><?php _e( 'API Key', 'newsletter-for-wp' ); ?></label></th>
 						<td>
-							<input type="text" class="widefat" placeholder="<?php _e( 'Your Newsletter API key', 'newsletter-for-wp' ); ?>" id="newsletter_api_key" name="nl4wp[api_key]" value="<?php echo esc_attr( $obfuscated_api_key ); ?>" />
+							<input type="text" class="widefat" placeholder="<?php _e( 'Your Newsletter API key', 'newsletter-for-wp' ); ?>" id="newsletter_api_key" name="nl4wp[api_key]" value="<?php echo esc_attr( $obfuscated_api_key ); ?>" <?php echo defined( 'NL4WP_API_KEY') ? 'readonly="readonly"' : ''; ?> />
 							<p class="help">
 								<?php _e( 'The API key for connecting with your Newsletter account.', 'newsletter-for-wp' ); ?>
 								<a target="_blank" href="https://admin.newsletter.com/account/api"><?php _e( 'Get your API key here.', 'newsletter-for-wp' ); ?></a>
 							</p>
+
+							<?php if( defined( 'NL4WP_API_KEY' ) ) { 
+								echo '<p class="help">'. __( 'You defined your Newsletter API key using the <code>NL4WP_API_KEY</code> constant.', 'newsletter-for-wp' ) . '</p>';
+							} ?>
 						</td>
 
 					</tr>

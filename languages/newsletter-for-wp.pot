@@ -65,27 +65,27 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: includes/admin/class-admin.php:421
+#: includes/admin/class-admin.php:424
 msgid "Error connecting to Newsletter:"
 msgstr ""
 
-#: includes/admin/class-admin.php:424
+#: includes/admin/class-admin.php:427
 msgid "Looks like your server is blocked by Newsletter's firewall. Please contact Newsletter support and include the following reference number: %s"
 msgstr ""
 
-#: includes/admin/class-admin.php:427
+#: includes/admin/class-admin.php:430
 msgid "Here's some info on solving common connectivity issues."
 msgstr ""
 
-#: includes/admin/class-admin.php:432
+#: includes/admin/class-admin.php:435
 msgid "Newsletter returned the following error:"
 msgstr ""
 
-#: includes/admin/class-admin.php:471
+#: includes/admin/class-admin.php:474
 msgid "Log successfully emptied."
 msgstr ""
 
-#: includes/admin/class-admin.php:501
+#: includes/admin/class-admin.php:504
 msgid "To get started with Newsletter for WordPress, please <a href=\"%s\">enter your Newsletter API key on the settings page of the plugin</a>."
 msgstr ""
 
@@ -429,6 +429,10 @@ msgstr ""
 msgid "Integrations"
 msgstr ""
 
+#: includes/integrations/class-integration.php:68
+msgid "Sign me up for the newsletter!"
+msgstr ""
+
 #: includes/views/general-settings.php:7, includes/views/other-settings.php:58, includes/forms/views/edit-form.php:22, includes/integrations/views/integration-settings.php:8, includes/integrations/views/integrations.php:57
 msgid "You are here: "
 msgstr ""
@@ -463,6 +467,10 @@ msgstr ""
 
 #: includes/views/general-settings.php:56
 msgid "Get your API key here."
+msgstr ""
+
+#: includes/views/general-settings.php:60
+msgid "You defined your Newsletter API key using the <code>NL4WP_API_KEY</code> constant."
 msgstr ""
 
 #: includes/views/other-settings.php:14
@@ -513,15 +521,15 @@ msgstr ""
 msgid "Please ensure %s has the proper <a href=\"%s\">file permissions</a>."
 msgstr ""
 
-#: includes/views/other-settings.php:123
+#: includes/views/other-settings.php:126
 msgid "Nothing here. Which means there are no errors!"
 msgstr ""
 
-#: includes/views/other-settings.php:133
+#: includes/views/other-settings.php:136
 msgid "Empty Log"
 msgstr ""
 
-#: includes/views/other-settings.php:141
+#: includes/views/other-settings.php:144
 msgid "Right now, the plugin is configured to only log errors and warnings."
 msgstr ""
 
