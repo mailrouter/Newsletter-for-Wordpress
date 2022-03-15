@@ -32,6 +32,8 @@ class NL4WP_Form_Manager
     */
     protected $previewer;
 
+    protected $recaptcha;
+
     /**
      * Constructor
      */
@@ -41,6 +43,7 @@ class NL4WP_Form_Manager
         $this->tags = new NL4WP_Form_Tags();
         $this->listener = new NL4WP_Form_Listener();
         $this->previewer = new NL4WP_Form_Previewer();
+        $this->recaptcha = new NL4WP_Google_Recaptcha();
     }
 
     /**
@@ -56,6 +59,7 @@ class NL4WP_Form_Manager
         $this->output_manager->add_hooks();
         $this->tags->add_hooks();
         $this->previewer->add_hooks();
+        $this->recaptcha->add_hooks();
     }
 
     /**

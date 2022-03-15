@@ -44,13 +44,9 @@ function nl4wp($service = null)
  */
 function nl4wp_get_options()
 {
-    static $options;
-
-    if (!$options) {
-        $defaults = require NL4WP_PLUGIN_DIR . 'config/default-settings.php';
-        $options = (array)get_option('nl4wp', array());
-        $options = array_merge($defaults, $options);
-    }
+    $defaults = require NL4WP_PLUGIN_DIR . 'config/default-settings.php';
+    $options = (array) get_option('nl4wp', array());
+    $options = array_merge($defaults, $options);
 
     /**
      * Filters the Newsletter for WordPress settings (general).
@@ -58,6 +54,13 @@ function nl4wp_get_options()
      * @param array $options
      */
     return apply_filters('nl4wp_settings', $options);
+}
+
+/**
+ * @return array
+ */
+function nl4wp_get_settings() {
+    return nl4wp_get_options();
 }
 
 /**

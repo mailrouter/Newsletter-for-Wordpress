@@ -1,5 +1,5 @@
 <?php
-// API Wrapper v1.24(20180209)
+// API Wrapper v1.27(20220315)
 //
 // Compatible with PHP4+ with HASH Cryptography extension (PHP >5.1.2)
 // or the MHASH Cryptography extension.
@@ -64,6 +64,7 @@ define('ENS_ERROR_TOKEN_PREVIOUSLY_USED', 13);
 define('ENS_ERROR_UNSUPPORTED', 101);
 define('ENS_ERROR_PERMISSION_DENIED', 102);
 define('ENS_ERROR_INVALID_ARGUMENT', 103);
+define('ENS_ERROR_RESULT_TOO_BIG', 105);
 define('ENS_ERROR_NEWSLETTER_NOT_EXISTS', 201);
 define('ENS_ERROR_NEWSLETTER_NOT_VALID', 202);
 define('ENS_ERROR_NEWSLETTER_NOT_SENT', 203);
@@ -78,7 +79,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
 
   function service_version() {
-    return 1024;
+    return 1027;
   }
 
   function service_init($hostoruniquekey, $api_key = false, $secret = false) {
@@ -112,7 +113,22 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
     $args = array_merge(array('API'.$service_api_key, $timestamp, $nonce, $hash), $args);
 
-    if (class_exists('xmlrpc_client')) {    
+    if (!preg_match('/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/', $service_host)) {
+      $service_last_result = array(
+        'faultCode' => ENS_ERROR_UNKNOWN,
+        'faultString' => 'Invalid API host configuration (please do not use http scheme or path, just the hostname)'
+      );
+    } else if (!preg_match('/^[a-f0-9]{32}$/', $service_api_key)) {
+      $service_last_result = array(
+        'faultCode' => ENS_ERROR_UNKNOWN,
+        'faultString' => 'Invalid API key configuration (must be 32 lowercase hex digits)'
+      );
+    } else if (!preg_match('/^[a-f0-9]{32}$/', $service_secret)) {
+      $service_last_result = array(
+        'faultCode' => ENS_ERROR_UNKNOWN,
+        'faultString' => 'Invalid API secret configuration (must be 32 lowercase hex digits)'
+      );
+    } else if (class_exists('xmlrpc_client')) {    
 
       // 'xmlrpc.inc' from phpxmlrpc sourceforge library version 4.0 does not support the runtime GLOBAL encoding switch.
       // in order to keep this class syntax compatible with php <= 5.2.x we use Reflection here.
@@ -217,12 +233,12 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
   function service_errorcode() {
     global $service_last_result;
-    return $service_last_result === 0 ? 0 : $service_last_result['faultCode'];
+    return $service_last_result === 0 || !isset($service_last_result) ? 0 : $service_last_result['faultCode'];
   }
 
   function service_errormessage() {
     global $service_last_result;
-    return $service_last_result === 0 ? '' : $service_last_result['faultString'];
+    return $service_last_result === 0 || !isset($service_last_result) ? '' : $service_last_result['faultString'];
   }
 
   function service_last_method() {
@@ -300,22 +316,22 @@ function service_user_login($uid_mail, $pass, $fields = array ()) {
 }
 
 function service_user_subscribe($data, $ip = false) {
-  if (empty($ip)) $ip = $_SERVER['REMOTE_ADDR'];
+  if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
   return service_invoke('service.user.subscribe', $data, $ip);
 }
 
 function service_user_unsubscribe($uid_mail, $ip = false) {
-  if (empty($ip)) $ip = $_SERVER['REMOTE_ADDR'];
+  if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
   return service_invoke('service.user.unsubscribe', $uid_mail, $ip);
 }
 
-function service_user_disable_mail($uid_mail, $type = 'admin', $ip = '') {
-  if (empty($ip)) $ip = $_SERVER['REMOTE_ADDR'];
+function service_user_disable_mail($uid_mail, $type = 'admin', $ip = false) {
+  if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
   return service_invoke('service.user.disable_mail', $uid_mail, $type, $ip);
 }
 
-function service_user_enable_mail($uid_mail, $ip = '') {
-  if (empty($ip)) $ip = $_SERVER['REMOTE_ADDR'];
+function service_user_enable_mail($uid_mail, $ip = false) {
+  if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
   return service_invoke('service.user.enable_mail', $uid_mail, $ip);
 }
 
@@ -358,4 +374,5 @@ function service_audience_create($data) {
 function service_audience_delete($aid) {
   return service_invoke('service.audience.delete', $aid);
 }
+
 

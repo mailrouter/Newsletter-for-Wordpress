@@ -282,11 +282,19 @@ class NL4WP_Forms_Admin
     public function process_save_form()
     {
         check_admin_referer('edit_form', '_nl4wp_nonce');
-        $form_id = (int) $_POST['nl4wp_form_id'];
 
+        // save global settings (if submitted)
+        $options = get_option('nl4wp', array());
+        $posted = $_POST['nl4wp'];
+        foreach($posted as $key => $value) {
+            $options[$key] = trim($value);
+        }
+        update_option('nl4wp', $options);
+
+        // save form + settings
+        $form_id = (int) $_POST['nl4wp_form_id'];
         $form_data = $_POST['nl4wp_form'];
         $form_data['ID'] = $form_id;
-
         $this->save_form($form_data);
         $this->set_default_form_id($form_id);
 
