@@ -110,6 +110,10 @@ class NL4WP_Form_Element
      */
     protected function get_notice_html(NL4WP_Form_Notice $notice)
     {
+        if ($notice->text === '') {
+            return '';
+        }
+
         $html = sprintf('<div class="nl4wp-alert nl4wp-%s"><p>%s</p></div>', esc_attr($notice->type), $notice->text);
         return $html;
     }

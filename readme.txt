@@ -3,7 +3,7 @@ Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, ibericode, newsletter forms, newsletter integrations
 Requires at least: 4.1
 Tested up to: 5.9.2
-Stable tag: 4.5.0
+Stable tag: 4.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.2.4
@@ -113,6 +113,66 @@ Per ogni questione relativa al plugin e al suo funzionamento, fate riferimento a
 
 Changelog
 =========
+
+#### 4.5.5 - Sep 12, 2019
+
+**Fixes**
+
+- Google reCAPTCHA script was still loading even if no forms have it enabled.
+
+
+#### 4.5.4 - Sep 11, 2019
+
+**Improvements**
+
+- Removed custom color from menu item for improved accessibility.
+- Take birthday field format into account when sending data to Newsletter.
+- Print Google reCAPTCHA script in footer.
+
+**Changes**
+
+- Changed plugin name to NL4WP instead of Newsletter for WordPress.
+
+
+#### 4.5.3 - July 23, 2019
+
+**Fixes**
+
+- Temporarily switch status of pending subscribers to "unsubscribe" versus deleting susbcriber before re-subscribing.
+- Deprecation notice for Gravity Forms version 2.4 and higher.
+
+**Improvements**
+
+- Filter out empty tags when applying tags to new subscribers.
+- Show all not installed integrations.
+- Show notice when form doesn't have a Newsletter list selected to subscribe people to.
+- Check function existence for compatibility with WordPress 4.7
+- Don't submit form when Google reCAPTCHA is enabled but errors.
+- Update third-party JavaScript dependencies.
+
+
+#### 4.5.2 - May 8, 2019
+
+**Improvements**
+
+- Accept more truthy values in custom integration for improved compatibility with third-party forms.
+- Update JavaScript dependencies.
+- Load Google reCaptcha script in footer (if needed). 
+
+
+#### 4.5.1 - April 8, 2019
+
+**Additions**
+
+- Add sign-up integration for [Give](https://wordpress.org/plugins/give/)
+- Add sign-up integration for [UltimateMember](https://wordpress.org/plugins/ultimate-member/)
+
+**Improvements**
+
+- Write to debug log if Google reCAPTCHA secret key is incorrect.
+- Validate reCAPTCHA keys when savings form settings.
+- Allow setting an empty "successfully subscribed" message.
+
 
 #### 4.5.0 - March 27, 2019
 

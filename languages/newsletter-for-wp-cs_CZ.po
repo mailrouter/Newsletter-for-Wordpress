@@ -2,6 +2,7 @@
 # This file is distributed under the same license as the newsletter-for-wp package.
 # Translators:
 # Dušan Marcinko <prectusi@gmail.com>, 2016
+# Jan Prochacek <jan@digitalnativeagency.eu>, 2019
 # Jan Toman <toman.jan@gmail.com>, 2014-2015
 # Libor Matějka <libor.matejka@hotmail.cz>, 2015
 # Ondra <subrt.ondra@gmail.com>, 2015
@@ -9,14 +10,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsletter for WordPress\n"
-"PO-Revision-Date: 2017-09-23 20:28+0000\n"
-"Last-Translator: Danny van Kooten <dannyvankooten@gmail.com>\n"
+"PO-Revision-Date: 2019-04-28 18:22+0000\n"
+"Last-Translator: Jan Prochacek <jan@digitalnativeagency.eu>\n"
 "Language-Team: Czech (Czech Republic) (http://www.transifex.com/ibericode/newsletter-for-wordpress/language/cs_CZ/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: cs_CZ\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;_ex:1,2c;_n:1,2;_n_noop:1,2;_nx:1,2,4c;_nx_noop:1,2,3c;_x:1,2c;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -186,11 +187,11 @@ msgstr "Více informací o běžných problémech s připojením."
 
 #: includes/forms/class-admin.php:62
 msgid "Add to form"
-msgstr ""
+msgstr "Přidat do formuláře"
 
 #: includes/forms/class-admin.php:63
 msgid "City"
-msgstr ""
+msgstr "Město"
 
 #: includes/forms/class-admin.php:64
 msgid "Checkboxes"
@@ -210,11 +211,11 @@ msgstr ""
 
 #: includes/forms/class-admin.php:68
 msgid "Close"
-msgstr ""
+msgstr "Zavřít"
 
 #: includes/forms/class-admin.php:69
 msgid "Country"
-msgstr ""
+msgstr "Stát"
 
 #: includes/forms/class-admin.php:70
 msgid "Dropdown"
@@ -222,11 +223,11 @@ msgstr ""
 
 #: includes/forms/class-admin.php:71
 msgid "Field type"
-msgstr ""
+msgstr "Typ pole"
 
 #: includes/forms/class-admin.php:72
 msgid "Field label"
-msgstr ""
+msgstr "Popisek pole"
 
 #: includes/forms/class-admin.php:73
 msgid "Form action"

@@ -15,7 +15,7 @@
 	<tr valign="top">
 		<th scope="row"><label for="nl4wp_form_subscribed"><?php _e('Successfully subscribed', 'newsletter-for-wp'); ?></label></th>
 		<td>
-			<input type="text" class="widefat" id="nl4wp_form_subscribed" name="nl4wp_form[messages][subscribed]" value="<?php echo esc_attr($form->messages['subscribed']); ?>" required />
+			<input type="text" class="widefat" id="nl4wp_form_subscribed" name="nl4wp_form[messages][subscribed]" value="<?php echo esc_attr($form->messages['subscribed']); ?>" />
 			<p class="help"><?php _e('The text that shows when an email address is successfully subscribed to the selected list(s).', 'newsletter-for-wp'); ?></p>
 		</td>
 	</tr>

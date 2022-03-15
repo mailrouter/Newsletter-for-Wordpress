@@ -53,7 +53,7 @@ msgstr ""
 msgid "Failed to renew your lists. An error occured."
 msgstr ""
 
-#: includes/admin/class-admin.php:355, includes/views/general-settings.php:31
+#: includes/admin/class-admin.php:355
 msgid "Newsletter API Settings"
 msgstr ""
 
@@ -413,27 +413,27 @@ msgstr ""
 msgid "There is no form with ID %d, perhaps it was deleted?"
 msgstr ""
 
-#: includes/forms/class-google-recaptcha.php:133
+#: includes/forms/class-google-recaptcha.php:158
 msgid "Enable Google reCaptcha"
 msgstr ""
 
-#: includes/forms/class-google-recaptcha.php:139
+#: includes/forms/class-google-recaptcha.php:164
 msgid "Select \"yes\" to enable Google reCAPTCHA spam protection for this form."
 msgstr ""
 
-#: includes/forms/class-google-recaptcha.php:145
+#: includes/forms/class-google-recaptcha.php:170
 msgid "Google reCAPTCHA Site Key"
 msgstr ""
 
-#: includes/forms/class-google-recaptcha.php:149
+#: includes/forms/class-google-recaptcha.php:174
 msgid "Enter your Google reCAPTCHA keys here. You can <a href=\"%s\">retrieve your keys in the Google reCAPTCHA admin console</a> or read our help article on <a href=\"%s\">how to configure Google reCAPTCHA</a>."
 msgstr ""
 
-#: includes/forms/class-google-recaptcha.php:155
+#: includes/forms/class-google-recaptcha.php:180
 msgid "Google reCAPTCHA Secret Key"
 msgstr ""
 
-#: includes/forms/class-google-recaptcha.php:159
+#: includes/forms/class-google-recaptcha.php:184
 msgstr ""
 
 #: includes/forms/class-widget.php:28
@@ -465,38 +465,38 @@ msgid "You are here: "
 msgstr ""
 
 #: includes/views/general-settings.php:18
-msgid "General Settings"
+msgid "API Settings"
 msgstr ""
 
-#: includes/views/general-settings.php:38, includes/integrations/views/integrations.php:57
+#: includes/views/general-settings.php:34, includes/integrations/views/integrations.php:57
 msgid "Status"
 msgstr ""
 
-#: includes/views/general-settings.php:43
+#: includes/views/general-settings.php:39
 msgid "CONNECTED"
 msgstr ""
 
-#: includes/views/general-settings.php:47
+#: includes/views/general-settings.php:43
 msgid "NOT CONNECTED"
 msgstr ""
 
-#: includes/views/general-settings.php:55
+#: includes/views/general-settings.php:51
 msgid "API Key"
 msgstr ""
 
-#: includes/views/general-settings.php:57
+#: includes/views/general-settings.php:53
 msgid "Your Newsletter API key"
 msgstr ""
 
-#: includes/views/general-settings.php:59
+#: includes/views/general-settings.php:55
 msgid "The API key for connecting with your Newsletter account."
 msgstr ""
 
-#: includes/views/general-settings.php:60
+#: includes/views/general-settings.php:56
 msgid "Get your API key here."
 msgstr ""
 
-#: includes/views/general-settings.php:64
+#: includes/views/general-settings.php:60
 msgid "You defined your Newsletter API key using the <code>NL4WP_API_KEY</code> constant."
 msgstr ""
 
@@ -624,10 +624,6 @@ msgstr ""
 msgid "Please ensure you <a href=\"%s\">configure the plugin to send all required fields</a> or <a href=\"%s\">log into your Newsletter account</a> and make sure only the email & name fields are marked as required fields for the selected list(s)."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:32, includes/integrations/views/integrations.php:25
-msgid "$integration->description"
-msgstr ""
-
 #: includes/integrations/views/integration-settings.php:63
 msgid "Enabled?"
 msgstr ""
@@ -732,7 +728,7 @@ msgstr ""
 msgid "Not installed"
 msgstr ""
 
-#: includes/integrations/views/integrations.php:55, includes/views/parts/lists-overview.php:59, includes/views/parts/lists-overview.php:96
+#: includes/integrations/views/integrations.php:55, includes/views/parts/lists-overview.php:59, includes/views/parts/lists-overview.php:100
 msgid "Name"
 msgstr ""
 
@@ -828,7 +824,7 @@ msgstr ""
 msgid "Tag"
 msgstr ""
 
-#: includes/views/parts/lists-overview.php:61, includes/views/parts/lists-overview.php:97
+#: includes/views/parts/lists-overview.php:61, includes/views/parts/lists-overview.php:101
 msgid "Type"
 msgstr ""
 
@@ -836,11 +832,11 @@ msgstr ""
 msgid "%s (%s) with field type %s."
 msgstr ""
 
-#: includes/views/parts/lists-overview.php:92
+#: includes/views/parts/lists-overview.php:96
 msgid "Interest Categories"
 msgstr ""
 
-#: includes/views/parts/lists-overview.php:98
+#: includes/views/parts/lists-overview.php:102
 msgid "Interests"
 msgstr ""
 

@@ -1,7 +1,7 @@
 <?php defined('ABSPATH') or exit;
 /** @var NL4WP_Integration_Fixture[] $enabled_integrations */
 /** @var NL4WP_Integration_Fixture[] $available_integrations */
-
+/** @var NL4WP_Integration $integration */
 function _nl4wp_integrations_table_row($integration) {
     ?>
     <tr style="<?php if (! $integration->is_installed()) {
@@ -28,7 +28,7 @@ function _nl4wp_integrations_table_row($integration) {
             <?php
             if ($integration->enabled && $integration->is_installed()) {
                 echo '<span class="green">' . __('Active', 'newsletter-for-wp') . '</span>';
-            } elseif( $integration->is_installed()) {
+            } elseif($integration->is_installed()) {
                 echo '<span class="neutral">' . __('Inactive', 'newsletter-for-wp') . '</span>';
             } else {
                 echo '<span class="red">' . __('Not installed', 'newsletter-for-wp') . '</span>';
@@ -63,21 +63,21 @@ function _nl4wp_integrations_table($integrations)
 		<?php
         // active & enabled integrations first
         foreach ($integrations as $integration) {
-            if( $integration->is_installed() && $integration->enabled) {
+            if ( $integration->is_installed() && $integration->enabled) {
                 _nl4wp_integrations_table_row($integration);
             }
         }
 
         // active & disabled integrations next
         foreach ($integrations as $integration) {
-            if( $integration->is_installed() && ! $integration->enabled) {
+            if ( $integration->is_installed() && ! $integration->enabled) {
                 _nl4wp_integrations_table_row($integration);
             }
         }
 
         // rest
         foreach ($integrations as $integration) {
-            if( ! $integration->is_installed() && ! $integration->enabled) {
+            if (! $integration->is_installed()) {
                 _nl4wp_integrations_table_row($integration);
             }
         }
@@ -100,7 +100,7 @@ function _nl4wp_integrations_table($integrations)
 		<!-- Main Content -->
 		<div class="col col-4">
 
-			<h1 class="page-title"><?php _e('Integrations', 'newsletter-for-wp'); ?></h1>
+			<h1 class="page-title">Newsletter for WordPress: <?php _e('Integrations', 'newsletter-for-wp'); ?></h1>
 
 			<h2 style="display: none;"></h2>
 			<?php settings_errors(); ?>

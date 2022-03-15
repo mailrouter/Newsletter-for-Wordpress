@@ -37,7 +37,7 @@ class NL4WP_Admin_Ads
     {
         $items['extensions'] = array(
             'title' => __('Add-ons', 'newsletter-for-wp'),
-            'text' => '<span style="color: #c44;">' . __('Add-ons', 'newsletter-for-wp') . '</span>',
+            'text' => __('Add-ons', 'newsletter-for-wp'),
             'slug' => 'extensions',
             'callback' => array( $this, 'show_extensions_page' ),
             'position' => 100

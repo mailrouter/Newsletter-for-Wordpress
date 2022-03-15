@@ -44,6 +44,27 @@ class NL4WP_Queue
 
         if (! is_array($jobs)) {
             $jobs = array();
+        } else {
+            $valid_jobs = array();
+
+            foreach($jobs as $i => $obj) {
+                // filter invalid data from array
+                if (! is_object($obj) || empty($obj->data)) {
+                    continue;
+                }
+
+                // make sure each job is instance of NL4WP_Queue_Job
+                if ($obj instanceof NL4WP_Queue_Job) {
+                    $job = $obj;
+                } else {
+                    $job = new NL4WP_Queue_Job($obj->data);
+                    $job->id = $obj->id;
+                }
+
+                $valid_jobs[] = $job;
+            }
+
+            $jobs = $valid_jobs;
         }
 
         $this->jobs = $jobs;

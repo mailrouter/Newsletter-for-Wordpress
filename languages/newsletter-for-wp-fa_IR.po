@@ -2,6 +2,7 @@
 # This file is distributed under the same license as the newsletter-for-wp package.
 # Translators:
 # A E <aeb.jan.2006@gmail.com>, 2018
+# ali qorbani <ghorbani2006@gmail.com>, 2019
 # A.Mehraban <Mehr.Ban@chmail.ir>, 2015
 # Ardavan Afrasiyabi <abox@usa.com>, 2015
 # farzad Noruzi <farzad.noruzi2@gmail.com>, 2018
@@ -12,8 +13,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsletter for WordPress\n"
-"PO-Revision-Date: 2018-08-31 09:35+0000\n"
-"Last-Translator: A E <aeb.jan.2006@gmail.com>\n"
+"PO-Revision-Date: 2019-05-10 13:15+0000\n"
+"Last-Translator: ali qorbani <ghorbani2006@gmail.com>\n"
 "Language-Team: Persian (Iran) (http://www.transifex.com/ibericode/newsletter-for-wordpress/language/fa_IR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,7 +39,7 @@ msgstr "مستندات"
 #: includes/admin/class-admin.php:204
 msgid ""
 "Success! The cached configuration for your Newsletter lists has been renewed."
-msgstr "تبریک می گوییم! تنظیمات مربوط به لیست های Newsletter که در سیستم شما کش شده بودند مجددا بارگزرای و بروز شدند."
+msgstr "عالی! تنظیمات مربوط به لیست های میل‌چیمپ که در سیستم شما کش شده بودند مجددا بارگزرای و بروز شدند."
 
 #: includes/admin/class-admin.php:304
 msgid ""
@@ -70,7 +71,7 @@ msgstr "تنظیمات API مربوط به Newsletter"
 
 #: includes/admin/class-admin.php:337
 msgid "Newsletter"
-msgstr "Newsletter"
+msgstr "میل‌چیمپ"
 
 #: includes/admin/class-admin.php343, includes/views/other-settings.php60,
 #: includes/views/other-settings.php:70
@@ -113,7 +114,7 @@ msgstr "افزایش مکالمه؟ <a href=\"%s\">Newsletter for WordPress Prem
 
 #: includes/admin/class-ads.php:70
 msgid "Upgrade to Premium"
-msgstr "بروز رسانی به نسخه حرفه‌ای"
+msgstr "بروزرسانی به نسخه حرفه‌ای"
 
 #: includes/admin/class-ads.php:83
 msgid ""

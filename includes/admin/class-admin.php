@@ -387,7 +387,7 @@ class NL4WP_Admin
         $menu_items = (array) apply_filters('nl4wp_admin_menu_items', $menu_items);
 
         // add top menu item
-        add_menu_page('Newsletter for WP', 'Newsletter for WP', $required_cap, 'newsletter-for-wp', array( $this, 'show_generals_setting_page' ), NL4WP_PLUGIN_URL . 'assets/img/icon.png', '99.68491');
+        add_menu_page('Newsletter for WP', 'NL4WP', $required_cap, 'newsletter-for-wp', array( $this, 'show_generals_setting_page' ), NL4WP_PLUGIN_URL . 'assets/img/icon.png', '99.68491');
 
         // sort submenu items by 'position'
         usort($menu_items, array( $this, 'sort_menu_items_by_position' ));

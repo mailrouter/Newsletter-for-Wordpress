@@ -4,9 +4,11 @@
 # Adnan Uludag <auludag@mac.com>, 2016
 # Akif Dien <emredilen1@gmail.com>, 2018
 # Alper Çiftçi <inactive+alprciftci@transifex.com>, 2015
+# Batuhan Yalçın <ponomol77@gmail.com>, 2019
 # Emre YILMAZ <emreyilmaz@yandex.com>, 2016
 # Erdem Akgöl <erdem@kobimedya.com>, 2017
 # Ferhat, 2015
+# Halil Bakmış <bakmisonline@gmail.com>, 2019
 # Hasan M. Bulut <hmb@heartcoder.net>, 2017
 # Hüseyin Sekmenoğlu <inactive+sekmenhuseyin@transifex.com>, 2015
 # İlbey Furkan Özden <ilbeyfurkanozden@gmail.com>, 2017
@@ -16,8 +18,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Newsletter for WordPress\n"
-"PO-Revision-Date: 2018-02-16 16:30+0000\n"
-"Last-Translator: Akif Dien <emredilen1@gmail.com>\n"
+"PO-Revision-Date: 2019-07-02 14:52+0000\n"
+"Last-Translator: Halil Bakmış <bakmisonline@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/ibericode/newsletter-for-wordpress/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -129,13 +131,13 @@ msgstr "Tüm site dilleriniz için çevirisi yapılmış formlar istermisiniz? <
 msgid ""
 "Do you want to create more than one form? Our Premium add-on does just that!"
 " <a href=\"%s\">Have a look at all Premium benefits</a>."
-msgstr ""
+msgstr "Birden fazla form oluşturmak ister misiniz? Premium eklentimiz tam da bunu yapıyor!<a href=\"%s\">Tüm Premium avantajlara göz atın</a>."
 
 #: includes/admin/class-ads.php:93
 msgid ""
 "Are you enjoying this plugin? The Premium add-on unlocks several powerful "
 "features. <a href=\"%s\">Find out about all benefits now</a>."
-msgstr ""
+msgstr "Bu eklentiden hoşlanıyor musunuz? Premium eklenti ile  birçok güçlü özelliğin kilidini açın.<a href=\"%s\"> Şimdi tüm avantajları öğrenin</a>."
 
 #: includes/admin/class-ads.php:112
 msgid "More subscribers, better newsletters."
@@ -163,19 +165,19 @@ msgstr "Abone ol"
 msgid ""
 "Do you want to track all WooCommerce orders in Newsletter so you can send "
 "emails based on the purchase activity of your subscribers?"
-msgstr ""
+msgstr "Newsletter'teki tüm WooCommerce siparişlerini izlemek istiyor musunuz, böylece abonelerinizin satın alma faaliyetlerine dayanarak e-posta gönderebilirsiniz?"
 
 #: includes/admin/class-ads.php:153
 msgid ""
 "<a href=\"%s\">Upgrade to Newsletter for WordPress Premium</a> or <a "
 "href=\"%s\">read more about Newsletter's E-Commerce features</a>."
-msgstr ""
+msgstr "<a href=\"%s\">WordPress Premium için Newsletter’e Yükseltme</a>veya<a href=\"%s\">Newsletter'in E-Ticaret özellikleri hakkında daha fazla bilgi edinin</a>"
 
 #: includes/admin/class-review-notice.php:68
 msgid ""
 "You've been using Newsletter for WordPress for some time now; we hope you "
 "love it!"
-msgstr ""
+msgstr "Newsletter'i bir süredir WordPress için kullanıyorsunuz; umarım seversin!"
 
 #: includes/admin/class-review-notice.php:69
 msgid ""
@@ -515,7 +517,7 @@ msgstr "Giriş yapılıyor"
 msgid ""
 "Determines what events should be written to <a href=\"%s\">the debug log</a>"
 " (see below)."
-msgstr ""
+msgstr "Hangi olaylara yazılması gerektiğini belirler<a href=\"%s\">hata ayıklama günlüğü</a>(aşağıya bakınız)."
 
 #: includes/views/other-settings.php:99
 msgid "Debug Log"
@@ -531,7 +533,7 @@ msgstr "Hata ayıklama günlüğü dosyası yazılabilir değil."
 
 #: includes/views/other-settings.php:105
 msgid "Please ensure %s has the proper <a href=\"%s\">file permissions</a>."
-msgstr ""
+msgstr "Lütfen emin olun %suygun olan<a href=\"%s\">dosya izinleri</a>"
 
 #: includes/views/other-settings.php:123
 msgid "Nothing here. Which means there are no errors!"
@@ -543,7 +545,7 @@ msgstr "Boş hata ayıklama günlüğü"
 
 #: includes/views/other-settings.php:141
 msgid "Right now, the plugin is configured to only log errors and warnings."
-msgstr ""
+msgstr "Şu anda, eklenti yalnızca hataları ve uyarıları günlüğe kaydetmek için yapılandırıldı."
 
 #: includes/admin/migrations/3.0.0-form-1-post-type.php:35
 msgid "Default sign-up form"
@@ -644,7 +646,7 @@ msgstr "Kesin mi?"
 msgid ""
 "Select \"no\" if you want to ask your visitors before they are subscribed "
 "(recommended)."
-msgstr ""
+msgstr "Ziyaretçilerinize abone olmadan önce sormak istiyorsanız \"hayır\" ı seçin (önerilir)."
 
 #: includes/integrations/views/integration-settings.php:90
 msgid "Newsletter Lists"
@@ -675,7 +677,7 @@ msgstr "Onay kutusu önceden işaretlensin mi?"
 
 #: includes/integrations/views/integration-settings.php:133
 msgid "Select \"yes\" if the checkbox should be pre-checked."
-msgstr ""
+msgstr "Onay kutusunun önceden işaretlenmesi gerekiyorsa \"evet\" i seçin."
 
 #: includes/integrations/views/integration-settings.php:141
 msgid "Load some default CSS?"
@@ -717,7 +719,7 @@ msgstr "İlgilenilen gruplar (?) değiştirilsin mi?"
 msgid ""
 "Select \"no\" if you want to add the selected interests to any previously "
 "selected interests when updating a subscriber."
-msgstr ""
+msgstr "Bir abone güncellerken seçilen ilgi alanlarını önceden seçilen ilgi alanlarına eklemek istiyorsanız \"hayır\" ı seçin."
 
 #: includes/integrations/views/integration-settings.php202,
 #: includes/forms/views/tabs/form-settings.php:80
@@ -806,7 +808,7 @@ msgid ""
 "The table below shows your Newsletter lists and their details. If you just "
 "applied changes to your Newsletter lists, please use the following button to "
 "renew the cached lists configuration."
-msgstr ""
+msgstr "Aşağıdaki tablo Newsletter listelerinizi ve detaylarını göstermektedir. Newsletter listelerinizde yeni değişiklikler yaptıysanız, önbelleğe alınmış listeler yapılandırmasını yenilemek için lütfen aşağıdaki düğmeyi kullanın."
 
 #: includes/views/parts/lists-overview.php:17
 msgid "No lists were found in your Newsletter account"
@@ -1053,7 +1055,7 @@ msgstr "Newsletter'e özel ayarlar"
 
 #: includes/forms/views/tabs/form-settings.php:15
 msgid "Lists this form subscribes to"
-msgstr ""
+msgstr "Abone olan bu formu listeler"
 
 #: includes/forms/views/tabs/form-settings.php:31
 msgid ""

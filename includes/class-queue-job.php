@@ -19,9 +19,19 @@ class NL4WP_Queue_Job
     public $data;
 
     /**
+     * @var int
+     */
+    public $max_attempts = 1;
+
+    /**
+     * @var int
+     */
+    public $attempts = 0;
+
+    /**
      * NL4WP_Queue_Job constructor.
      *
-     * @param $data
+     * @param mixed $data
      */
     public function __construct($data)
     {

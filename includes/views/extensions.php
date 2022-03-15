@@ -39,24 +39,19 @@ defined('ABSPATH') or exit;
 		</div>
 
 		<div>
-			<h4><a href="https://wordpress.org/plugins/newsletter-sync/">Newsletter User Sync</a></h4>
-			<p>Synchronises your WordPress users with a Newsletter list.</p>
-		</div>
-
-		<div>
 			<h4><a href="https://wordpress.org/plugins/nl4wp-activity/">Newsletter Activity</a></h4>
 			<p>Adds an overview of Newsletter list metrics to your WordPress dashboard.</p>
-		</div>
-
-		<div>
-			<h4><a href="https://wordpress.org/plugins/nl4wp-captcha/">Captcha</a></h4>
-			<p>Integrates Newsletter for WordPress forms with Google Captcha</p>
 		</div>
 
 		<div>
 			<h4><a href="https://wordpress.org/plugins/nl4wp-wpml/">WPML Integration</a></h4>
 			<p>Improved Newsletter integration for multilingual sites using WPML.</p>
 		</div>
+
+        <div>
+            <h4><a href="https://wordpress.org/plugins/newsletter-top-bar/">Boxzilla Pop-ups</a></h4>
+            <p>Pop-ups for your sign-up forms.</p>
+        </div>
 	</div>
 	
 
