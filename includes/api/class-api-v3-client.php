@@ -8,11 +8,6 @@ class NL4WP_API_v3_Client {
     private $api_key;
 
     /**
-     * @var string Non necessario
-     */
-    private $api_url = 'https://api.newsletter.com/3.0/';
-
-    /**
      * @var array
      */
     private $last_response;
@@ -24,12 +19,6 @@ class NL4WP_API_v3_Client {
      */
     public function __construct( $api_key ) {
         $this->api_key = $api_key;
-
-        $dash_position = strpos( $api_key, '-' );
-        if( $dash_position !== false ) {
-            $this->api_url = str_replace( '//api.', '//' . substr( $api_key, $dash_position + 1 ) . ".api.", $this->api_url );
-        }
-        
     }
 
 
@@ -90,6 +79,7 @@ class NL4WP_API_v3_Client {
      * NEWSLETTER unica funzione da cambiare.
      */
     private function request( $method, $resource, array $data = array() ) {
+        global $wp_version;
         $this->reset();
 
         // don't bother if no API key was given.
@@ -97,33 +87,8 @@ class NL4WP_API_v3_Client {
             throw new NL4WP_API_Exception( "Missing API key", 001 );
         }
 
-        $GLOBALS['service_wrapper_uaprefix'] = 'newsletter-for-wp/'.NL4WP_VERSION.' ';
+        $GLOBALS['service_wrapper_uaprefix'] = 'nl4wp/' . NL4WP_VERSION . '; wp/' . $wp_version . '; ' . home_url() . '; '; // get_bloginfo( 'url' )
         service_init($this->api_key); // inizializzazione API service
-        /* commentato
-        $url = $this->api_url . ltrim( $resource, '/' );
-        $args = array(
-            'method' => $method,
-            'headers' => $this->get_headers(),
-            'timeout' => 10,
-            'sslverify' => apply_filters( 'nl4wp_use_sslverify', true ),
-        );*/
-        //$this->get_log()->info( sprintf( "Richiesta: %s", $resource  ) );
-        //$this->get_log()->info( sprintf( "Parametri richiesta: %s",  print_r($data,true)  ) );
-        
-        // attach arguments (in body or URL)
-       /* commentato
-        if( $method === 'GET' ) {
-            $url = add_query_arg( $data, $url );
-        } else {
-            $args['body'] = json_encode( $data );
-        }
-        */
-        // perform request
-        //$response = wp_remote_request( $url, $args );
-        //$this->last_response = $response;
-
-        // parse response
-        //$data = $this->parse_response( $response );
         
         // gestione ad hoc della richiesta di check utente
         if (preg_match ( '/(\/lists\/1\/members)\/(.*)/', $resource,$matches))
@@ -305,71 +270,11 @@ class NL4WP_API_v3_Client {
                     break;
                 }
             break;
+            default: 
+                throw new NL4WP_API_Exception( "Unsupported call: " . $resource, 002 );
         }
        
         return (object) $data;
-    }
-
-    /**
-     * @return array
-     */
-    private function get_headers() {
-        global $wp_version;
-
-        $headers = array();
-        $headers['Authorization'] = 'Basic ' . base64_encode( 'nl4wp:' . $this->api_key );
-        $headers['Accept'] = 'application/json';
-        $headers['Content-Type'] = 'application/json';
-        $headers['User-Agent'] = 'nl4wp/' . NL4WP_VERSION . '; WordPress/' . $wp_version . '; ' . get_bloginfo( 'url' );
-
-        // Copy Accept-Language from browser headers
-        if( ! empty( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ) {
-            $headers['Accept-Language'] = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-        }
-
-        return $headers;
-    }
-
-    /**
-     * @param array|WP_Error $response
-     *
-     * @return mixed
-     *
-     * @throws NL4WP_API_Exception
-     */
-    private function parse_response( $response ) {
-
-        if( $response instanceof WP_Error ) {
-            throw new NL4WP_API_Connection_Exception( $response->get_error_message(), (int) $response->get_error_code() );
-        }
-
-        // decode response body
-        $code = (int) wp_remote_retrieve_response_code( $response );
-        $message = wp_remote_retrieve_response_message( $response );
-        $body = wp_remote_retrieve_body( $response );
-
-        // set body to "true" in case Newsletter returned No Content
-        if( $code < 300 && empty( $body ) ) {
-            $body = "true";
-        }
-
-        $data = json_decode( $body );
-        if( $code >= 400 ) {
-            if( $code === 404 ) {
-                throw new NL4WP_API_Resource_Not_Found_Exception( $message, $code, $response, $data );
-            }
-
-            throw new NL4WP_API_Exception( $message, $code, $response, $data );
-        }
-
-        if( ! is_null( $data ) ) {
-            return $data;
-        }
-
-        // unable to decode response
-        $message = service_errormessage();
-        $code = (int) service_errorcode();
-        throw new NL4WP_API_Exception( $message, $code, $response );
     }
 
     /**
