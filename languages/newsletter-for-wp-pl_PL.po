@@ -479,7 +479,7 @@ msgstr "Twoj klucz API z Newsletter."
 
 #: includes/views/general-settings.php:55
 msgid "The API key for connecting with your Newsletter account."
-msgstr "Klucz API do połączenia z Twoim konem Newsletter."
+msgstr "Klucz API do połączenia z Twoim kontem Newsletter."
 
 #: includes/views/general-settings.php:56
 msgid "Get your API key here."
@@ -505,7 +505,7 @@ msgstr "Oto jak śledzimy."
 
 #: includes/views/other-settings.php:37
 msgid "Logging"
-msgstr ""
+msgstr "Logowanie"
 
 #: includes/views/other-settings.php:44
 msgid ""
@@ -867,7 +867,7 @@ msgstr "Edytuj pola list subskrybentów dla"
 msgid ""
 "Click the following button to have Newsletter for WordPress pick up on your "
 "changes."
-msgstr "Kliknij poniższy button, by \"Mailchimp dla WordPress\" zaktualizował wprowadzone przez Ciebie zmiany."
+msgstr "Kliknij poniższy button, by \"Newsletter dla WordPress\" zaktualizował wprowadzone przez Ciebie zmiany."
 
 #: includes/forms/views/parts/dynamic-content-tags.php:6
 msgid "Add dynamic form variable"

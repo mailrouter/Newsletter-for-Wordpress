@@ -1,6 +1,7 @@
 <?php
 
-class NL4WP_Newsletter_Subscriber {
+class NL4WP_Newsletter_Subscriber
+{
 
     /**
      * @var string Email address for this subscriber.
@@ -43,18 +44,23 @@ class NL4WP_Newsletter_Subscriber {
     public $vip;
 
     /**
+     * @var array The tags applied to this member.
+     */
+    public $tags = array();
+
+    /**
      * Retrieves member data as an array, without null values.
      *
      * @return array
      */
-    public function to_array() {
-        $array = get_object_vars( $this );
+    public function to_array()
+    {
+        $array = get_object_vars($this);
 
         // filter out null values
-        $null_values = array_filter( $array, 'is_null' );
-        $values = array_diff_key( $array, $null_values );
+        $null_values = array_filter($array, 'is_null');
+        $values = array_diff_key($array, $null_values);
 
         return $values;
     }
-
 }

@@ -794,7 +794,7 @@ msgstr ""
 
 #: includes/views/parts/lists-overview.php:1
 msgid "Your Newsletter Account"
-msgstr "あなたのMailchimpアカウント"
+msgstr "あなたのNewsletterアカウント"
 
 #: includes/views/parts/lists-overview.php:2
 msgid ""

@@ -3,22 +3,22 @@
 Plugin Name: Newsletter for WordPress
 Plugin URI: https://github.com/mailrouter/Newsletter-for-Wordpress
 Description: Newsletter for WordPress by mailrouter. Aggiunge vari metodi di iscrizione newsletter al tuo sito.
-Version: 4.3.3
+Version: 4.4
 Author: mailrouter
 Text Domain: newsletter-for-wp
 Domain Path: /languages
 License: GPL v3
 
 Newsletter for WordPress
-Copyright (C) 2017, Void Labs snc, info.it
+Copyright (C) 2022, Void Labs snc, info.it
 forked from
 Mailchimp for WordPress
-Copyright (C) 2012-2017, Danny van Kooten, hi.com
+Copyright (C) 2012-2022, Danny van Kooten, hi.com
 
 integrates
-Plugin Update Checker Library 4.3
+Plugin Update Checker Library 4.4
 http://w-shadow.com/
-Copyright 2017 Janis Elsts
+Copyright 2018 Janis Elsts
 Released under the MIT license. See license.txt for details.
 
 This program is free software: you can redistribute it and/or modify
@@ -44,7 +44,7 @@ $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 );
 /* end */
 // Prevent direct file access
-defined( 'ABSPATH' ) or exit;
+defined('ABSPATH') or exit;
 
 /**
  * Bootstrap the Newsletter for WordPress plugin
@@ -53,88 +53,88 @@ defined( 'ABSPATH' ) or exit;
  * @access private
  * @return bool
  */
-function _nl4wp_load_plugin() {
+function _nl4wp_load_plugin()
+{
+    global $nl4wp;
 
-	global $nl4wp;
+    // Don't run if Newsletter for WP Pro 2.x is activated
+    if (defined('NL4WP_VERSION')) {
+        return false;
+    }
 
-	// Don't run if Newsletter for WP Pro 2.x is activated
-	if( defined( 'NL4WP_VERSION' ) ) {
-		return false;
-	}
+    // bootstrap the core plugin
+    define( 'NL4WP_VERSION', '4.4');
+    /* NL_CHANGED - start
+     * imposta la versione pro
+     */
+    define ('NL4WP_PREMIUM_VERSION', '4.4');
+    /* NL_CHANGED - end */
+    define('NL4WP_PLUGIN_DIR', dirname(__FILE__) . '/');
+    define('NL4WP_PLUGIN_URL', plugins_url('/', __FILE__));
+    define('NL4WP_PLUGIN_FILE', __FILE__);
 
-	// bootstrap the core plugin
-	define( 'NL4WP_VERSION', '4.3.3');
-/* NL_CHANGED - start
-* imposta la versione pro
-*/
-define ('NL4WP_PREMIUM_VERSION', '4.3.3');
-/* NL_CHANGED - end */
-	define( 'NL4WP_PLUGIN_DIR', dirname( __FILE__ ) . '/' );
-	define( 'NL4WP_PLUGIN_URL', plugins_url( '/' , __FILE__ ) );
-	define( 'NL4WP_PLUGIN_FILE', __FILE__ );
+    // load autoloader if function not yet exists (for compat with sitewide autoloader)
+    if (! function_exists('nl4wp')) {
+        require_once NL4WP_PLUGIN_DIR . 'vendor/autoload_52.php';
+    }
 
-	// load autoloader if function not yet exists (for compat with sitewide autoloader)
-	if( ! function_exists( 'nl4wp' ) ) {
-		require_once NL4WP_PLUGIN_DIR . 'vendor/autoload_52.php';
-	}
+    /**
+     * @global NL4WP_Container $GLOBALS['nl4wp']
+     * @name $nl4wp
+     */
+    $nl4wp = nl4wp();
+    $nl4wp['api'] = 'nl4wp_get_api_v3';
+    $nl4wp['request'] = array( 'NL4WP_Request', 'create_from_globals' );
+    $nl4wp['log'] = 'nl4wp_get_debug_log';
 
-	/**
-	 * @global NL4WP_Container $GLOBALS['nl4wp']
-	 * @name $nl4wp
-	 */
-	$nl4wp = nl4wp();
-	$nl4wp['api'] = 'nl4wp_get_api_v3';
-	$nl4wp['request'] = array( 'NL4WP_Request', 'create_from_globals' );
-	$nl4wp['log'] = 'nl4wp_get_debug_log';
+    // forms
+    $nl4wp['forms'] = new NL4WP_Form_Manager();
+    $nl4wp['forms']->add_hooks();
 
-	// forms
-	$nl4wp['forms'] = new NL4WP_Form_Manager();
-	$nl4wp['forms']->add_hooks();
+    // integration core
+    $nl4wp['integrations'] = new NL4WP_Integration_Manager();
+    $nl4wp['integrations']->add_hooks();
 
-	// integration core
-	$nl4wp['integrations'] = new NL4WP_Integration_Manager();
-	$nl4wp['integrations']->add_hooks();
+    // Doing cron? Load Usage Tracking class.
+    if (isset($_GET['doing_wp_cron']) || (defined('DOING_CRON') && DOING_CRON) || (defined('WP_CLI') && WP_CLI)) {
+        NL4WP_Usage_Tracking::instance()->add_hooks();
+    }
 
-	// Doing cron? Load Usage Tracking class.
-	if( isset( $_GET['doing_wp_cron'] ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
-		NL4WP_Usage_Tracking::instance()->add_hooks();
-	}
+    // Initialize admin section of plugin
+    if (is_admin()) {
+        $admin_tools = new NL4WP_Admin_Tools();
 
-	// Initialize admin section of plugin
-	if( is_admin() ) {
+        if (defined('DOING_AJAX') && DOING_AJAX) {
+            $ajax = new NL4WP_Admin_Ajax($admin_tools);
+            $ajax->add_hooks();
+        } else {
+            $messages = new NL4WP_Admin_Messages();
+            $nl4wp['admin.messages'] = $messages;
 
-		$admin_tools = new NL4WP_Admin_Tools();
+            $newsletter = new NL4WP_Newsletter();
 
-		if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-			$ajax = new NL4WP_Admin_Ajax( $admin_tools );
-			$ajax->add_hooks();
-		} else {
-			$messages = new NL4WP_Admin_Messages();
-			$nl4wp['admin.messages'] = $messages;
+            $admin = new NL4WP_Admin($admin_tools, $messages, $newsletter);
+            $admin->add_hooks();
 
-			$newsletter = new NL4WP_Newsletter();
+            $forms_admin = new NL4WP_Forms_Admin($messages, $newsletter);
+            $forms_admin->add_hooks();
 
-			$admin = new NL4WP_Admin( $admin_tools, $messages, $newsletter );
-			$admin->add_hooks();
+            $integrations_admin = new NL4WP_Integration_Admin($nl4wp['integrations'], $messages, $newsletter);
+            $integrations_admin->add_hooks();
+        }
+    }
 
-			$forms_admin = new NL4WP_Forms_Admin( $messages, $newsletter );
-			$forms_admin->add_hooks();
-
-			$integrations_admin = new NL4WP_Integration_Admin( $nl4wp['integrations'], $messages, $newsletter );
-			$integrations_admin->add_hooks();
-		}
-	}
-
-	return true;
+    return true;
 }
 
 // bootstrap custom integrations
-function _nl4wp_bootstrap_integrations() {
-	require_once NL4WP_PLUGIN_DIR . 'integrations/bootstrap.php';
+function _nl4wp_bootstrap_integrations()
+{
+    require_once NL4WP_PLUGIN_DIR . 'integrations/bootstrap.php';
 }
 
-add_action( 'plugins_loaded', '_nl4wp_load_plugin', 8 );
-add_action( 'plugins_loaded', '_nl4wp_bootstrap_integrations', 90 );
+add_action('plugins_loaded', '_nl4wp_load_plugin', 8);
+add_action('plugins_loaded', '_nl4wp_bootstrap_integrations', 90);
 
 /**
  * Flushes transient cache & schedules refresh hook.
@@ -142,9 +142,10 @@ add_action( 'plugins_loaded', '_nl4wp_bootstrap_integrations', 90 );
  * @ignore
  * @since 3.0
  */
-function _nl4wp_on_plugin_activation() {
-	$time_string = sprintf("tomorrow %d:%d%d am", rand(1,6), rand(0,5), rand(0, 9) );
-	wp_schedule_event( strtotime( $time_string ), 'daily', 'nl4wp_refresh_newsletter_lists' );
+function _nl4wp_on_plugin_activation()
+{
+    $time_string = sprintf("tomorrow 0%d:%d%d", rand(0, 8), rand(0, 5), rand(0, 9));
+    wp_schedule_event(strtotime($time_string), 'daily', 'nl4wp_refresh_newsletter_lists');
 }
 
 /**
@@ -153,13 +154,13 @@ function _nl4wp_on_plugin_activation() {
  * @ignore
  * @since 4.0.3
  */
-function _nl4wp_on_plugin_deactivation() {
-	global $wpdb;
-	wp_clear_scheduled_hook( 'nl4wp_refresh_newsletter_lists' );
+function _nl4wp_on_plugin_deactivation()
+{
+    global $wpdb;
+    wp_clear_scheduled_hook('nl4wp_refresh_newsletter_lists');
 
-	$wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE 'nl4wp_newsletter_list_%'");
+    $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE 'nl4wp_newsletter_list_%'");
 }
 
-register_activation_hook( __FILE__, '_nl4wp_on_plugin_activation' );
-register_deactivation_hook( __FILE__, '_nl4wp_on_plugin_deactivation' );
-
+register_activation_hook(__FILE__, '_nl4wp_on_plugin_activation');
+register_deactivation_hook(__FILE__, '_nl4wp_on_plugin_deactivation');

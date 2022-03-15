@@ -122,7 +122,7 @@ msgstr "Upgraden naar Premium"
 msgid ""
 "Do you want translated forms for all of your languages? <a href=\"%s\">Try "
 "Newsletter for WordPress Premium</a>, which does just that plus more."
-msgstr "Wil je vertaalde formulieren voor al je talen? Dit en meer kan met <a href=\"%s\">Mailchimp voor Wordpress Premium.</a>"
+msgstr "Wil je vertaalde formulieren voor al je talen? Dit en meer kan met <a href=\"%s\">Newsletter voor Wordpress Premium.</a>"
 
 #: includes/admin/class-ads.php:88
 msgid ""
@@ -162,13 +162,13 @@ msgstr "Inschrijven"
 msgid ""
 "Do you want to track all WooCommerce orders in Newsletter so you can send "
 "emails based on the purchase activity of your subscribers?"
-msgstr "Wil je alle WooCommerce bestellingen in Mailchimp opvolgen zodat je emails kan versturen op basis van de koopacties van je abonnees?"
+msgstr "Wil je alle WooCommerce bestellingen in Newsletter opvolgen zodat je emails kan versturen op basis van de koopacties van je abonnees?"
 
 #: includes/admin/class-ads.php:153
 msgid ""
 "<a href=\"%s\">Upgrade to Newsletter for WordPress Premium</a> or <a "
 "href=\"%s\">read more about Newsletter's E-Commerce features</a>."
-msgstr "<a href=\"%s\">Upgrade naar Mailchimp voor WordPress Premium</a>of<a href=\"%s\">lees meer over Newsletter's E-Commerce mogelijkheden</a>."
+msgstr "<a href=\"%s\">Upgrade naar Newsletter voor WordPress Premium</a>of<a href=\"%s\">lees meer over Newsletter's E-Commerce mogelijkheden</a>."
 
 #: includes/admin/class-review-notice.php:68
 msgid ""

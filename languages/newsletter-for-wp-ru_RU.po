@@ -807,7 +807,7 @@ msgid ""
 "The table below shows your Newsletter lists and their details. If you just "
 "applied changes to your Newsletter lists, please use the following button to "
 "renew the cached lists configuration."
-msgstr "Приведенная ниже таблица показывает списки Mailchimp и их детали. Если вы только что произвели изменения в списках Newsletter, пожалуйста, используйте следующую кнопку, чтобы обновить кэшированную конфигурацию списков."
+msgstr "Приведенная ниже таблица показывает списки Newsletter и их детали. Если вы только что произвели изменения в списках Newsletter, пожалуйста, используйте следующую кнопку, чтобы обновить кэшированную конфигурацию списков."
 
 #: includes/views/parts/lists-overview.php:17
 msgid "No lists were found in your Newsletter account"
@@ -872,7 +872,7 @@ msgstr "Редактировать поля списка для"
 msgid ""
 "Click the following button to have Newsletter for WordPress pick up on your "
 "changes."
-msgstr "Нажмите кнопку, чтобы Mailchimp для WordPress обновился до ваших последних изменений."
+msgstr "Нажмите кнопку, чтобы Newsletter для WordPress обновился до ваших последних изменений."
 
 #: includes/forms/views/parts/dynamic-content-tags.php:6
 msgid "Add dynamic form variable"

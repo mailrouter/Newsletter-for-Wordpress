@@ -565,7 +565,7 @@ msgstr "Digite o título do formulário.."
 
 #: includes/forms/views/add-form.php:37
 msgid "To which Newsletter lists should this form subscribe?"
-msgstr "Para quais listas do Mailchimp este formulário deve subscrever?"
+msgstr "Para quais listas do Newsletter este formulário deve subscrever?"
 
 #: includes/forms/views/add-form.php:54
 msgid "No lists found. Did you <a href=\"%s\">connect with Newsletter</a>?"

@@ -5,7 +5,8 @@
  *
  * @ignore
  */
-class NL4WP_Queue {
+class NL4WP_Queue
+{
 
     /**
      * @var NL4WP_Queue_Job[]
@@ -27,19 +28,21 @@ class NL4WP_Queue {
      *
      * @param string $option_name
      */
-    public function __construct( $option_name ) {
+    public function __construct($option_name)
+    {
         $this->option_name = $option_name;
 
-        register_shutdown_function( array( $this, 'save' ) );
+        register_shutdown_function(array( $this, 'save' ));
     }
 
     /**
      * Load jobs from option
      */
-    protected function load() {
-        $jobs = get_option( $this->option_name, array() );
+    protected function load()
+    {
+        $jobs = get_option($this->option_name, array());
 
-        if( ! is_array( $jobs ) ) {
+        if (! is_array($jobs)) {
             $jobs = array();
         }
 
@@ -51,9 +54,9 @@ class NL4WP_Queue {
      *
      * @return NL4WP_Queue_Job[] Array of jobs
      */
-    public function all() {
-
-        if( is_null( $this->jobs ) ) {
+    public function all()
+    {
+        if (is_null($this->jobs)) {
             $this->load();
         }
 
@@ -66,21 +69,21 @@ class NL4WP_Queue {
      * @param mixed $data
      * @return boolean
      */
-    public function put( $data ) {
-
-        if( is_null( $this->jobs ) ) {
+    public function put($data)
+    {
+        if (is_null($this->jobs)) {
             $this->load();
         }
 
         // check if we already have a job with same data
-        foreach( $this->jobs as $job ) {
-            if( $job->data === $data ) {
+        foreach ($this->jobs as $job) {
+            if ($job->data === $data) {
                 return false;
             }
         }
 
         // add job to queue
-        $job = new NL4WP_Queue_Job( $data );
+        $job = new NL4WP_Queue_Job($data);
         $this->jobs[] = $job;
         $this->dirty = true;
         return true;
@@ -91,36 +94,36 @@ class NL4WP_Queue {
      *
      * @return NL4WP_Queue_Job|false
      */
-    public function get() {
-
-        if( is_null( $this->jobs ) ) {
+    public function get()
+    {
+        if (is_null($this->jobs)) {
             $this->load();
         }
 
         // do we have jobs?
-        if( count( $this->jobs ) === 0 ) {
+        if (count($this->jobs) === 0) {
             return false;
         }
 
         // return first element
-        return reset( $this->jobs );
+        return reset($this->jobs);
     }
 
     /**
      * @param NL4WP_Queue_Job $job
      */
-    public function delete( NL4WP_Queue_Job $job ) {
-
-        if( is_null( $this->jobs ) ) {
+    public function delete(NL4WP_Queue_Job $job)
+    {
+        if (is_null($this->jobs)) {
             $this->load();
         }
 
-        $index = array_search( $job, $this->jobs, true );
+        $index = array_search($job, $this->jobs, true);
 
         // check for "false" here, as 0 is a valid index.
-        if( $index !== false ) {
-            unset( $this->jobs[ $index ] );
-            $this->jobs = array_values( $this->jobs );
+        if ($index !== false) {
+            unset($this->jobs[ $index ]);
+            $this->jobs = array_values($this->jobs);
             $this->dirty = true;
         }
     }
@@ -128,13 +131,14 @@ class NL4WP_Queue {
     /**
      * @param NL4WP_Queue_Job $job
      */
-    public function reschedule( NL4WP_Queue_Job $job  ) {
-        if( is_null( $this->jobs ) ) {
+    public function reschedule(NL4WP_Queue_Job $job)
+    {
+        if (is_null($this->jobs)) {
             $this->load();
         }
 
         // delete job from start of queue
-        $this->delete( $job );
+        $this->delete($job);
 
         // add job to end of queue
         $this->jobs[] = $job;
@@ -144,7 +148,8 @@ class NL4WP_Queue {
     /**
      * Reset queue
      */
-    public function reset() {
+    public function reset()
+    {
         $this->jobs = array();
         $this->dirty = true;
     }
@@ -152,20 +157,18 @@ class NL4WP_Queue {
     /**
      * Save the queue
      */
-    public function save() {
-
-        if( ! $this->dirty || is_null( $this->jobs ) ) {
+    public function save()
+    {
+        if (! $this->dirty || is_null($this->jobs)) {
             return false;
         }
 
-        $success = update_option( $this->option_name, $this->jobs, false );
+        $success = update_option($this->option_name, $this->jobs, false);
 
-        if( $success ) {
+        if ($success) {
             $this->dirty = false;
         }
 
         return $success;
     }
-
-
 }

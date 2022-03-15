@@ -750,7 +750,7 @@ msgid ""
 "translated in your language or do you spot errors with the current "
 "translations? Helping out is easy! Head over to <a href=\"%s\">the "
 "translation project and click \"help translate\"</a>."
-msgstr "Mailchimp per a Wordpress necessita que el tradueixin. No està traduït al teu idioma o hi ha errors en la traducció actual? Ajudar-nos és fàcil. Visita <a href=\"%s\">el projecte de traducció i selecciona \"help translate\"</a>."
+msgstr "Newsletter per a Wordpress necessita que el tradueixin. No està traduït al teu idioma o hi ha errors en la traducció actual? Ajudar-nos és fàcil. Visita <a href=\"%s\">el projecte de traducció i selecciona \"help translate\"</a>."
 
 #: includes/views/parts/admin-footer.php:35
 msgid ""

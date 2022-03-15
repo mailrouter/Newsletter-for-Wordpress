@@ -10,7 +10,7 @@ class NL4WP_API_v3_Client {
     /**
      * @var string Non necessario
      */
-    private $api_url = 'https://api.mailchimp.com/3.0/';
+    private $api_url = 'https://api.newsletter.com/3.0/';
 
     /**
      * @var array

@@ -8,8 +8,9 @@
  *
  * @return NL4WP_Integration[]
  */
-function nl4wp_get_integrations() {
-	return nl4wp('integrations')->get_all();
+function nl4wp_get_integrations()
+{
+    return nl4wp('integrations')->get_all();
 }
 
 /**
@@ -22,8 +23,9 @@ function nl4wp_get_integrations() {
  *
  * @return NL4WP_Integration
  */
-function nl4wp_get_integration( $slug ) {
-	return nl4wp('integrations')->get( $slug );
+function nl4wp_get_integration($slug)
+{
+    return nl4wp('integrations')->get($slug);
 }
 
 /**
@@ -37,8 +39,9 @@ function nl4wp_get_integration( $slug ) {
  *
  * @param bool $always_enabled
  */
-function nl4wp_register_integration( $slug, $class, $always_enabled = false ) {
-	return nl4wp('integrations')->register_integration( $slug, $class, $always_enabled );
+function nl4wp_register_integration($slug, $class, $always_enabled = false)
+{
+    return nl4wp('integrations')->register_integration($slug, $class, $always_enabled);
 }
 
 /**
@@ -48,6 +51,7 @@ function nl4wp_register_integration( $slug, $class, $always_enabled = false ) {
  * @access public
  * @param string $slug
  */
-function nl4wp_deregister_integration( $slug ) {
-	nl4wp('integrations')->deregister_integration( $slug );
+function nl4wp_deregister_integration($slug)
+{
+    nl4wp('integrations')->deregister_integration($slug);
 }

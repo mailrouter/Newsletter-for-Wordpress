@@ -36,7 +36,7 @@ msgstr "Dokumentacija"
 #: includes/admin/class-admin.php:204
 msgid ""
 "Success! The cached configuration for your Newsletter lists has been renewed."
-msgstr "Uspeh! Predpomnjena konfiguracija Mailchimp list je prenovljena."
+msgstr "Uspeh! Predpomnjena konfiguracija Newsletter list je prenovljena."
 
 #: includes/admin/class-admin.php:304
 msgid ""
@@ -351,7 +351,7 @@ msgstr "Predogled obrazca"
 
 #: includes/forms/class-admin.php449, includes/forms/class-widget.php:30
 msgid "Newsletter Sign-Up Form"
-msgstr "Mailchimp prijavni obrzec"
+msgstr "Newsletter prijavni obrzec"
 
 #: includes/forms/class-admin.php:453
 msgid "Select the form to show"
@@ -424,7 +424,7 @@ msgstr "E-novice"
 
 #: includes/forms/class-widget.php:32
 msgid "Displays your Newsletter for WordPress sign-up form"
-msgstr "Prikaži Mailchimp-ov prijavni obrazec za Wordpress"
+msgstr "Prikaži Newsletter-ov prijavni obrazec za Wordpress"
 
 #: includes/forms/class-widget.php:75
 msgid "Title:"
@@ -557,7 +557,7 @@ msgstr "Vnesi naslov obrazca.."
 
 #: includes/forms/views/add-form.php:37
 msgid "To which Newsletter lists should this form subscribe?"
-msgstr "H kateri Mailchimp listi naj se naroči ta obrazec?"
+msgstr "H kateri Newsletter listi naj se naroči ta obrazec?"
 
 #: includes/forms/views/add-form.php:54
 msgid "No lists found. Did you <a href=\"%s\">connect with Newsletter</a>?"
@@ -642,7 +642,7 @@ msgstr "Izberite \"ne\", če želite vprašati obiskovalce, če se res želijo n
 
 #: includes/integrations/views/integration-settings.php:90
 msgid "Newsletter Lists"
-msgstr "Mailchimp lista"
+msgstr "Newsletter lista"
 
 #: includes/integrations/views/integration-settings.php:103
 msgid ""
@@ -847,7 +847,7 @@ msgstr "Tako:"
 
 #: includes/forms/views/parts/add-fields-help.php:17
 msgid "Log in to your Newsletter account."
-msgstr "Prijavi se v Mailchimp račun."
+msgstr "Prijavi se v Newsletter račun."
 
 #: includes/forms/views/parts/add-fields-help.php:22
 msgid "Add list fields to any of your selected lists."

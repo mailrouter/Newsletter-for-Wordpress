@@ -117,7 +117,7 @@ msgstr "Opgrader til Premium"
 msgid ""
 "Do you want translated forms for all of your languages? <a href=\"%s\">Try "
 "Newsletter for WordPress Premium</a>, which does just that plus more."
-msgstr "Ønsker du oversatte formularer til alle dine sprog? Prøv Mailchimp til Wordpress Premium, som bare lige giver det mere..."
+msgstr "Ønsker du oversatte formularer til alle dine sprog? Prøv Newsletter til Wordpress Premium, som bare lige giver det mere..."
 
 #: includes/admin/class-ads.php:88
 msgid ""

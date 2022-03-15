@@ -59,7 +59,7 @@ msgstr "Kész! Newsletter listák frissítve."
 
 #: includes/admin/class-admin.php:308
 msgid "This can take a while if you have many Newsletter lists."
-msgstr "Ez altarthat egy darabig, ha több Mailchimp listát használsz."
+msgstr "Ez altarthat egy darabig, ha több Newsletter listát használsz."
 
 #: includes/admin/class-admin.php336, includes/views/general-settings.php:31
 msgid "Newsletter API Settings"

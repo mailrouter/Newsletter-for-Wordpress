@@ -2,8 +2,8 @@
 Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, ibericode, newsletter forms, newsletter integrations
 Requires at least: 4.1
-Tested up to: 5.0.2
-Stable tag: 4.3.3
+Tested up to: 5.9.2
+Stable tag: 4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires PHP: 5.2.4
@@ -113,6 +113,27 @@ Per ogni questione relativa al plugin e al suo funzionamento, fate riferimento a
 
 Changelog
 =========
+
+#### 4.4 - March 1, 2018
+
+**Fixes**
+
+- AffiliateWP integration subscribing the wrong user if affiliate ID differs from user ID.
+
+**Improvements**
+
+- Renamed "Newsletter" to "Newsletter" to match Newsletter's new branding.
+- More accurate handling of timeouts for accounts with many Newsletter lists.
+- UX improvements for integrations overview page.
+- Validate Newsletter API key format when it's entered.
+- Improved compatibility with Klarna Checkout in the WooCommerce checkout integration.
+- Bumped required PHP version to 5.3 (soft requirement for now).
+
+**Additions**
+
+- Added Gutenberg block for easily adding a form to a post or page.
+- Added subscriber tags setting to forms.
+
 
 #### 4.3.3 - December 31, 2018
 

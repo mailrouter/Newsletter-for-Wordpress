@@ -629,7 +629,7 @@ msgid ""
 "fields</a> or <a href=\"%s\">log into your Newsletter account</a> and make "
 "sure only the email & name fields are marked as required fields for the "
 "selected list(s)."
-msgstr "Sie müssen alles so einstellen, dass das Plugin <a href=\"%s\">alle zum Absenden des Formulars erforderlichen Felder ihres Formulars enthält</a> oder sich bei <a href=\"%s\">Mailchimp einloggen</a> und nur das E-Mail & Name-Feld für Ihre Liste(n) als \"erforderlich\" (required) markieren."
+msgstr "Sie müssen alles so einstellen, dass das Plugin <a href=\"%s\">alle zum Absenden des Formulars erforderlichen Felder ihres Formulars enthält</a> oder sich bei <a href=\"%s\">Newsletter einloggen</a> und nur das E-Mail & Name-Feld für Ihre Liste(n) als \"erforderlich\" (required) markieren."
 
 #: includes/integrations/views/integration-settings.php:62
 msgid "Enabled?"

@@ -7,132 +7,136 @@
  * @ignore
  * @access private
  */
-class NL4WP_Form_Output_Manager {
+class NL4WP_Form_Output_Manager
+{
 
-	/**
-	 * @var int The # of forms outputted
-	 */
-	public $count = 0;
+    /**
+     * @var int The # of forms outputted
+     */
+    public $count = 0;
 
-	/**
-	 * @const string
-	 */
-	const SHORTCODE = 'nl4wp_form';
+    /**
+     * @const string
+     */
+    const SHORTCODE = 'nl4wp_form';
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/**
-	 * Add hooks
-	 */
-	public function add_hooks() {
-		// enable shortcodes in text widgets
-		add_filter( 'widget_text', 'shortcode_unautop' );
-		add_filter( 'widget_text', 'do_shortcode', 11 );
+    /**
+     * Add hooks
+     */
+    public function add_hooks()
+    {
+        // enable shortcodes in text widgets
+        add_filter('widget_text', 'shortcode_unautop');
+        add_filter('widget_text', 'do_shortcode', 11);
 
-		// enable shortcodes in form content
-		add_filter( 'nl4wp_form_content', 'do_shortcode' );
+        // enable shortcodes in form content
+        add_filter('nl4wp_form_content', 'do_shortcode');
 
-		add_action( 'init', array( $this, 'register_shortcode' ) );
-	}
+        add_action('init', array( $this, 'register_shortcode' ));
+    }
 
-	/**
-	 * Registers the [nl4wp_form] shortcode
-	 */
-	public function register_shortcode() {
-		// register shortcodes
-		add_shortcode( self::SHORTCODE, array( $this, 'shortcode' ) );
-	}
+    /**
+     * Registers the [nl4wp_form] shortcode
+     */
+    public function register_shortcode()
+    {
+        // register shortcodes
+        add_shortcode(self::SHORTCODE, array( $this, 'shortcode' ));
+    }
 
-	/**
-	 * @param array  $attributes
-	 * @param string $content
-	 * @return string
-	 */
-	public function shortcode( $attributes = array(), $content = '' ) {
-		$default_attributes = array(
-			'id' => '',
-			'lists' => '',
-			'email_type' => '',
-			'element_id' => '',
-	        'element_class' => '',
-		);
+    /**
+     * @param array  $attributes
+     * @param string $content
+     * @return string
+     */
+    public function shortcode($attributes = array(), $content = '')
+    {
+        $default_attributes = array(
+            'id' => '',
+            'lists' => '',
+            'email_type' => '',
+            'element_id' => '',
+            'element_class' => '',
+        );
 
-		$attributes = shortcode_atts(
-			$default_attributes,
-			$attributes,
-			self::SHORTCODE
-		);
+        $attributes = shortcode_atts(
+            $default_attributes,
+            $attributes,
+            self::SHORTCODE
+        );
 
-		$config = array(
-			'element_id' => $attributes['element_id'],
-			'lists' => $attributes['lists'],
-			'email_type' => $attributes['email_type'],
-			'element_class' => $attributes['element_class'],
-		);
-	
-		return $this->output_form( $attributes['id'], $config, false );
-	}
+        $config = array(
+            'element_id' => $attributes['element_id'],
+            'lists' => $attributes['lists'],
+            'email_type' => $attributes['email_type'],
+            'element_class' => $attributes['element_class'],
+        );
+    
+        return $this->output_form($attributes['id'], $config, false);
+    }
 
-	/**
-	 * @param int   $id
-	 * @param array $config
-	 * @param bool $echo
-	 *
-	 * @return string
-	 */
-	public function output_form( $id = 0, $config = array(), $echo = true ) {
+    /**
+     * @param int   $id
+     * @param array $config
+     * @param bool $echo
+     *
+     * @return string
+     */
+    public function output_form($id = 0, $config = array(), $echo = true)
+    {
+        try {
+            $form = nl4wp_get_form($id);
+        } catch (Exception $e) {
+            if (current_user_can('manage_options')) {
+                return sprintf('<strong>Newsletter for WordPress error:</strong> %s', $e->getMessage());
+            }
 
-		try {
-			$form = nl4wp_get_form( $id );
-		} catch( Exception $e ) {
+            return '';
+        }
 
-			if( current_user_can( 'manage_options' ) ) {
-				return sprintf( '<strong>Newsletter for WordPress error:</strong> %s', $e->getMessage() );
-			}
-
-			return '';
-		}
-
-		$this->count++;
+        $this->count++;
 
         // set a default element_id if none is given
-		if( empty( $config['element_id'] ) ) {
-			$config['element_id'] = 'nl4wp-form-' . $this->count;
-		}
+        if (empty($config['element_id'])) {
+            $config['element_id'] = 'nl4wp-form-' . $this->count;
+        }
 
-		$form_html = $form->get_html( $config['element_id'], $config );
+        $form_html = $form->get_html($config['element_id'], $config);
 
-		try {
-			// start new output buffer
-			ob_start();
+        try {
+            // start new output buffer
+            ob_start();
 
-			/**
-			 * Runs just before a form element is outputted.
-			 *
-			 * @since 3.0
-			 *
-			 * @param NL4WP_Form $form
-			 */
-			do_action( 'nl4wp_output_form', $form );
+            /**
+             * Runs just before a form element is outputted.
+             *
+             * @since 3.0
+             *
+             * @param NL4WP_Form $form
+             */
+            do_action('nl4wp_output_form', $form);
 
-			// output the form (in output buffer)
-			echo $form_html;
+            // output the form (in output buffer)
+            echo $form_html;
 
-			// grab all contents in current output buffer & then clean + end it.
-			$html = ob_get_clean();
-		} catch( Error $e ) {
-			$html = $form_html;
-		}
+            // grab all contents in current output buffer & then clean + end it.
+            $html = ob_get_clean();
+        } catch (Error $e) {
+            $html = $form_html;
+        }
 
-		// echo content if necessary
-		if( $echo ) {
-			echo $html;
-		}
+        // echo content if necessary
+        if ($echo) {
+            echo $html;
+        }
 
-		return $html;
-	}
-
+        return $html;
+    }
 }

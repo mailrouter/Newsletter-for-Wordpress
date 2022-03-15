@@ -483,7 +483,7 @@ msgstr "Newsletter API anahtarınız"
 
 #: includes/views/general-settings.php:55
 msgid "The API key for connecting with your Newsletter account."
-msgstr "Mailchimp hesabınızın bağlanması için gerekli API anahtarı"
+msgstr "Newsletter hesabınızın bağlanması için gerekli API anahtarı"
 
 #: includes/views/general-settings.php:56
 msgid "Get your API key here."

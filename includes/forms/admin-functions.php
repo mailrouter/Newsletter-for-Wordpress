@@ -8,14 +8,15 @@
  *
  * @return string
  */
-function nl4wp_get_edit_form_url( $form_id, $tab = '' ) {
-	$url = admin_url( sprintf( 'admin.php?page=newsletter-for-wp-forms&view=edit-form&form_id=%d', $form_id ) );
+function nl4wp_get_edit_form_url($form_id, $tab = '')
+{
+    $url = admin_url(sprintf('admin.php?page=newsletter-for-wp-forms&view=edit-form&form_id=%d', $form_id));
 
-	if( ! empty( $tab ) ) {
-		$url .= sprintf( '&tab=%s', $tab );
-	}
+    if (! empty($tab)) {
+        $url .= sprintf('&tab=%s', $tab);
+    }
 
-	return $url;
+    return $url;
 }
 
 /**
@@ -23,9 +24,10 @@ function nl4wp_get_edit_form_url( $form_id, $tab = '' ) {
  *
  * @return string
  */
-function nl4wp_get_add_form_url() {
-	$url = admin_url( 'admin.php?page=newsletter-for-wp-forms&view=add-form' );
-	return $url;
+function nl4wp_get_add_form_url()
+{
+    $url = admin_url('admin.php?page=newsletter-for-wp-forms&view=add-form');
+    return $url;
 }
 
 /**

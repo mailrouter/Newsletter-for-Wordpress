@@ -433,7 +433,7 @@ msgstr "Titulek:"
 msgid ""
 "You can edit your sign-up form in the <a href=\"%s\">Newsletter for WordPress"
 " form settings</a>."
-msgstr "Editovat nastavení přihlašovacích formulářů pluginu \"Mailchimp for Wordpress\" můžete <a href=\"%s\">zde</a>."
+msgstr "Editovat nastavení přihlašovacích formulářů pluginu \"Newsletter for Wordpress\" můžete <a href=\"%s\">zde</a>."
 
 #: includes/integrations/class-admin.php79,
 #: includes/integrations/class-admin.php80,

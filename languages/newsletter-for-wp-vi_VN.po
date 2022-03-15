@@ -473,7 +473,7 @@ msgstr "Newsletter API key của bạn"
 
 #: includes/views/general-settings.php:55
 msgid "The API key for connecting with your Newsletter account."
-msgstr "Mã API để kết nối với tài khoản Mailchimp của bạn."
+msgstr "Mã API để kết nối với tài khoản Newsletter của bạn."
 
 #: includes/views/general-settings.php:56
 msgid "Get your API key here."
@@ -553,11 +553,11 @@ msgstr "Điền tiêu đề biểu mẫu của bạn.."
 
 #: includes/forms/views/add-form.php:37
 msgid "To which Newsletter lists should this form subscribe?"
-msgstr "Biểu mẫu này sẽ đăng ký vào danh sách Mailchimp nào?"
+msgstr "Biểu mẫu này sẽ đăng ký vào danh sách Newsletter nào?"
 
 #: includes/forms/views/add-form.php:54
 msgid "No lists found. Did you <a href=\"%s\">connect with Newsletter</a>?"
-msgstr "Không có danh sách nào được tìm thấy. Bạn đã <a href=\"%s\">kết nội với Mailchimp</a> chưa?"
+msgstr "Không có danh sách nào được tìm thấy. Bạn đã <a href=\"%s\">kết nội với Newsletter</a> chưa?"
 
 #: includes/forms/views/edit-form.php:4
 msgid "Fields"
@@ -607,7 +607,7 @@ msgstr "%s tích hợp"
 msgid ""
 "The selected Newsletter lists require non-default fields, which may prevent "
 "this integration from working."
-msgstr "Những danh sách Mailchimp đã chọn yêu cầu những trường không mặc định, điều này có thể chặn sự đồng nhất trong hoạt động."
+msgstr "Những danh sách Newsletter đã chọn yêu cầu những trường không mặc định, điều này có thể chặn sự đồng nhất trong hoạt động."
 
 #: includes/integrations/views/integration-settings.php:28
 msgid ""
@@ -615,7 +615,7 @@ msgid ""
 "fields</a> or <a href=\"%s\">log into your Newsletter account</a> and make "
 "sure only the email & name fields are marked as required fields for the "
 "selected list(s)."
-msgstr "Hãy đảm bảo bạn <a href=\"%s\"> cấu hình bộ mở rộng để gửi tất cả các trường yêu cầu</a> hoặc <a href=\"%s\">đăng nhập vào tài khoản Mailchimp của bạn</a> và đảm bảo chỉ có duy nhất trường email và tên được đánh dấu trường yêu cầu cho (các) danh sách đã chọn."
+msgstr "Hãy đảm bảo bạn <a href=\"%s\"> cấu hình bộ mở rộng để gửi tất cả các trường yêu cầu</a> hoặc <a href=\"%s\">đăng nhập vào tài khoản Newsletter của bạn</a> và đảm bảo chỉ có duy nhất trường email và tên được đánh dấu trường yêu cầu cho (các) danh sách đã chọn."
 
 #: includes/integrations/views/integration-settings.php:62
 msgid "Enabled?"
@@ -789,14 +789,14 @@ msgstr ""
 
 #: includes/views/parts/lists-overview.php:1
 msgid "Your Newsletter Account"
-msgstr "Tài khoản Mailchimp của bạn"
+msgstr "Tài khoản Newsletter của bạn"
 
 #: includes/views/parts/lists-overview.php:2
 msgid ""
 "The table below shows your Newsletter lists and their details. If you just "
 "applied changes to your Newsletter lists, please use the following button to "
 "renew the cached lists configuration."
-msgstr "Bảng dưới hiển thị những danh sách Mailchimp của bạn và chi tiết. Nếu bạn mới thay đổi danh sách Mailchimp của bạn, hãy sử dụng nút dưới để làm mới cấu hình danh sách đã lưu."
+msgstr "Bảng dưới hiển thị những danh sách Newsletter của bạn và chi tiết. Nếu bạn mới thay đổi danh sách Newsletter của bạn, hãy sử dụng nút dưới để làm mới cấu hình danh sách đã lưu."
 
 #: includes/views/parts/lists-overview.php:17
 msgid "No lists were found in your Newsletter account"
@@ -804,7 +804,7 @@ msgstr "Không có danh sách nào được tìm thấy ở tài khoản Newslet
 
 #: includes/views/parts/lists-overview.php:19
 msgid "A total of %d lists were found in your Newsletter account."
-msgstr "%d danh sách đã được tìm thấy trong tài khoản Mailchimp của bạn."
+msgstr "%d danh sách đã được tìm thấy trong tài khoản Newsletter của bạn."
 
 #: includes/views/parts/lists-overview.php:24
 msgid "List Name"
@@ -820,7 +820,7 @@ msgstr "Những người đăng ký"
 
 #: includes/views/parts/lists-overview.php:48
 msgid "Edit this list in Newsletter"
-msgstr "Sửa danh sách trong Mailchimp"
+msgstr "Sửa danh sách trong Newsletter"
 
 #: includes/views/parts/lists-overview.php:62
 msgid "%s (%s) with field type %s."
@@ -835,7 +835,7 @@ msgstr "Thêm các trường khác"
 msgid ""
 "To add more fields to your form, you will need to create those fields in "
 "Newsletter first."
-msgstr "Để thêm nhiều trường vào biểu mẫu của bạn, bạn sẽ cần tạo những trường đó trong Mailchimp trước."
+msgstr "Để thêm nhiều trường vào biểu mẫu của bạn, bạn sẽ cần tạo những trường đó trong Newsletter trước."
 
 #: includes/forms/views/parts/add-fields-help.php:12
 msgid "Here's how:"
@@ -843,7 +843,7 @@ msgstr "Bằng cách này:"
 
 #: includes/forms/views/parts/add-fields-help.php:17
 msgid "Log in to your Newsletter account."
-msgstr "Đăng nhập vào tài khoản Mailchimp của bạn"
+msgstr "Đăng nhập vào tài khoản Newsletter của bạn"
 
 #: includes/forms/views/parts/add-fields-help.php:22
 msgid "Add list fields to any of your selected lists."
@@ -861,7 +861,7 @@ msgstr "Sửa các trường danh sách cho"
 msgid ""
 "Click the following button to have Newsletter for WordPress pick up on your "
 "changes."
-msgstr "Click vào nút dưới để Mailchimp for Wordpress nhận các thay đổi của bạn."
+msgstr "Click vào nút dưới để Newsletter for Wordpress nhận các thay đổi của bạn."
 
 #: includes/forms/views/parts/dynamic-content-tags.php:6
 msgid "Add dynamic form variable"
@@ -1039,7 +1039,7 @@ msgstr "Cài đặt mẫu đăng ký"
 
 #: includes/forms/views/tabs/form-settings.php:5
 msgid "Newsletter specific settings"
-msgstr "Những cài đặt cụ thể Mailchimp"
+msgstr "Những cài đặt cụ thể Newsletter"
 
 #: includes/forms/views/tabs/form-settings.php:15
 msgid "Lists this form subscribes to"

@@ -64,9 +64,10 @@ function nl4wp_get_options()
  * @since 4.2.6
  * @return string
  */
-function nl4wp_get_api_key() {
+function nl4wp_get_api_key()
+{
     // try to get from constant
-    if( defined( 'NL4WP_API_KEY' ) && constant( 'NL4WP_API_KEY' ) !== '' ) {
+    if (defined('NL4WP_API_KEY') && constant('NL4WP_API_KEY') !== '') {
         return NL4WP_API_KEY;
     }
 
@@ -147,8 +148,9 @@ function nl4wp_get_debug_log()
  *
  * @return string
  */
-function nl4wp_get_request_url() {
-     global $wp;
+function nl4wp_get_request_url()
+{
+    global $wp;
 
     // get requested url from global $wp object
     $site_request_uri = $wp->request;
@@ -167,10 +169,10 @@ function nl4wp_get_request_url() {
 
 /**
  * Get current URL path.
- * 
+ *
  * @return string
  */
-function nl4wp_get_request_path() 
+function nl4wp_get_request_path()
 {
     return $_SERVER['REQUEST_URI'];
 }
@@ -180,15 +182,15 @@ function nl4wp_get_request_path()
 *
 * @return string
 */
-function nl4wp_get_request_ip_address() 
+function nl4wp_get_request_ip_address()
 {
-    $headers = ( function_exists( 'apache_request_headers' ) ) ? apache_request_headers() : $_SERVER;
+    $headers = (function_exists('apache_request_headers')) ? apache_request_headers() : $_SERVER;
 
-    if ( array_key_exists( 'X-Forwarded-For', $headers ) && filter_var( $headers['X-Forwarded-For'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+    if (array_key_exists('X-Forwarded-For', $headers) && filter_var($headers['X-Forwarded-For'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
         return $headers['X-Forwarded-For'];
     }
 
-    if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers ) && filter_var( $headers['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+    if (array_key_exists('HTTP_X_FORWARDED_FOR', $headers) && filter_var($headers['HTTP_X_FORWARDED_FOR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
         return $headers['HTTP_X_FORWARDED_FOR'];
     }
 
@@ -205,7 +207,6 @@ function nl4wp_get_request_ip_address()
  */
 function nl4wp_sanitize_deep($value)
 {
-
     if (is_scalar($value)) {
         // strip all HTML tags & whitespace
         $value = trim(strip_tags($value));
@@ -353,7 +354,6 @@ function nl4wp_add_name_data($data = array())
  */
 function nl4wp_get_email_type()
 {
-
     $email_type = 'html';
 
     /**
@@ -450,17 +450,18 @@ function nl4wp_refresh_newsletter_lists()
 * @param mixed $default
 * @return mixed
 */
-function nl4wp_array_get( $array, $key, $default = null ) {
-    if ( is_null( $key ) ) {
+function nl4wp_array_get($array, $key, $default = null)
+{
+    if (is_null($key)) {
         return $array;
     }
 
-    if ( isset( $array[$key] ) ) {
+    if (isset($array[$key])) {
         return $array[$key];
     }
 
-    foreach (explode( '.', $key ) as $segment) {
-        if ( ! is_array( $array ) || ! array_key_exists( $segment, $array ) ) {
+    foreach (explode('.', $key) as $segment) {
+        if (! is_array($array) || ! array_key_exists($segment, $array)) {
             return $default;
         }
 
