@@ -1,5 +1,5 @@
 <?php
-// API Wrapper v1.27(20220315)
+// API Wrapper v1.28(20220316)
 //
 // Compatible with PHP4+ with HASH Cryptography extension (PHP >5.1.2)
 // or the MHASH Cryptography extension.
@@ -38,7 +38,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE. 
 
-if (!class_exists('xmlrpc_client'))
+if (!class_exists('xmlrpc_client') && !function_exists('xmlrpc_encode_request'))
   @include_once('xmlrpc.inc');
 
 // Settings
@@ -79,7 +79,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
 
   function service_version() {
-    return 1027;
+    return 1028;
   }
 
   function service_init($hostoruniquekey, $api_key = false, $secret = false) {
@@ -253,6 +253,17 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
 }
 
+if (!function_exists('_service_realip')) {
+  function _service_realip($ip) {
+    if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
+    $fip = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    if (empty($fip) && isset($_SERVER) && isset($_SERVER['HTTP_X_FORWARDED_FOR'])) $fip = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
+    $fip = filter_var($fip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    if (empty($fip)) $fip = $ip;
+    return $fip;
+  }
+}
+
 if (!isset($GLOBALS['service_wrapper_uaprefix']))
   $GLOBALS['service_wrapper_uaprefix'] = "service-wrapper/".service_version()." ";
 function service_info() {
@@ -316,22 +327,22 @@ function service_user_login($uid_mail, $pass, $fields = array ()) {
 }
 
 function service_user_subscribe($data, $ip = false) {
-  if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
+  $ip = _service_realip($ip);
   return service_invoke('service.user.subscribe', $data, $ip);
 }
 
 function service_user_unsubscribe($uid_mail, $ip = false) {
-  if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
+  $ip = _service_realip($ip);
   return service_invoke('service.user.unsubscribe', $uid_mail, $ip);
 }
 
 function service_user_disable_mail($uid_mail, $type = 'admin', $ip = false) {
-  if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
+  $ip = _service_realip($ip);
   return service_invoke('service.user.disable_mail', $uid_mail, $type, $ip);
 }
 
 function service_user_enable_mail($uid_mail, $ip = false) {
-  if (empty($ip) && isset($_SERVER) && isset($_SERVER['REMOTE_ADDR'])) $ip = $_SERVER['REMOTE_ADDR'];
+  $ip = _service_realip($ip);
   return service_invoke('service.user.enable_mail', $uid_mail, $ip);
 }
 
@@ -374,5 +385,4 @@ function service_audience_create($data) {
 function service_audience_delete($aid) {
   return service_invoke('service.audience.delete', $aid);
 }
-
-
+ 

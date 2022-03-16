@@ -194,6 +194,7 @@ class NL4WP_API_v3_Client {
                 $data= (object) array('interests'=> $interests); 
             break;
             case '/lists/1/members':
+                $ip = !empty($data['ip_signup']) ? $data['ip_signup'] : false;
                 switch ($method) {
                     case 'GET':
                         $result=service_user_load($emailtocheck);
@@ -210,6 +211,7 @@ class NL4WP_API_v3_Client {
                             throw new NL4WP_API_Resource_Not_Found_Exception( "Utente non trovato", "404", $response, $data );  // da mettere a posto
                     break;
                     case 'PUT':
+                        $this->get_log()->debug( sprintf( "PUT %s %s", $emailtocheck, print_r($data, true) ) );
                         $data_to = array('mail' => $data['email_address']);
                        
                         foreach($data['merge_fields'] as $key=>$value)
@@ -232,15 +234,22 @@ class NL4WP_API_v3_Client {
                         foreach ($data['interests'] as $key => $value) 
                         {
                             if ($value)
-                                $data_to['audiences']=$key.','.$data_to['audiences'];
+                                $data_to['audiences']=$key.(!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
+                        }
+                        if (!empty($data['tags'])) foreach ($data['tags'] as $value) 
+                        {
+                            if ($value)
+                                $data_to['audiences']=$value.(!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
                         }
                                        
                         $data_to['privacy']=1; // forzatura Privacy
-                        // $this->get_log()->info( sprintf( "UTENTE VOX: %s",  print_r($data_to,true)  ) );
-                        if ($data['status']=='pending')  //GESTIONE DOUBLE OPTIN!!
-                            $result=service_user_subscribe($data_to);
-                        else
+                        if ($data['status']=='pending') { //GESTIONE DOUBLE OPTIN!!
+                            $this->get_log()->debug( sprintf( "CALL service_user_subscribe %s %s", print_r($data_to, true), $ip ) );
+                            $result=service_user_subscribe($data_to, $ip);
+                        } else {
+                            $this->get_log()->debug( sprintf( "CALL service_user_create %s %s", print_r($data_to, true) ) );
                             $result=service_user_create($data_to);
+                        }
                         
                         if (!$result) 
                         {
@@ -253,6 +262,7 @@ class NL4WP_API_v3_Client {
                                         $data_to['-audiences']=$key.','.$data_to['-audiences'];
                                 }
 
+                                $this->get_log()->debug( sprintf( "CALL service_user_update %s %s", $data_to["mail"], print_r($data_to, true) ) );
                                 $result=service_user_update($data_to["mail"],$data_to);
                                 if (!$result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data ); // verificare
                             }
@@ -261,9 +271,11 @@ class NL4WP_API_v3_Client {
                         $data['id']=$result;
                     break;
                     case 'PATCH':
+                        $this->get_log()->debug( sprintf( "PATCH %s %s", $emailtocheck, print_r($data, true) ) );
                         if ($data['status']=='unsubscribed') //al momento viene usato solo per la disicrizione
                         {
-                            $result = service_user_unsubscribe($emailtocheck);
+                            $this->get_log()->debug( sprintf( "CALL service_user_unsubscribe %s %s", $emailtocheck, $ip ) );
+                            $result = service_user_unsubscribe($emailtocheck, $ip);
                             $data['id']=$result;
                             if (!$result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data );
                         }

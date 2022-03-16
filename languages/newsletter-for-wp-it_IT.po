@@ -1677,3 +1677,52 @@ msgstr "Link alla pagina dell'informativa privacy"
 
 msgid "Agree to terms"
 msgstr "Informativa privacy"
+
+#: includes/forms/class-google-recaptcha.php:158
+msgid "Enable Google reCaptcha"
+msgstr "Abilita Google reCaptcha"
+
+#: includes/forms/class-google-recaptcha.php:164
+msgid "Select \"yes\" to enable Google reCAPTCHA spam protection for this form."
+msgstr "Seleziona \"si\" per abilitare la protezione Google reCAPTCHA per questo modulo."
+
+#: includes/forms/class-google-recaptcha.php:170
+msgid "Google reCAPTCHA Site Key"
+msgstr "Site Key di Google reCAPTCHA"
+
+#: includes/forms/class-google-recaptcha.php:174
+msgid "Enter your Google reCAPTCHA keys here. You can <a href=\"%s\">retrieve your keys in the Google reCAPTCHA admin console</a> or read our help article on <a href=\"%s\">how to configure Google reCAPTCHA</a>."
+msgstr "Inserisci le chiavi Google reCAPTCHA qui. Puoi <a href=\"%s\">recuperare le tue chiavi nella admin console di Google reCAPTCHA</a>."
+
+#: includes/forms/class-google-recaptcha.php:180
+msgid "Google reCAPTCHA Secret Key"
+msgstr "Secret Key di Google reCPATCHA"
+
+#: includes/integrations/views/integrations.php:30
+msgid "Active"
+msgstr "Attivo"
+
+#: includes/integrations/views/integrations.php:32
+msgid "Inactive"
+msgstr "Inattivo"
+
+#: includes/integrations/views/integrations.php:34
+msgid "Not installed"
+msgstr "Non installato"
+
+#: includes/forms/views/tabs/form-settings.php:90
+msgid "Subscriber tags"
+msgstr "Gruppi iscritti"
+
+#: includes/forms/views/tabs/form-settings.php:92
+msgid "Example: My tag, another tag"
+msgstr "Esempio: identificativogruppo1, identificativogruppo2"
+
+#: includes/forms/views/tabs/form-settings.php:94
+msgid "The listed tags will be applied to all new subscribers added by this form."
+msgstr "I gruppi indicati verranno aggiunti a tutti i nuovi iscritti aggiunti con questo modulo."
+
+#: includes/forms/views/tabs/form-settings.php:95
+msgid "Separate multiple values with a comma."
+msgstr "Separa valori multipli con una virgola."
+
