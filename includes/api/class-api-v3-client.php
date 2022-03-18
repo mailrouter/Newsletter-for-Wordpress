@@ -1,5 +1,7 @@
 <?php
-require "wrapper.php";
+
+if (!function_exists('service_info')) require "wrapper.php";
+
 class NL4WP_API_v3_Client {
 /** File da cambiare per il supporto API Newsletter **/
     /**
@@ -78,104 +80,143 @@ class NL4WP_API_v3_Client {
      * @throws NL4WP_API_Exception
      * NEWSLETTER unica funzione da cambiare.
      */
-    private function request( $method, $resource, array $data = array() ) {
+    private function request( $method, $resource, array $args = array() ) {
         global $wp_version;
         $this->reset();
 
         // don't bother if no API key was given.
-        if( empty( $this->api_key ) ) {
+        if(empty($this->api_key))
             throw new NL4WP_API_Exception( "Missing API key", 001 );
-        }
 
-        $GLOBALS['service_wrapper_uaprefix'] = 'nl4wp/' . NL4WP_VERSION . '; wp/' . $wp_version . '; ' . home_url() . '; '; // get_bloginfo( 'url' )
+        $GLOBALS['service_wrapper_uaprefix'] = 'nl4wp/' . NL4WP_VERSION . ' wp/' . $wp_version . ' (+' . home_url() . ') ';
+
         service_init($this->api_key); // inizializzazione API service
         
         // gestione ad hoc della richiesta di check utente
-        if (preg_match ( '/(\/lists\/1\/members)\/(.*)/', $resource,$matches))
-        {
+        if (preg_match ('/(\/lists\/1\/members)\/([^\/]*)/', $resource, $matches)) {
             $resource=$matches[1];
             $emailtocheck=base64_decode($matches[2]);
         }
+
         // gestione delle varie richieste
         switch ($resource) {
             case '/':
-                service_init( $this->api_key);
-                $result=service_info();        
-    
-                if ($result) 
+                if ($args !== array('fields' => 'account_id') /* 4.5.5 */ && $args !== array() /* 4.1.15 */)
                 {
-                    $data=(object) array('account_id'=>$this->api_key);
+                    throw new NL4WP_API_Exception( 'Unexpected arguments for '.$resource, 999, false, $args ); // da verificare
                 }
-                else throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data ); // da verificare
+
+                $result=service_info();
+
+                if ($result)
+                    return (object) array('account_id' => $this->api_key);
+                else throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $result, $args ); // da verificare
                 
             break;
             case '/lists':
-                $data =(object) array('lists'=>  array((object) array('id'=>1)));
-            break;
             case '/lists/1':
 
-                $groups= service_audience_list();
-                $groups= array_filter($groups, function($v) {
-                            return $v["handler"] == "servicesubscription"; //visibility register??
-                            });
+                foreach ($args as $k => $v) if ($k !== 'count' && $k !== 'fields' && $k !== 'offset') {
+                    throw new NL4WP_API_Exception( 'Unexpected arguments for '.$resource.': (supported count and fields)', 999, false, $args ); // da verificare
+                }
 
-                $fields=service_user_profile_fields_list();
-                $data=(object) array(
-                    'id'=>1,
-                    'name'=>'Lista Contatti',
-                    'stats'=>(object) array(
-                        'member_count'=>service_user_count(),
-                        'merge_field_count' => count($fields),
-                    )
-                );
+                // $groups = service_audience_list();
+                // $groups = array_filter($groups, function($v) {
+                //             return $v["handler"] == "servicesubscription"; //visibility register??
+                //             });
+
+                $ret= (object) array();
+
+
+                $ff = explode(',', !empty($args['fields']) ? $args['fields'] : 'id');
+                $exposecount = false;
+                if (empty($args['offset'])) foreach($ff as $f) {
+                    switch($f) {
+                        case 'total_items': $exposecount = true; break;
+                        case 'id': case 'lists.id': $ret->id = 1; break;
+                        case 'name': case 'lists.name': $ret->name = 'Lista Contatti'; break;
+                        case 'stats': case 'lists.stats': case 'lists.stats.member_count': case 'lists.stats.merge_field_count':
+                            if (!property_exists($ret, 'stats')) $ret->stats = (object) array();
+                            if ($f == 'stats' || $f == 'lists.stats' || $f == 'lists.stats.member_count') $ret->stats->member_count = service_user_count();
+                            if ($f == 'stats' || $f == 'lists.stats' || $f == 'lists.stats.merge_field_count') $ret->stats->merge_field_count = count(service_user_profile_fields_list());
+                            break;
+                        case 'web_id': case 'lists.web_id': $ret->web_id = '1'; break; // non applicabile
+                        // fino a nl4wp 4.5.5 venivano chiesti, ma non utilizzati, quindi li popolo casualmente.
+                        case 'campaign_defaults.from_name': 
+                        case 'campaign_defaults.from_email': 
+                            if (!property_exists($ret, 'campaign_default')) $ret->campaign_default = (object) array();
+                            if ($f == 'campaign_defaults.from_name') $ret->campaign_default->from_name = 'Mittente';
+                            if ($f == 'campaign_defaults.from_email') $ret->campaign_default->from_email = 'mittente@example.com';
+                            break;
+                        case 'lists.marketing_permissions': /* Whether or not the list has marketing permissions (eg. GDPR) enabled. */
+                            $ret->marketing_permissions = true;
+                            break;
+                        default: throw new NL4WP_API_Exception( 'Unsupported field for '.$resource.': '.$f, 999, false, $args );
+                    }
+                };
+
+                if ($resource == '/lists') {
+                    $ret = (object) array('lists'=> array($ret));
+                    if ($exposecount) $ret->total_items = 1;
+                }
+
+                return $ret;
                 
             break;
             case '/lists/1/merge-fields':
                 $result=service_user_profile_fields_list();
                  
-                if( $result ) {
-                    
+                if ($result) {
                     $merge_vars = array();
-                    
+                    $id = 1;
                     foreach ($result as $merge_var) {
-                        if ($merge_var['visibility']=='public'||$merge_var['visibility']=='register'||$merge_var['visibility']=='register_required'){
-                            $merge_var['type']=$merge_var['type']=='selection'?'dropdown':$merge_var['type'];
-                            $merge_var['type']=$merge_var['type']=='textfield'?'text':$merge_var['type'];
+                        if ($merge_var['visibility'] == 'hidden' || $merge_var['visibility'] =='public' || $merge_var['visibility'] == 'register' || $merge_var['visibility'] == 'register_required') {
+
                             if ($merge_var['type']=='checkbox')
-                            {
                                 $merge_var['options']=$merge_var['title'];
-                                $merge_var['type']="checkboxes";
-                            }
                                 
-                            if ($merge_var['name']=='profile_name') {
-                                $merge_var['name']='FNAME';
+                            $mv = (object) array(
+                                'id' => $id++,
+                                'required' => $merge_var['visibility'] == 'register_required' ? 1 : 0,
+                                'name' => $merge_var['title']
+                            );
+
+                            switch($merge_var['name']) {
+                                case 'profile_name': $mv->tag = 'FNAME'; break;
+                                case 'profile_surname': $mv->tag = 'LNAME'; break;
+                                default: $mv->tag = $merge_var['name']; break;
                             }
-                            if ($merge_var['name']=='profile_surname') {
-                                $merge_var['name']='LNAME';
+
+                            $mv->helptext = $merge_var['description'];
+
+                            switch($merge_var['type']) {
+                                case 'selection': $mv->type = 'dropdown'; break;
+                                case 'textfield': $mv->type = 'text'; break;
+                                case 'checkbox': $mv->type = 'checkboxes'; break;
+                                default: $mv->type = $merge_var['type'];
                             }
-                            $merge_vars[] = (object) array(
-                                            'id' => $id++,
-                                            'required' => $merge_var['visibility']=='register_required'?1:0,
-                                            'name' => $merge_var['title'],      
-                                            'tag' => $merge_var['name'],    
-                                            'helptext' => $merge_var['description'],          
-                                            'type' => $merge_var['type'],      
-                                            'public' => ($merge_var['visibility']=='public'||$merge_var['visibility']=='register'||$merge_var['visibility']=='register_required')?1:0,
-                                            'options' => (object) array('choices' => $merge_var['options']?explode("\n", $merge_var['options']):'')
-                                        );
+
+                            $mv->public = ($merge_var['visibility'] !== 'hidden') ? 1 : 0;
+
+                            if (isset($merge_var['options']))
+                                $mv->options = (object) array('choices' => $merge_var['options'] ? explode("\n", $merge_var['options']) : '');
+
+                            $merge_vars[] = $mv;
                         }
                     }
-                    $data =(object) array('merge_fields'=>$merge_vars);
-                }
+                    return (object) array('merge_fields' => $merge_vars);
+                } else return (object) array();
             break;
             case '/lists/1/interest-categories':
                 $groups= service_audience_list();
                 $groups= array_filter($groups, function($v) {
                             return $v["visibility"] == "register"; //visibility register??
                         });
-                if (count($groups)>0)
-                    $data= (object) array('categories'=>array((object) array('id'=>1,'title'=>"Gruppi", 'type'=>'checkboxes')));
-                
+                $ret = (object) array();
+                if (count($groups) > 0)
+                    $ret->categories = array((object) array('id' => 1, 'title' => "Gruppi", 'type' => 'checkboxes'));
+
+                return $ret;                
             break;
             case '/lists/1/interest-categories/1/interests':
                 $groups= service_audience_list();
@@ -183,7 +224,6 @@ class NL4WP_API_v3_Client {
                             return $v["visibility"] == "register"; //visibility register??
                         });
                 
-                $data = array();
                 $interests = array();
                 foreach ($groups as $group) {
                     $interests[] = (object) array(
@@ -191,102 +231,98 @@ class NL4WP_API_v3_Client {
                                             "name" => $group["caption"]
                                         );  
                 }
-                $data= (object) array('interests'=> $interests); 
+                return (object) array('interests'=> $interests); 
             break;
             case '/lists/1/members':
-                $ip = !empty($data['ip_signup']) ? $data['ip_signup'] : false;
+                $ip = !empty($args['ip_signup']) ? $args['ip_signup'] : false;
                 switch ($method) {
                     case 'GET':
-                        $result=service_user_load($emailtocheck);
+                        $result = service_user_load($emailtocheck);
                         //check esistenza
-                        if (is_array($result))
-                        { 
-                            $status=$result['mail_disable']==0?'subscribed':'';
+                        if (is_array($result)) {
                             // gestione gruppi
-                            $interests=explode(',',$result['audiences']);
-                            foreach ($interests as $value) $inter[$value]=1;
-                            $data= (object) array('id' => $result['uid'], 'email_address' => $result['mail'], 'unique_email_id' => $result['uid'], 'status' => $status, 'interests' => (object) $inter);
+                            $interests=explode(',', $result['audiences']);
+                            $inter = (object) array();
+                            foreach ($interests as $value) if (!empty($value)) $inter->{$value} = 1;
+                            $ret = (object) array(
+                                'id' => $result['uid'], 
+                                'email_address' => $result['mail'], 
+                                'unique_email_id' => $result['uid'], 
+                                'status' => $result['mail_disable'] == 0 ? 'subscribed' : '',
+                                'interests' => $inter
+                            );
+                            return $ret;
                         }
                         else
-                            throw new NL4WP_API_Resource_Not_Found_Exception( "Utente non trovato", "404", $response, $data );  // da mettere a posto
+                            throw new NL4WP_API_Resource_Not_Found_Exception( "Utente non trovato", "404", $result, $args );  // da mettere a posto
                     break;
                     case 'PUT':
-                        $this->get_log()->debug( sprintf( "PUT %s %s", $emailtocheck, print_r($data, true) ) );
-                        $data_to = array('mail' => $data['email_address']);
-                       
-                        foreach($data['merge_fields'] as $key=>$value)
-                        {
-                            switch ($key)
-                            {
-                                case 'FNAME':
-                                    $data_to['profile_name']=$value;
-                                break;
-                                case 'LNAME':
-                                    $data_to['profile_surname']=$value;
-                                break;
-                                default:
-                                    if (is_array($value)) $value=1;
-                                    $data_to[strtolower($key)]=$value;
-                                break;
-                            }
-                                
+                        $this->get_log()->debug( sprintf( "PUT %s %s", $emailtocheck, print_r($args, true) ) );
+
+                        $data_to = array('mail' => $args['email_address']);
+                        foreach($args['merge_fields'] as $key => $value) switch ($key) {
+                            case 'FNAME': $data_to['profile_name'] = $value; break;
+                            case 'LNAME': $data_to['profile_surname'] = $value; break;
+                            default:
+                                if (is_array($value)) $value = 1;
+                                $data_to[strtolower($key)] = $value;
+                            break;
                         }
-                        foreach ($data['interests'] as $key => $value) 
-                        {
-                            if ($value)
-                                $data_to['audiences']=$key.(!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
-                        }
-                        if (!empty($data['tags'])) foreach ($data['tags'] as $value) 
-                        {
-                            if ($value)
-                                $data_to['audiences']=$value.(!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
-                        }
+                        foreach ($args['interests'] as $key => $value) if ($value)
+                            $data_to['audiences'] = $key . (!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
+
+                        if (!empty($args['tags'])) foreach ($args['tags'] as $value) if ($value)
+                            $data_to['audiences'] = $value.(!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
                                        
-                        $data_to['privacy']=1; // forzatura Privacy
-                        if ($data['status']=='pending') { //GESTIONE DOUBLE OPTIN!!
+                        $data_to['privacy'] = 1; // forzatura Privacy
+                        if ($args['status'] == 'pending') { //GESTIONE DOUBLE OPTIN!!
                             $this->get_log()->debug( sprintf( "CALL service_user_subscribe %s %s", print_r($data_to, true), $ip ) );
-                            $result=service_user_subscribe($data_to, $ip);
+                            $result = service_user_subscribe($data_to, $ip);
                         } else {
                             $this->get_log()->debug( sprintf( "CALL service_user_create %s %s", print_r($data_to, true) ) );
-                            $result=service_user_create($data_to);
+                            $result = service_user_create($data_to);
                         }
                         
-                        if (!$result) 
-                        {
-                            if ($data['status']=='subscribed') //se arriva qui, vuol dire che l'utente è da aggiornare
-                            {
+                        if (!$result) {
+                            if ($args['status'] == 'subscribed') { //se arriva qui, vuol dire che l'utente è da aggiornare
                                 // gestione degli interessi da togliere
-                                foreach ($data['interests'] as $key => $value) 
-                                {    
-                                    if (!$value)
-                                        $data_to['-audiences']=$key.','.$data_to['-audiences'];
-                                }
+                                foreach ($args['interests'] as $key => $value) if (!$value)
+                                    $data_to['-audiences']=$key.','.$data_to['-audiences'];
 
                                 $this->get_log()->debug( sprintf( "CALL service_user_update %s %s", $data_to["mail"], print_r($data_to, true) ) );
-                                $result=service_user_update($data_to["mail"],$data_to);
-                                if (!$result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data ); // verificare
-                            }
-                            else throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data ); // verificare
+                                $result = service_user_update($data_to["mail"],$data_to);
+                                if (!$result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $result, $args );
+                            } else throw new NL4WP_API_Exception( 'Unexpected status after user.create', 999, false, $args );
                         }
-                        $data['id']=$result;
+                        $ret = array('id' => $result) + $args;
+                        return (object) $ret;
                     break;
                     case 'PATCH':
-                        $this->get_log()->debug( sprintf( "PATCH %s %s", $emailtocheck, print_r($data, true) ) );
-                        if ($data['status']=='unsubscribed') //al momento viene usato solo per la disicrizione
-                        {
+                        $this->get_log()->debug( sprintf( "PATCH %s %s", $emailtocheck, print_r($args, true) ) );
+                        if ($args['status'] == 'unsubscribed') { //al momento viene usato solo per la disicrizione
                             $this->get_log()->debug( sprintf( "CALL service_user_unsubscribe %s %s", $emailtocheck, $ip ) );
                             $result = service_user_unsubscribe($emailtocheck, $ip);
-                            $data['id']=$result;
-                            if (!$result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $response, $data );
+                            if (!$result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $result, $args );
+
+                            $ret = array('id' => $result) + $args;
+                            return (object) $ret;
                         }
                     break;
+                    /*
+                        case 'DELETE'  per la cancellazione ( vedi delete_list_member )
+                        NL4WP_API_Resource_Not_Found_Exception  se non esiste
+                        NL4WP_API_Exception   se non riesce
+                        si aspetta un void, quindi non importa che ritorno nulla.
+                    */
+                    default:
+                        throw new NL4WP_API_Exception( "Unsupported method " . $method . " for " . $resource, 004 );
                 }
             break;
             default: 
                 throw new NL4WP_API_Exception( "Unsupported call: " . $resource, 002 );
         }
        
-        return (object) $data;
+        throw new NL4WP_API_Exception( "Unsupported call: " . $resource, 003 );
     }
 
     /**

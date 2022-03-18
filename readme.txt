@@ -3,10 +3,10 @@ Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, ibericode, newsletter forms, newsletter integrations
 Requires at least: 4.1
 Tested up to: 5.9.2
-Stable tag: 4.5.5
+Stable tag: 4.5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Requires PHP: 5.2.4
+Requires PHP: 5.3
 
 Newsletter for WordPress, usa il tuo sito Wordpress per raccogliere iscritti per la tua Newsletter!
 
@@ -36,6 +36,8 @@ Newsletter for WordPress ti aiuta a aumentare il numero degli iscritti alla tua 
     - MemberPress
 	- Events Manager
 	- Easy Digital Downloads
+	- Give
+	- UltimateMember
 
 #### Che cos'è un ESP e quali ESP sono compatibili con Newsletter for WordPress?
 
@@ -53,7 +55,7 @@ Newsletter for Worpress facilita l'implementazione della procedura di iscrizione
 1. Immetti la tua chiave API nella configurazione del plugin.
 
 #### Come configurare il Modulo di iscrizione
-1. Vai su *Newsletter for WP > Modulo*
+1. Vai su *NL4WP > Modulo*
 2. Seleziona una lista in cui andranno a finire gli iscritti.
 3. *(Opzionale)* Aggiungi più campi al modulo scegliendoli da quelli proposti.
 4. Usa il modulo nelle pagine o negli articoli usando il pulsante "Preleva Shortcode".

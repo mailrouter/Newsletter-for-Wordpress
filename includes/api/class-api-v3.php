@@ -52,7 +52,7 @@ class NL4WP_API_v3
      */
     public function get_subscriber_hash($email_address)
     {
-        return base64_encode( strtolower( trim( $email_address ) ) ); /* NL_CHANGED */
+        return base64_encode( trim( $email_address ) ); /* NL_CHANGED */
     }
 
     /**
