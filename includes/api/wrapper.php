@@ -1,5 +1,5 @@
 <?php
-// API Wrapper v1.28(20220316)
+// API Wrapper v1.30(20220811)
 //
 // Compatible with PHP4+ with HASH Cryptography extension (PHP >5.1.2)
 // or the MHASH Cryptography extension.
@@ -38,7 +38,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 // OF THE POSSIBILITY OF SUCH DAMAGE. 
 
-if (!class_exists('xmlrpc_client') && !function_exists('xmlrpc_encode_request'))
+if (!ini_get('allow_url_fopen') || (!class_exists('xmlrpc_client') && !function_exists('xmlrpc_encode_request')))
   @include_once('xmlrpc.inc');
 
 // Settings
@@ -47,7 +47,7 @@ if (!isset($GLOBALS['service_wrapper_debug']))
 if (!isset($GLOBALS['service_wrapper_timeout']))
   $GLOBALS['service_wrapper_timeout'] = 30;
 if (!isset($GLOBALS['service_wrapper_method']))
-  $GLOBALS['service_wrapper_method'] = "http11";
+  $GLOBALS['service_wrapper_method'] = "https"; // was http11 in older releases
 if (!isset($GLOBALS['service_wrapper_url']))
   $GLOBALS['service_wrapper_url'] = "services/xmlrpc";
 if (!isset($GLOBALS['service_wrapper_time_offset']))
@@ -79,7 +79,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
 
 
   function service_version() {
-    return 1028;
+    return 1030;
   }
 
   function service_init($hostoruniquekey, $api_key = false, $secret = false) {
@@ -100,7 +100,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
     global $service_host, $service_api_key, $service_secret, $service_last_result, $service_last_method, $service_last_args;
     $service_last_result = 0;
     $timestamp = time() + $GLOBALS['service_wrapper_time_offset'];
-    $nonce = md5(mt_rand());
+    $nonce = md5((string)mt_rand());
     $hash = function_exists('hash_hmac') ? 
       hash_hmac("sha256", $service_api_key.';'.$timestamp.';'.$nonce.';'.$method, $service_secret) :
       bin2hex(mhash(MHASH_SHA256, $service_api_key.';'.$timestamp.';'.$nonce.';'.$method, $service_secret));
@@ -176,7 +176,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
         $service_last_result['value'] = $service_last_result_dec->value();
       }
 
-    } else if (function_exists('xmlrpc_encode_request')) {
+    } else if (function_exists('xmlrpc_encode_request') && ini_get('allow_url_fopen')) {
 
       $request = xmlrpc_encode_request($method,$args,array(
         'encoding' => 'utf-8',
@@ -191,12 +191,21 @@ define('ENS_ERROR_INVALID_FROM', 502);
         'timeout' => $GLOBALS['service_wrapper_timeout'],
       )));
 
-      $service_last_result_raw = file_get_contents('http://'.$service_host.'/'.$GLOBALS['service_wrapper_url'], false, $context);
+      $service_last_result_raw = @file_get_contents(($GLOBALS['service_wrapper_method'] == 'https' ? 'https://' : 'http://').$service_host.'/'.$GLOBALS['service_wrapper_url'], false, $context);
+
+      if ($GLOBALS['service_wrapper_debug']) {
+        print("<PRE>\r\n");
+        print(">>> file_get_contents(" . ($GLOBALS['service_wrapper_method'] == 'https' ? 'https://' : 'http://').$service_host.'/'.$GLOBALS['service_wrapper_url'] . ")\r\n");
+        print(">>> " . $request . "\r\n");
+        print("<<< " . ($service_last_result_raw ? $service_last_result_raw : "ERROR: " . print_r(error_get_last(), true)) . "\r\n");
+        print("</PRE>\r\n");
+      }
 
       if ($service_last_result_raw == false) {
+        $error = error_get_last();
         $service_last_result = array(
           'faultCode' => 8,
-          'faultString' => 'Remote request timed-out or failed'
+          'faultString' => 'Remote request timed-out or failed: ' . $error['message']
         );
       } else {
         $service_last_result_dec = xmlrpc_decode($service_last_result_raw, 'utf-8');
@@ -218,6 +227,13 @@ define('ENS_ERROR_INVALID_FROM', 502);
           }
         }
       }
+
+    } else if (function_exists('xmlrpc_encode_request')) {
+
+      $service_last_result = array(
+        'faultCode' => ENS_ERROR_UNKNOWN,
+        'faultString' => 'No usable XMLRPC library found. Please set allow_url_fopen PHP ini directive to 1 (default) or download xmlrpc.inc from http://phpxmlrpc.sourceforge.net/'
+      );
 
     } else {
 
@@ -385,4 +401,4 @@ function service_audience_create($data) {
 function service_audience_delete($aid) {
   return service_invoke('service.audience.delete', $aid);
 }
- 
+

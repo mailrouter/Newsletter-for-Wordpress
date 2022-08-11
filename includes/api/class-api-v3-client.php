@@ -106,11 +106,16 @@ class NL4WP_API_v3_Client {
                     throw new NL4WP_API_Exception( 'Unexpected arguments for '.$resource, 999, false, $args ); // da verificare
                 }
 
+                $this->get_log()->debug( sprintf( "CALL service_info %s", print_r($args, true) ) );
                 $result=service_info();
 
                 if ($result)
                     return (object) array('account_id' => $this->api_key);
-                else throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $result, $args ); // da verificare
+                else 
+                {
+                    $this->get_log()->warning( sprintf( "CALL to service_info failed: %s", service_errormessage() ) );
+                    throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $result, $args ); // da verificare
+                }
                 
             break;
             case '/lists':
@@ -237,6 +242,7 @@ class NL4WP_API_v3_Client {
                 $ip = !empty($args['ip_signup']) ? $args['ip_signup'] : false;
                 switch ($method) {
                     case 'GET':
+                        $this->get_log()->debug( sprintf( "GET %s %s", $emailtocheck, print_r($args, true) ) );
                         $result = service_user_load($emailtocheck);
                         //check esistenza
                         if (is_array($result)) {
