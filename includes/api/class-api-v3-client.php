@@ -281,12 +281,14 @@ class NL4WP_API_v3_Client {
                             $data_to['audiences'] = $value.(!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
                                        
                         $data_to['privacy'] = 1; // forzatura Privacy
+                        $method = 'user.subscribe';
                         if ($args['status'] == 'pending') { //GESTIONE DOUBLE OPTIN!!
                             $this->get_log()->debug( sprintf( "CALL service_user_subscribe %s %s", print_r($data_to, true), $ip ) );
                             $result = service_user_subscribe($data_to, $ip);
                         } else {
-                            $this->get_log()->debug( sprintf( "CALL service_user_create %s %s", print_r($data_to, true) ) );
+                            $this->get_log()->debug( sprintf( "CALL service_user_create %s", print_r($data_to, true) ) );
                             $result = service_user_create($data_to);
+                            $method = 'user.create';
                         }
                         
                         if (!$result) {
@@ -298,7 +300,7 @@ class NL4WP_API_v3_Client {
                                 $this->get_log()->debug( sprintf( "CALL service_user_update %s %s", $data_to["mail"], print_r($data_to, true) ) );
                                 $result = service_user_update($data_to["mail"],$data_to);
                                 if (!$result) throw new NL4WP_API_Exception( service_errormessage(), service_errorcode(), $result, $args );
-                            } else throw new NL4WP_API_Exception( 'Unexpected status after user.create', 999, false, $args );
+                            } else throw new NL4WP_API_Exception( 'Unexpected status after '.$method.': '.service_errormessage(), service_errorcode(), false, $args );
                         }
                         $ret = array('id' => $result) + $args;
                         return (object) $ret;
