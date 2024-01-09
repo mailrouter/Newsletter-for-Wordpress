@@ -70,6 +70,7 @@ class NL4WP_Container implements ArrayAccess
      * <p>
      * The return value will be casted to boolean if non-boolean was returned.
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return $this->has($offset);
@@ -86,6 +87,7 @@ class NL4WP_Container implements ArrayAccess
      *
      * @return mixed Can return all value types.
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->get($offset);
@@ -105,6 +107,7 @@ class NL4WP_Container implements ArrayAccess
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->services[ $offset ] = $value;
@@ -121,6 +124,7 @@ class NL4WP_Container implements ArrayAccess
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->services[ $offset ]);

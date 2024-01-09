@@ -1,6 +1,17 @@
 Changelog
 =========
 
+#### 4.5.11 - Gen 09, 2023
+
+**Fixes**
+
+- PHP Deprecated:  Return type of NL4WP_Container::offsetExists($offset) should either be compatible with ArrayAccess::offsetExists(mixed $offset)
+- PHP Deprecated:  Return type of NL4WP_Container::offsetGet($offset) should either be compatible with ArrayAccess::offsetGet(mixed $offset)
+- PHP Deprecated:  Return type of NL4WP_Container::offsetSet($offset, $value) should either be compatible with ArrayAccess::offsetSet(mixed $offset, mixed $value)
+- PHP Deprecated:  Return type of NL4WP_Container::offsetUnset($offset) should either be compatible with ArrayAccess::offsetUnset(mixed $offset)
+- Added attribute #[\ReturnTypeWillChange] to NL4WP_Container for Deprecated notices in PHP 8.1
+
+
 #### 4.5.5 - Sep 12, 2019
 
 **Fixes**
