@@ -3,7 +3,7 @@
 Plugin Name: Newsletter for WordPress
 Plugin URI: https://github.com/mailrouter/Newsletter-for-Wordpress
 Description: Newsletter for WordPress by mailrouter. Aggiunge vari metodi di iscrizione newsletter al tuo sito.
-Version: 4.5.11
+Version: 4.5.12
 Author: mailrouter
 Text Domain: newsletter-for-wp
 Domain Path: /languages

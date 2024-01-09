@@ -1,7 +1,16 @@
 Changelog
 =========
 
-#### 4.5.11 - Gen 09, 2023
+#### 4.5.12 - Gen 09, 2024
+
+**Fixes**
+
+- PHP Deprecated:  trim(): Passing null to parameter #1 ($string) of type string is deprecated in Newsletter-for-Wordpress/includes/api/xmlrpc.inc on line 2444
+- Added check to evaluate empty array value in Newsletter-for-Wordpress/includes/api/xmlrpc.inc on line 2444
+- Changed wrong date in Changelog entry
+
+
+#### 4.5.11 - Gen 09, 2024
 
 **Fixes**
 
