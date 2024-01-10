@@ -57,11 +57,11 @@ function _nl4wp_load_plugin()
     }
 
     // bootstrap the core plugin
-    define( 'NL4WP_VERSION', '4.5.10');
+    define( 'NL4WP_VERSION', '4.5.12');
     /* NL_CHANGED - start
      * imposta la versione pro
      */
-    define ('NL4WP_PREMIUM_VERSION', '4.5.10');
+    define ('NL4WP_PREMIUM_VERSION', '4.5.12');
     /* NL_CHANGED - end */
     define('NL4WP_PLUGIN_DIR', dirname(__FILE__) . '/');
     define('NL4WP_PLUGIN_URL', plugins_url('/', __FILE__));
