@@ -143,7 +143,10 @@ class NL4WP_API_v3_Client {
                         case 'stats': case 'lists.stats': case 'lists.stats.member_count': case 'lists.stats.merge_field_count':
                             if (!property_exists($ret, 'stats')) $ret->stats = (object) array();
                             if ($f == 'stats' || $f == 'lists.stats' || $f == 'lists.stats.member_count') $ret->stats->member_count = service_user_count();
-                            if ($f == 'stats' || $f == 'lists.stats' || $f == 'lists.stats.merge_field_count') $ret->stats->merge_field_count = count(service_user_profile_fields_list());
+                            if ($f == 'stats' || $f == 'lists.stats' || $f == 'lists.stats.merge_field_count') {
+                                $fc = service_user_profile_fields_list();
+                                $ret->stats->merge_field_count = is_array($fc) ? count($fc) : 0;
+                            }
                             break;
                         case 'web_id': case 'lists.web_id': $ret->web_id = '1'; break; // non applicabile
                         // fino a nl4wp 4.5.5 venivano chiesti, ma non utilizzati, quindi li popolo casualmente.
@@ -218,7 +221,7 @@ class NL4WP_API_v3_Client {
                             return $v["visibility"] == "register"; //visibility register??
                         });
                 $ret = (object) array();
-                if (count($groups) > 0)
+                if (is_array($groups) && count($groups) > 0)
                     $ret->categories = array((object) array('id' => 1, 'title' => "Gruppi", 'type' => 'checkboxes'));
 
                 return $ret;                

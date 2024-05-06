@@ -2441,7 +2441,7 @@ xmlrpc_encode_entitites($this->errstr, $GLOBALS['xmlrpc_internalencoding'], $cha
 								{
 									$val = explode('=', $val, 2);
 									$tag = trim($val[0]);
-									$val = trim(@$val[1]);
+									$val = isset($val[1]) && !empty($val[1]) ? trim($val[1]) : '';
 									/// @todo with version 1 cookies, we should strip leading and trailing " chars
 									if ($pos == 0)
 									{
