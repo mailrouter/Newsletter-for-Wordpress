@@ -656,7 +656,7 @@ class NL4WP_Form
         $required_fields_string = strtoupper($this->settings['required_fields']);
 
         // remove array-formatted fields
-        // workaround for #261 (https://github.com/ibericode/newsletter-for-wordpress/issues/261)
+        // workaround for issue #261
         $required_fields_string = preg_replace('/\[\w+\]/', '', $required_fields_string);
 
         // turn into an array
@@ -669,7 +669,7 @@ class NL4WP_Form
         $required_fields = array_unique($required_fields);
         $required_fields = array_filter($required_fields);
 
-        // fix uppercased subkeys, see https://github.com/ibericode/newsletter-for-wordpress/issues/516
+        // fix uppercased subkeys #516
         foreach ($required_fields as $key => $value) {
             $pos = strpos($value, '.');
             if ($pos > 0) {

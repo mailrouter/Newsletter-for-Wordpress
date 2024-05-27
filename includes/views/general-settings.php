@@ -12,7 +12,7 @@ defined('ABSPATH') or exit;
 	<div class="row">
 
 		<!-- Main Content -->
-		<div class="main-content col col-4">
+		<div class="main-content col col-6">
 
 			<h1 class="page-title">
                 Newsletter for WordPress: <?php _e('API Settings', 'newsletter-for-wp'); ?>
@@ -50,10 +50,10 @@ defined('ABSPATH') or exit;
 					<tr valign="top">
 						<th scope="row"><label for="newsletter_api_key"><?php _e('API Key', 'newsletter-for-wp'); ?></label></th>
 						<td>
-							<input type="text" class="widefat" placeholder="<?php _e('Your Newsletter API key', 'newsletter-for-wp'); ?>" id="newsletter_api_key" name="nl4wp[api_key]" value="<?php echo esc_attr($obfuscated_api_key); ?>" <?php echo defined('NL4WP_API_KEY') ? 'readonly="readonly"' : ''; ?> />
+							<textarea class="widefat" placeholder="<?php _e('Your Newsletter API key', 'newsletter-for-wp'); ?>" id="newsletter_api_key" name="nl4wp[api_key]" <?php echo defined('NL4WP_API_KEY') ? 'readonly="readonly"' : ''; ?> ><?php echo esc_textarea( $obfuscated_api_key ); ?></textarea>
 							<p class="help">
 								<?php _e('The API key for connecting with your Newsletter account.', 'newsletter-for-wp'); ?>
-								<a target="_blank" href="https://admin.newsletter.com/account/api"><?php _e('Get your API key here.', 'newsletter-for-wp'); ?></a>
+								
 							</p>
 
 							<?php if (defined('NL4WP_API_KEY')) {
@@ -84,15 +84,12 @@ defined('ABSPATH') or exit;
                 include dirname(__FILE__) . '/parts/lists-overview.php';
             }
 
-            include dirname(__FILE__) . '/parts/admin-footer.php';
+            
 
             ?>
 		</div>
 
-		<!-- Sidebar -->
-		<div class="sidebar col col-2">
-			<?php include dirname(__FILE__) . '/parts/admin-sidebar.php'; ?>
-		</div>
+		
 
 
 	</div>

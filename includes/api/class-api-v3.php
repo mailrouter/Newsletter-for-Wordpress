@@ -58,7 +58,7 @@ class NL4WP_API_v3
     /**
      * Get recent daily, aggregated activity stats for a list.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/activity/#read-get_lists_list_id_activity
+     *
      *
      * @param string $list_id
      * @param array $args
@@ -81,7 +81,7 @@ class NL4WP_API_v3
     /**
      * Gets the interest categories for a given List
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/interest-categories/#read-get_lists_list_id_interest_categories
+     *
      *
      * @param string $list_id
      * @param array $args
@@ -102,7 +102,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/interest-categories/interests/#read-get_lists_list_id_interest_categories_interest_category_id_interests
+     *
      *
      * @param string $list_id
      * @param string $interest_category_id
@@ -126,7 +126,7 @@ class NL4WP_API_v3
     /**
      * Get merge vars for a given list
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/merge-fields/#read-get_lists_list_id_merge_fields
+     *
      *
      * @param string $list_id
      * @param array $args
@@ -147,7 +147,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/#read-get_lists_list_id
+     *
      *
      * @param string $list_id
      * @param array $args
@@ -163,7 +163,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/#read-get_lists
+     *
      *
      * @param array $args
      *
@@ -183,7 +183,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/members/
+     *
      *
      * @param string $list_id
      * @param string $email_address
@@ -203,7 +203,7 @@ class NL4WP_API_v3
     /**
      * Batch subscribe / unsubscribe list members.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/#create-post_lists_list_id
+     *
      *
      * @param string $list_id
      * @param array $args
@@ -219,7 +219,7 @@ class NL4WP_API_v3
     /**
      * Add or update (!) a member to a Newsletter list.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/members/#create-post_lists_list_id_members
+     *
      *
      * @param string $list_id
      * @param array $args
@@ -247,7 +247,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/members/#edit-patch_lists_list_id_members_subscriber_hash
+     *
      *
      * @param $list_id
      * @param $email_address
@@ -275,7 +275,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/members/
+     *
      *
      * @param string $list_id
      * @param string $email_address
@@ -294,7 +294,7 @@ class NL4WP_API_v3
     /**
      * Get the tags on a list member.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/members/tags/#create-post_lists_list_id_members_subscriber_hash_tags
+     *
      * @param string $list_id
      * @param string $email_address
      * @return object
@@ -310,7 +310,7 @@ class NL4WP_API_v3
     /**
      * Add or remove tags from a list member. If a tag that does not exist is passed in and set as ‘active’, a new tag will be created.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/members/tags/#read-get_lists_list_id_members_subscriber_hash_tags
+     *
      * @param string $list_id
      * @param string $email_address
      * @param array $data
@@ -327,7 +327,7 @@ class NL4WP_API_v3
     /**
      * Get information about all available segments for a specific list.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/lists/segments/#read-get_lists_list_id_segments
+     *
      * @param string $list_id
      * @param array $args
      * @return object
@@ -340,7 +340,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/#read-get_ecommerce_stores
+     *
      *
      * @param array $args
      *
@@ -354,7 +354,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/#read-get_ecommerce_stores_store_id
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -369,7 +369,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/#create-post_ecommerce_stores
+     *
      *
      * @param array $args
      *
@@ -383,7 +383,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/#edit-patch_ecommerce_stores_store_id
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -398,7 +398,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/#delete-delete_ecommerce_stores_store_id
+     *
      *
      * @param string $store_id
      *
@@ -412,7 +412,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/customers/#read-get_ecommerce_stores_store_id_customers
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -427,7 +427,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/customers/#read-get_ecommerce_stores_store_id_customers_customer_id
+     *
      *
      * @param string $store_id
      * @param string $customer_id
@@ -445,7 +445,7 @@ class NL4WP_API_v3
     /**
      * Add OR update a store customer
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/customers/#edit-put_ecommerce_stores_store_id_customers_customer_id
+     *
      *
      * @param $store_id
      * @param array $args
@@ -460,7 +460,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/customers/#edit-patch_ecommerce_stores_store_id_customers_customer_id
+     *
      *
      * @param string $store_id
      * @param string $customer_id
@@ -476,7 +476,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/customers/#delete-delete_ecommerce_stores_store_id_customers_customer_id
+     *
      *
      * @param string $store_id
      * @param string $customer_id
@@ -491,7 +491,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/#read-get_ecommerce_stores_store_id_products
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -506,7 +506,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/#read-get_ecommerce_stores_store_id_products_product_id
+     *
      *
      * @param string $store_id
      * @param string $product_id
@@ -524,7 +524,7 @@ class NL4WP_API_v3
     /**
      * Add a product to a store
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/#create-post_ecommerce_stores_store_id_products
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -539,7 +539,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/#edit-patch_ecommerce_stores_store_id_products_product_id
+     *
      *
      * @param string $store_id
      * @param string $product_id
@@ -555,7 +555,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/#delete-delete_ecommerce_stores_store_id_products_product_id
+     *
      *
      * @param string $store_id
      * @param string $product_id
@@ -570,7 +570,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/variants/#read-get_ecommerce_stores_store_id_products_product_id_variants
+     *
      *
      * @param string $store_id
      * @param string $product_id
@@ -586,7 +586,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/variants/#read-get_ecommerce_stores_store_id_products_product_id_variants_variant_id
+     *
      *
      * @param string $store_id
      * @param string $product_id
@@ -605,7 +605,7 @@ class NL4WP_API_v3
     /**
      * Add OR update a product variant.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/variants/#edit-put_ecommerce_stores_store_id_products_product_id_variants_variant_id
+     *
      *
      * @param string $store_id
      * @param string $product_id
@@ -621,7 +621,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/variants/#edit-patch_ecommerce_stores_store_id_products_product_id_variants_variant_id
+     *
      *
      * @param string $store_id
      * @param string $product_id
@@ -638,7 +638,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/products/variants/#delete-delete_ecommerce_stores_store_id_products_product_id_variants_variant_id
+     *
      *
      * @param string $store_id
      * @param string $product_id
@@ -654,7 +654,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/#read-get_ecommerce_stores_store_id_orders
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -669,7 +669,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/#read-get_ecommerce_stores_store_id_orders_order_id
+     *
      *
      * @param string $store_id
      * @param string $order_id
@@ -685,7 +685,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/#create-post_ecommerce_stores_store_id_orders
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -700,7 +700,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/#edit-patch_ecommerce_stores_store_id_orders_order_id
+     *
      *
      * @param string $store_id
      * @param string $order_id
@@ -716,7 +716,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/#delete-delete_ecommerce_stores_store_id_orders_order_id
+     *
      *
      * @param string $store_id
      * @param string $order_id
@@ -730,7 +730,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/lines/#create-post_ecommerce_stores_store_id_orders_order_id_lines
+     *
      *
      * @param string $store_id
      * @param string $order_id
@@ -747,7 +747,7 @@ class NL4WP_API_v3
 
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/lines/#read-get_ecommerce_stores_store_id_orders_order_id_lines
+     *
      *
      * @param string $store_id
      * @param string $order_id
@@ -763,7 +763,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/lines/#read-get_ecommerce_stores_store_id_orders_order_id_lines_line_id
+     *
      *
      * @param string $store_id
      * @param string $order_id
@@ -780,7 +780,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/lines/#edit-patch_ecommerce_stores_store_id_orders_order_id_lines_line_id
+     *
      *
      * @param string $store_id
      * @param string $order_id
@@ -797,7 +797,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/orders/lines/#delete-delete_ecommerce_stores_store_id_orders_order_id_lines_line_id
+     *
      *
      * @param string $store_id
      * @param string $order_id
@@ -813,7 +813,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/#read-get_ecommerce_stores_store_id_carts
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -828,7 +828,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/#read-get_ecommerce_stores_store_id_carts_cart_id
+     *
      *
      * @param string $store_id
      * @param string $cart_id
@@ -844,7 +844,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/#create-post_ecommerce_stores_store_id_carts
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -859,7 +859,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/#edit-patch_ecommerce_stores_store_id_carts_cart_id
+     *
      *
      * @param string $store_id
      * @param string $cart_id
@@ -875,7 +875,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/#delete-delete_ecommerce_stores_store_id_carts_cart_id
+     *
      *
      * @param string $store_id
      * @param string $cart_id
@@ -888,7 +888,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/lines/#read-get_ecommerce_stores_store_id_carts_cart_id_lines
+     *
      *
      * @param string $store_id
      * @param string $cart_id
@@ -904,7 +904,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/lines/#read-get_ecommerce_stores_store_id_carts_cart_id_lines_line_id
+     *
      *
      * @param string $store_id
      * @param string $cart_id
@@ -921,7 +921,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/lines/#create-post_ecommerce_stores_store_id_carts_cart_id_lines
+     *
      *
      * @param string $store_id
      * @param string $cart_id
@@ -937,7 +937,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/lines/#edit-patch_ecommerce_stores_store_id_carts_cart_id_lines_line_id
+     *
      *
      * @param string $store_id
      * @param string $cart_id
@@ -954,7 +954,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/carts/lines/#delete-delete_ecommerce_stores_store_id_carts_cart_id_lines_line_id
+     *
      *
      * @param string $store_id
      * @param string $cart_id
@@ -970,7 +970,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/#create-post_ecommerce_stores_store_id_promo_rules
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -985,7 +985,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/#read-get_ecommerce_stores_store_id_promo_rules
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -1000,7 +1000,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/#read-get_ecommerce_stores_store_id_promo_rules_promo_rule_id
+     *
      *
      * @param string $store_id
      * @param string $promo_rule_id
@@ -1016,7 +1016,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/#edit-patch_ecommerce_stores_store_id_promo_rules_promo_rule_id
+     *
      *
      * @param string $store_id
      * @param string $promo_rule_id
@@ -1032,7 +1032,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/#delete-delete_ecommerce_stores_store_id_promo_rules_promo_rule_id
+     *
      *
      * @param string $store_id
      * @param string $promo_rule_id
@@ -1047,7 +1047,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/promo-codes/#create-post_ecommerce_stores_store_id_promo_rules_promo_rule_id_promo_codes
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -1062,7 +1062,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/promo-codes/#read-get_ecommerce_stores_store_id_promo_rules_promo_rule_id_promo_codes
+     *
      *
      * @param string $store_id
      * @param array $args
@@ -1077,7 +1077,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/promo-codes/#read-get_ecommerce_stores_store_id_promo_rules_promo_rule_id_promo_codes_promo_code_id
+     *
      *
      * @param string $store_id
      * @param string $promo_rule_id
@@ -1093,7 +1093,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/promo-codes/#edit-patch_ecommerce_stores_store_id_promo_rules_promo_rule_id_promo_codes_promo_code_id
+     *
      *
      * @param string $store_id
      * @param string $promo_rule_id
@@ -1109,7 +1109,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/ecommerce/stores/promo-rules/promo-codes/#delete-delete_ecommerce_stores_store_id_promo_rules_promo_rule_id_promo_codes_promo_code_id
+     *
      *
      * @param string $store_id
      * @param string $promo_rule_id
@@ -1127,7 +1127,7 @@ class NL4WP_API_v3
     /**
      * Get a list of an account's available templates
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/templates/#read-get_templates
+     *
      * @param array $args
      * @return object
      * @throws NL4WP_API_Exception
@@ -1141,7 +1141,7 @@ class NL4WP_API_v3
     /**
      * Get information about a specific template.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/templates/#read-get_templates_template_id
+     *
      * @param string $template_id
      * @return object
      * @throws NL4WP_API_Exception
@@ -1153,7 +1153,7 @@ class NL4WP_API_v3
     }
 
     /**
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/templates/default-content/
+     *
      * @param string $template_id
      * @return object
      * @throws NL4WP_API_Exception
@@ -1167,7 +1167,7 @@ class NL4WP_API_v3
     /**
      * Create a new campaign
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/campaigns/#create-post_campaigns
+     *
      * @param array $args
      * @return object
      * @throws NL4WP_API_Exception
@@ -1181,7 +1181,7 @@ class NL4WP_API_v3
     /**
      * Get all campaigns in an account
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/campaigns/#read-get_campaigns
+     *
      * @param array $args
      * @return object
      * @throws NL4WP_API_Exception
@@ -1195,7 +1195,7 @@ class NL4WP_API_v3
     /**
      * Get information about a specific campaign.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/campaigns/#read-get_campaigns_campaign_id
+     *
      * @param string $campaign_id
      * @param array $args
      * @return object
@@ -1210,7 +1210,7 @@ class NL4WP_API_v3
     /**
      * Update some or all of the settings for a specific campaign.
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/campaigns/#edit-patch_campaigns_campaign_id
+     *
      * @param string $campaign_id
      * @param array $args
      * @return object
@@ -1225,7 +1225,7 @@ class NL4WP_API_v3
     /**
      * Remove a campaign from the Newsletter account
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/campaigns/#delete-delete_campaigns_campaign_id
+     *
      * @param string $campaign_id
      * @return bool
      * @throws NL4WP_API_Exception
@@ -1239,7 +1239,7 @@ class NL4WP_API_v3
     /**
      * Perform an action on a Newsletter campaign
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/campaigns/#action-post_campaigns
+     *
      *
      * @param string $campaign_id
      * @param string $action
@@ -1256,7 +1256,7 @@ class NL4WP_API_v3
     /**
      * Get the HTML and plain-text content for a campaign
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/campaigns/content/#read-get_campaigns_campaign_id_content
+     *
      * @param string $campaign_id
      * @param array $args
      * @return object
@@ -1271,7 +1271,7 @@ class NL4WP_API_v3
     /**
      * Set the content for a campaign
      *
-     * @link https://developer.newsletter.com/documentation/newsletter/reference/campaigns/content/#edit-put_campaigns_campaign_id_content
+     *
      * @param string $campaign_id
      * @param array $args
      * @return object

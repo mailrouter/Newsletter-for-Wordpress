@@ -267,7 +267,7 @@ abstract class NL4WP_Integration
 
         ob_start();
 
-        echo sprintf('<!-- Newsletter for WordPress v%s - https://mc4wp.com/ -->', NL4WP_VERSION);
+        echo sprintf('<!-- Newsletter for WordPress v%s -  -->', NL4WP_VERSION);
 
         /** @ignore */
         do_action('nl4wp_integration_before_checkbox_wrapper', $this);

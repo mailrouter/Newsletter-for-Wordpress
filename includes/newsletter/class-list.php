@@ -151,7 +151,7 @@ class NL4WP_Newsletter_List
      */
     public function get_web_url()
     {
-        return 'https://admin.newsletter.com/lists/members/?id=' . $this->web_id;
+        return '';
     }
 
     /**

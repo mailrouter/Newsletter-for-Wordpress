@@ -109,7 +109,7 @@ function nl4wp_get_api()
 {
     _deprecated_function(__FUNCTION__, '4.0', 'nl4wp_get_api_v3');
     $api_key = nl4wp_get_api_key();
-    $instance = new NL4WP_API($api_key);
+    
     return $instance;
 }
 

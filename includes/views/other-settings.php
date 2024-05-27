@@ -31,7 +31,7 @@ function _nl4wp_usage_tracking_setting($opts)
 
 					<p class="help">
 						<?php echo __('Allow us to anonymously track how this plugin is used to help us make it better fit your needs.', 'newsletter-for-wp'); ?>
-						<a href="https://kb.mc4wp.com/what-is-usage-tracking/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=settings-page" target="_blank">
+						<a href="https://removed/what-is-usage-tracking/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=settings-page" target="_blank">
 							<?php _e('This is what we track.', 'newsletter-for-wp'); ?>
 						</a>
 					</p>
@@ -47,7 +47,7 @@ function _nl4wp_usage_tracking_setting($opts)
 						<option value="debug" <?php selected('debug', $opts['debug_log_level']); ?>><?php _e('Everything', 'newsletter-for-wp'); ?></option>
 					</select>
 					<p class="help">
-						<?php printf(__('Determines what events should be written to <a href="%s">the debug log</a> (see below).', 'newsletter-for-wp'), 'https://kb.mc4wp.com/how-to-enable-log-debugging/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=settings-page'); ?>
+						<?php printf(__('Determines what events should be written to the debug log (see below).', 'newsletter-for-wp')); ?>
 					</p>
 				</td>
 			</tr>
@@ -70,7 +70,7 @@ add_action('nl4wp_admin_other_settings', '_nl4wp_usage_tracking_setting', 70);
 	<div class="row">
 
 		<!-- Main Content -->
-		<div class="main-content col col-4">
+		<div class="main-content col col-6">
 
 			<h1 class="page-title">
 				<?php _e('Other Settings', 'newsletter-for-wp'); ?>
@@ -198,13 +198,10 @@ add_action('nl4wp_admin_other_settings', '_nl4wp_usage_tracking_setting', 70);
 
 
 
-			<?php include dirname(__FILE__) . '/parts/admin-footer.php'; ?>
+			<?php  ?>
 		</div>
 
-		<!-- Sidebar -->
-		<div class="sidebar col col-2">
-			<?php include dirname(__FILE__) . '/parts/admin-sidebar.php'; ?>
-		</div>
+		
 
 
 	</div>

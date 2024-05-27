@@ -125,10 +125,10 @@ class NL4WP_Forms_Admin
     {
         $items['forms'] = array(
             'title' => __('Forms', 'newsletter-for-wp'),
-            'text' => __('Form', 'newsletter-for-wp'),
+            'text' => __('Forms', 'newsletter-for-wp'),
             'slug' => 'forms',
             'callback' => array( $this, 'show_forms_page' ),
-            'load_callback' => array( $this, 'redirect_to_form_action' ),
+            // 'load_callback' => array( $this, 'redirect_to_form_action' ),
             'position' => 10
         );
 
@@ -385,6 +385,11 @@ class NL4WP_Forms_Admin
          * @ignore
          */
         do_action('nl4wp_admin_show_forms_page', $view);
+        if (empty($view)) {
+            $table = new NL4WP_Forms_List_Table();
+            include __DIR__ . '/views/overview.php';
+        }
+
 
         /**
          * @ignore

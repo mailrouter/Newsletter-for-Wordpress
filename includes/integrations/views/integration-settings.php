@@ -14,7 +14,7 @@
 	<div class="main-content row">
 
 		<!-- Main Content -->
-		<div class="main-content col col-4 col-sm-6">
+		<div class="main-content col col-6">
 
 			<h1 class="page-title">
 				<?php printf(__('%s integration', 'newsletter-for-wp'), esc_html($integration->name)); ?>
@@ -85,7 +85,7 @@
 									<?php _e('Select "yes" if you want to subscribe people without asking them explicitly.', 'newsletter-for-wp');
                     echo '<br />';
 
-                    printf(__('<strong>Warning: </strong> enabling this may affect your <a href="%s">GDPR compliance</a>.', 'newsletter-for-wp'), 'https://kb.mc4wp.com/gdpr-compliance/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=integrations-page'); ?>
+                    printf(__('<strong>Warning: </strong> enabling this may affect your GDPR compliance.', 'newsletter-for-wp')); ?>
 									</p>
 							</td>
 						</tr>
@@ -143,7 +143,7 @@
 								<p class="help">
 									<?php _e('Select "yes" if the checkbox should be pre-checked.', 'newsletter-for-wp');
                     echo '<br />';
-                    printf(__('<strong>Warning: </strong> enabling this may affect your <a href="%s">GDPR compliance</a>.', 'newsletter-for-wp'), 'https://kb.mc4wp.com/gdpr-compliance/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=integrations-page'); ?>
+                    printf(__('<strong>Warning: </strong> enabling this may affect your GDPR compliance.', 'newsletter-for-wp')); ?>
 								</p>
 							</td>
 					<?php
@@ -217,7 +217,7 @@
 								</label>
 								<p class="help">
 									<?php _e('Select "no" if you want to add the selected interests to any previously selected interests when updating a subscriber.', 'newsletter-for-wp'); ?>
-									<?php printf(' <a href="%s" target="_blank">' . __('What does this do?', 'newsletter-for-wp') . '</a>', 'https://kb.mc4wp.com/what-does-replace-groupings-mean/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=integrations-page'); ?>
+									
 								</p>
 							</td>
 						</tr>
@@ -253,10 +253,7 @@
 
 		</div>
 
-		<!-- Sidebar -->
-		<div class="sidebar col col-2">
-			<?php include NL4WP_PLUGIN_DIR . '/includes/views/parts/admin-sidebar.php'; ?>
-		</div>
+		
 
 	</div>
 

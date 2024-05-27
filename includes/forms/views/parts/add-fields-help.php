@@ -20,20 +20,9 @@
 			<li>
 				<p>
 					<?php echo __('Add list fields to any of your selected lists.', 'newsletter-for-wp'); ?>
-					<?php echo __('Clicking the following links will take you to the right screen.', 'newsletter-for-wp'); ?>
+					
 				</p>
-				<ul class="children lists--only-selected">
-					<?php foreach ($lists as $list) {
-    ?>
-					<li data-list-id="<?php echo $list->id; ?>" class="<?php echo in_array($list->id, $opts['lists']) ? '' : 'hidden'; ?>">
-						<a href="https://admin.newsletter.com/lists/settings/merge-tags?id=<?php echo $list->web_id; ?>">
-							<span class="screen-reader-text"><?php _e('Edit list fields for', 'newsletter-for-wp'); ?> </span>
-							<?php echo $list->name; ?>
-						</a>
-					</li>
-					<?php
-} ?>
-				</ul>
+				
 			</li>
 			<li>
 				<p>

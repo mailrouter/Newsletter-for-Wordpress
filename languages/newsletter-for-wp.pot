@@ -17,10 +17,6 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: includes/admin/class-admin-texts.php:85
-msgid "Documentation"
-msgstr ""
-
 #: includes/admin/class-admin.php:216
 msgid "Success! The cached configuration for your Newsletter lists has been renewed."
 msgstr ""
@@ -57,7 +53,8 @@ msgstr ""
 msgid "Newsletter API Settings"
 msgstr ""
 
-#: includes/admin/class-admin.php:356
+#: includes/forms/class-google-recaptcha.php:184
+#: includes/forms/class-widget.php:28
 msgid "Newsletter"
 msgstr ""
 
@@ -77,10 +74,6 @@ msgstr ""
 msgid "Looks like your server is blocked by Newsletter's firewall. Please contact Newsletter support and include the following reference number: %s"
 msgstr ""
 
-#: includes/admin/class-admin.php:445
-msgid "Here's some info on solving common connectivity issues."
-msgstr ""
-
 #: includes/admin/class-admin.php:450
 msgid "Newsletter returned the following error:"
 msgstr ""
@@ -93,80 +86,8 @@ msgstr ""
 msgid "To get started with Newsletter for WordPress, please <a href=\"%s\">enter your Newsletter API key on the settings page of the plugin</a>."
 msgstr ""
 
-#: includes/admin/class-ads.php:39, includes/admin/class-ads.php:40
-msgid "Add-ons"
-msgstr ""
-
-#: includes/admin/class-ads.php:57
-msgid "Want to customize the style of your form? <a href=\"%s\">Try our Styles Builder</a> & edit the look of your forms with just a few clicks."
-msgstr ""
-
-#: includes/admin/class-ads.php:73
-msgid "Be notified whenever someone subscribes? <a href=\"%s\">Newsletter for WordPress Premium</a> allows you to set up email notifications for your forms."
-msgstr ""
-
-#: includes/admin/class-ads.php:75
-msgid "Increased conversions? <a href=\"%s\">Newsletter for WordPress Premium</a> submits forms without reloading the entire page, resulting in a much better experience for your visitors."
-msgstr ""
-
-#: includes/admin/class-ads.php:90
-msgid "Upgrade to Premium"
-msgstr ""
-
-#: includes/admin/class-ads.php:103
-msgid "Do you want translated forms for all of your languages? <a href=\"%s\">Try Newsletter for WordPress Premium</a>, which does just that plus more."
-msgstr ""
-
-#: includes/admin/class-ads.php:108
-msgid "Do you want to create more than one form? Our Premium add-on does just that! <a href=\"%s\">Have a look at all Premium benefits</a>."
-msgstr ""
-
-#: includes/admin/class-ads.php:113
-msgid "Are you enjoying this plugin? The Premium add-on unlocks several powerful features. <a href=\"%s\">Find out about all benefits now</a>."
-msgstr ""
-
-#: includes/admin/class-ads.php:132
-msgid "More subscribers, better newsletters."
-msgstr ""
-
-#: includes/admin/class-ads.php:133
-msgid "Learn how to best grow your lists & write better emails by subscribing to our monthly tips."
-msgstr ""
-
-#: includes/admin/class-ads.php:136
-msgid "Email Address"
-msgstr ""
-
-#: includes/admin/class-ads.php:140
-msgid "First Name"
-msgstr ""
-
 #: includes/admin/class-ads.php:147, includes/forms/class-admin.php:110
 msgid "Subscribe"
-msgstr ""
-
-#: includes/admin/class-ads.php:171
-msgid "Do you want to track all WooCommerce orders in Newsletter so you can send emails based on the purchase activity of your subscribers?"
-msgstr ""
-
-#: includes/admin/class-ads.php:174
-msgid "<a href=\"%s\">Upgrade to Newsletter for WordPress Premium</a> or <a href=\"%s\">read more about Newsletter's E-Commerce features</a>."
-msgstr ""
-
-#: includes/admin/class-review-notice.php:73
-msgid "You've been using Newsletter for WordPress for some time now; we hope you love it!"
-msgstr ""
-
-#: includes/admin/class-review-notice.php:74
-msgid "If you do, please <a href=\"%s\">leave us a 5★ rating on WordPress.org</a>. It would be of great help to us."
-msgstr ""
-
-#: includes/admin/class-review-notice.php:76
-msgid "Dismiss this notice."
-msgstr ""
-
-#: includes/api/class-api.php:87
-msgid "Read more about common connectivity issues."
 msgstr ""
 
 #: includes/forms/class-admin.php:75
@@ -426,18 +347,11 @@ msgid "Google reCAPTCHA Site Key"
 msgstr ""
 
 #: includes/forms/class-google-recaptcha.php:174
-msgid "Enter your Google reCAPTCHA keys here. You can <a href=\"%s\">retrieve your keys in the Google reCAPTCHA admin console</a> or read our help article on <a href=\"%s\">how to configure Google reCAPTCHA</a>."
+msgid "Enter your Google reCAPTCHA keys here. You can <a href=\"%s\">retrieve your keys in the Google reCAPTCHA admin console</a>."
 msgstr ""
 
 #: includes/forms/class-google-recaptcha.php:180
 msgid "Google reCAPTCHA Secret Key"
-msgstr ""
-
-#: includes/forms/class-google-recaptcha.php:184
-msgstr ""
-
-#: includes/forms/class-widget.php:28
-msgid "Newsletter"
 msgstr ""
 
 #: includes/forms/class-widget.php:34
@@ -492,20 +406,12 @@ msgstr ""
 msgid "The API key for connecting with your Newsletter account."
 msgstr ""
 
-#: includes/views/general-settings.php:56
-msgid "Get your API key here."
-msgstr ""
-
 #: includes/views/general-settings.php:60
 msgid "You defined your Newsletter API key using the <code>NL4WP_API_KEY</code> constant."
 msgstr ""
 
 #: includes/views/other-settings.php:15
 msgid "Miscellaneous settings"
-msgstr ""
-
-#: includes/views/other-settings.php:18
-msgid "Usage Tracking"
 msgstr ""
 
 #: includes/views/other-settings.php:30
@@ -529,7 +435,7 @@ msgid "Everything"
 msgstr ""
 
 #: includes/views/other-settings.php:45
-msgid "Determines what events should be written to <a href=\"%s\">the debug log</a> (see below)."
+msgid "Determines what events should be written to the debug log (see below)."
 msgstr ""
 
 #: includes/views/other-settings.php:100
@@ -620,10 +526,6 @@ msgstr ""
 msgid "The selected Newsletter lists require non-default fields, which may prevent this integration from working."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:28
-msgid "Please ensure you <a href=\"%s\">configure the plugin to send all required fields</a> or <a href=\"%s\">log into your Newsletter account</a> and make sure only the email & name fields are marked as required fields for the selected list(s)."
-msgstr ""
-
 #: includes/integrations/views/integration-settings.php:63
 msgid "Enabled?"
 msgstr ""
@@ -645,7 +547,7 @@ msgid "Select \"yes\" if you want to subscribe people without asking them explic
 msgstr ""
 
 #: includes/integrations/views/integration-settings.php:88, includes/integrations/views/integration-settings.php:146
-msgid "<strong>Warning: </strong> enabling this may affect your <a href=\"%s\">GDPR compliance</a>."
+msgid "<strong>Warning: </strong> enabling this may affect your GDPR compliance."
 msgstr ""
 
 #: includes/integrations/views/integration-settings.php:100
@@ -708,10 +610,6 @@ msgstr ""
 msgid "Select \"no\" if you want to add the selected interests to any previously selected interests when updating a subscriber."
 msgstr ""
 
-#: includes/integrations/views/integration-settings.php:220, includes/forms/views/tabs/form-settings.php:84
-msgid "What does this do?"
-msgstr ""
-
 #: includes/integrations/views/integrations.php:16
 msgid "Configure this integration"
 msgstr ""
@@ -748,42 +646,6 @@ msgstr ""
 msgid "Greyed out integrations will become available after installing & activating the corresponding plugin."
 msgstr ""
 
-#: includes/views/parts/admin-footer.php:16
-msgid "Newsletter for WordPress is in need of translations. Is the plugin not translated in your language or do you spot errors with the current translations? Helping out is easy! Head over to <a href=\"%s\">the translation project and click \"help translate\"</a>."
-msgstr ""
-
-#: includes/views/parts/admin-footer.php:36
-msgid "This plugin is not developed by or affiliated with Newsletter in any way."
-msgstr ""
-
-#: includes/views/parts/admin-sidebar.php:12
-msgid "Looking for help?"
-msgstr ""
-
-#: includes/views/parts/admin-sidebar.php:13
-msgid "We have some resources available to help you in the right direction."
-msgstr ""
-
-#: includes/views/parts/admin-sidebar.php:15
-msgid "Knowledge Base"
-msgstr ""
-
-#: includes/views/parts/admin-sidebar.php:16
-msgid "Frequently Asked Questions"
-msgstr ""
-
-#: includes/views/parts/admin-sidebar.php:30
-msgid "Other plugins by ibericode"
-msgstr ""
-
-#: includes/views/parts/admin-sidebar.php:37
-msgid "Pop-ups or boxes that slide-in with a newsletter sign-up form. A sure-fire way to grow your email lists."
-msgstr ""
-
-#: includes/views/parts/admin-sidebar.php:43
-msgid "Super flexible forms using native HTML. Just like with Newsletter for WordPress forms but for other purposes, like a contact form."
-msgstr ""
-
 #: includes/views/parts/lists-overview.php:1
 msgid "Your Newsletter Account"
 msgstr ""
@@ -810,10 +672,6 @@ msgstr ""
 
 #: includes/views/parts/lists-overview.php:28
 msgid "Subscribers"
-msgstr ""
-
-#: includes/views/parts/lists-overview.php:50
-msgid "Edit this list in Newsletter"
 msgstr ""
 
 #: includes/views/parts/lists-overview.php:55
@@ -860,14 +718,6 @@ msgstr ""
 msgid "Add list fields to any of your selected lists."
 msgstr ""
 
-#: includes/forms/views/parts/add-fields-help.php:23
-msgid "Clicking the following links will take you to the right screen."
-msgstr ""
-
-#: includes/forms/views/parts/add-fields-help.php:30
-msgid "Edit list fields for"
-msgstr ""
-
 #: includes/forms/views/parts/add-fields-help.php:40
 msgid "Click the following button to have Newsletter for WordPress pick up on your changes."
 msgstr ""
@@ -877,7 +727,7 @@ msgid "Add dynamic form variable"
 msgstr ""
 
 #: includes/forms/views/parts/dynamic-content-tags.php:8
-msgid "The following list of variables can be used to <a href=\"%s\">add some dynamic content to your form or success and error messages</a>."
+msgid "The following list of variables can be used to add some dynamic content to your form or success and error messages."
 msgstr ""
 
 #: includes/forms/views/parts/dynamic-content-tags.php:8
@@ -1102,4 +952,323 @@ msgstr ""
 
 #: includes/forms/views/tabs/form-settings.php:143
 msgid "Your \"subscribed\" message will not show when redirecting to another page, so make sure to let your visitors know they were successfully subscribed."
+msgstr ""
+
+#: plugin-update-checker/Puc/v5p4/Plugin/Ui.php:128
+msgid "Check for updates"
+msgstr ""
+
+#: plugin-update-checker/Puc/v5p4/Plugin/Ui.php:214
+#, php-format
+msgctxt "the plugin title"
+msgid "The %s plugin is up to date."
+msgstr ""
+
+#: plugin-update-checker/Puc/v5p4/Plugin/Ui.php:216
+#, php-format
+msgctxt "the plugin title"
+msgid "A new version of the %s plugin is available."
+msgstr ""
+
+#: plugin-update-checker/Puc/v5p4/Plugin/Ui.php:218
+#, php-format
+msgctxt "the plugin title"
+msgid "Could not determine if updates are available for %s."
+msgstr ""
+
+#: plugin-update-checker/Puc/v5p4/Plugin/Ui.php:224
+#, php-format
+msgid "Unknown update checker status \"%s\""
+msgstr ""
+
+#: plugin-update-checker/Puc/v5p4/Vcs/PluginUpdateChecker.php:100
+msgid "There is no changelog available."
+msgstr ""
+
+#: config/default-form-content.php:3
+msgid "Email address"
+msgstr ""
+
+#: config/default-form-content.php:4
+msgid "Your email address"
+msgstr ""
+
+#: config/default-form-content.php:5
+msgid "Sign up"
+msgstr ""
+
+#: config/default-form-messages.php:5
+msgid "Thank you, your sign-up request was successful! Please check your email inbox to confirm."
+msgstr ""
+
+#: config/default-form-messages.php:9
+msgid "Thank you, your records have been updated!"
+msgstr ""
+
+#: config/default-form-messages.php:13
+msgid "You were successfully unsubscribed."
+msgstr ""
+
+#: config/default-form-messages.php:17
+msgid "Given email address is not subscribed."
+msgstr ""
+
+#: config/default-form-messages.php:21
+msgid "Oops. Something went wrong. Please try again later."
+msgstr ""
+
+#: config/default-form-messages.php:25
+msgid "Please provide a valid email address."
+msgstr ""
+
+#: config/default-form-messages.php:29
+msgid "Given email address is already subscribed, thank you!"
+msgstr ""
+
+#: config/default-form-messages.php:33
+msgid "Please fill in the required fields."
+msgstr ""
+
+#: config/default-form-messages.php:37
+msgid "Please select at least one list."
+msgstr ""
+
+#: includes/forms/class-admin.php:415
+msgid "Go back"
+msgstr ""
+
+#: includes/forms/class-google-recaptcha.php:160
+#: includes/forms/views/tabs/form-settings.php:45
+#: includes/forms/views/tabs/form-settings.php:60
+#: includes/forms/views/tabs/form-settings.php:76
+#: includes/forms/views/tabs/form-settings.php:124
+#: includes/integrations/views/integration-settings.php:65
+#: includes/integrations/views/integration-settings.php:81
+#: includes/integrations/views/integration-settings.php:141
+#: includes/integrations/views/integration-settings.php:157
+#: includes/integrations/views/integration-settings.php:172
+#: includes/integrations/views/integration-settings.php:193
+#: includes/integrations/views/integration-settings.php:212
+#: includes/views/other-settings.php:25
+#: integrations/contact-form-7/class-contact-form-7.php:79
+#: integrations/gravity-forms/class-gravity-forms.php:113
+#: integrations/wpforms/class-field.php:267
+msgid "Yes"
+msgstr ""
+
+#: includes/forms/class-google-recaptcha.php:162
+#: includes/forms/views/tabs/form-settings.php:49
+#: includes/forms/views/tabs/form-settings.php:64
+#: includes/forms/views/tabs/form-settings.php:80
+#: includes/forms/views/tabs/form-settings.php:128
+#: includes/integrations/views/integration-settings.php:66
+#: includes/integrations/views/integration-settings.php:82
+#: includes/integrations/views/integration-settings.php:142
+#: includes/integrations/views/integration-settings.php:158
+#: includes/integrations/views/integration-settings.php:176
+#: includes/integrations/views/integration-settings.php:197
+#: includes/integrations/views/integration-settings.php:216
+#: includes/views/other-settings.php:29
+#: integrations/contact-form-7/class-contact-form-7.php:79
+#: integrations/gravity-forms/class-gravity-forms.php:114
+#: integrations/wpforms/class-field.php:267
+msgid "No"
+msgstr ""
+
+#: integrations/contact-form-7/admin-before.php:2
+msgid "To integrate with Contact Form 7, configure the settings below and then add %s to your CF7 form mark-up."
+msgstr ""
+
+#: integrations/custom/admin-before.php:2
+msgid "To get a custom integration to work, include the following HTML in the form you are trying to integrate with."
+msgstr ""
+
+#: integrations/custom/admin-before.php:9
+msgid "Subscribe to our newsletter."
+msgstr ""
+
+#: integrations/gravity-forms/admin-before.php:2
+msgid "To integrate with Gravity Forms, add the \"Newsletter for WordPress\" field to <a href=\"%s\">one of your Gravity Forms forms</a>."
+msgstr ""
+
+#: integrations/gravity-forms/class-gravity-forms.php:99
+#: integrations/wpforms/class-field.php:98
+msgid "Newsletter list"
+msgstr ""
+
+#: integrations/gravity-forms/class-gravity-forms.php:102
+msgid "Select a Newsletter list"
+msgstr ""
+
+#: integrations/ninja-forms-2/admin-before.php:2
+msgid "To integrate with Ninja Forms, add the \"Newsletter\" field to your Ninja Forms forms."
+msgstr ""
+
+#: integrations/ninja-forms-2/class-ninja-forms.php:43
+msgid "Left of Element"
+msgstr ""
+
+#: integrations/ninja-forms-2/class-ninja-forms.php:44
+msgid "Above Element"
+msgstr ""
+
+#: integrations/ninja-forms-2/class-ninja-forms.php:45
+msgid "Below Element"
+msgstr ""
+
+#: integrations/ninja-forms-2/class-ninja-forms.php:46
+msgid "Right of Element"
+msgstr ""
+
+#: integrations/ninja-forms-2/class-ninja-forms.php:61
+#: integrations/ninja-forms/class-field.php:84
+msgid "Unchecked"
+msgstr ""
+
+#: integrations/ninja-forms-2/class-ninja-forms.php:65
+#: integrations/ninja-forms/class-field.php:82
+msgid "Checked"
+msgstr ""
+
+#: integrations/ninja-forms-2/class-ninja-forms.php:70
+msgid "Default Value"
+msgstr ""
+
+#: integrations/ninja-forms/admin-before.php:2
+msgid "To integrate with Ninja Forms, add the \"Newsletter\" action to <a href=\"%s\">one of your Ninja Forms forms</a>."
+msgstr ""
+
+#: integrations/ninja-forms/class-field.php:36
+msgid "Newsletter opt-in"
+msgstr ""
+
+#: integrations/woocommerce/admin-after.php:4
+msgid "After billing details"
+msgstr ""
+
+#: integrations/woocommerce/admin-after.php:5
+msgid "After shipping details"
+msgstr ""
+
+#: integrations/woocommerce/admin-after.php:6
+msgid "After customer details"
+msgstr ""
+
+#: integrations/woocommerce/admin-after.php:7
+msgid "Before submit button"
+msgstr ""
+
+#: integrations/woocommerce/admin-after.php:19
+msgid "Position"
+msgstr ""
+
+#: integrations/woocommerce/class-woocommerce.php:153
+msgid "Order #%d"
+msgstr ""
+
+#: integrations/wpforms/admin-before.php:2
+msgid "Use this integration by adding the \"Newsletter\" field to <a href=\"%s\">your WPForms forms</a>."
+msgstr ""
+
+#: integrations/wpforms/class-field.php:35
+msgid "Sign-up to our newsletter?"
+msgstr ""
+
+#: integrations/wpforms/class-field.php:92
+msgid "Select the Newsletter list to subscribe to."
+msgstr ""
+
+#: integrations/wpforms/class-field.php:125
+msgid "Set your sign-up label text and whether it should be pre-checked."
+msgstr ""
+
+#: integrations/wpforms/class-field.php:136
+msgid "Sign-up checkbox"
+msgstr ""
+
+#: integrations/wpforms/class-field.php:180
+msgid "(empty)"
+msgstr ""
+
+#: integrations/wpforms/class-field.php:196
+msgid "Showing the first 20 choices.<br> All %d choices will be displayed when viewing the form."
+msgstr ""
+
+#: integrations/gravity-forms/class-field.php:40
+msgid "Newsletter for WordPress"
+msgstr ""
+
+#: includes/views/other-settings.php:21
+msgid "Usage Tracking"
+msgstr ""
+
+#: integrations/ninja-forms/class-action.php:68
+msgid "Replace existing interest groups?"
+msgstr ""
+
+#: integrations/wp-comment-form/class-comment-form.php:26
+msgid "Subscribes people from your WordPress comment form."
+msgstr ""
+
+#: integrations/wp-registration-form/class-registration-form.php:21
+msgid "Subscribes people from your WordPress registration form."
+msgstr ""
+
+#: integrations/contact-form-7/class-contact-form-7.php:21
+msgid "Subscribes people from Contact Form 7 forms."
+msgstr ""
+
+#: integrations/events-manager/class-events-manager.php:21
+msgid "Subscribes people from Events Manager booking forms."
+msgstr ""
+
+#: integrations/custom/class-custom.php:25
+msgid "Integrate with custom third-party forms."
+msgstr ""
+
+#: integrations/ninja-forms-2/class-ninja-forms.php:21
+#: integrations/ninja-forms/class-ninja-forms.php:21
+msgid "Subscribe visitors from your Ninja Forms forms."
+msgstr ""
+
+#: integrations/buddypress/class-buddypress.php:21
+msgid "Subscribes users from BuddyPress registration forms."
+msgstr ""
+
+#: integrations/easy-digital-downloads/class-easy-digital-downloads.php:21
+msgid "Subscribes your Easy Digital Downloads customers."
+msgstr ""
+
+#: integrations/memberpress/class-memberpress.php:21
+msgid "Subscribes people from MemberPress register forms."
+msgstr ""
+
+#: integrations/wpforms/class-wpforms.php:21
+msgid "Subscribe visitors from your WPForms forms."
+msgstr ""
+
+#: integrations/gravity-forms/class-gravity-forms.php:21
+msgid "Subscribe visitors from your Gravity Forms forms."
+msgstr ""
+
+#: integrations/affiliatewp/class-affiliatewp.php:21
+msgid "Subscribes people from your AffiliateWP registration form."
+msgstr ""
+
+#: integrations/woocommerce/admin-after.php:8
+msgid "After order notes"
+msgstr ""
+
+#: integrations/give/class-give.php:11
+msgid "Subscribes people from your Give donation forms."
+msgstr ""
+
+#: integrations/woocommerce/class-woocommerce.php:21
+msgid "Subscribes people from WooCommerce's checkout form."
+msgstr ""
+
+msgid "Email Address"
+msgstr ""
+
+msgid "No forms found. <a href=\"%s\">Create your first form</a>."
 msgstr ""

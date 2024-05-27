@@ -1,24 +1,24 @@
 <?php
 /*
 Plugin Name: Newsletter for WordPress
-Plugin URI: https://github.com/mailrouter/Newsletter-for-Wordpress
+Plugin URI: https://github.com/mailrouter/Newsletter-for-Wordpress/
 Description: Newsletter for WordPress by mailrouter. Aggiunge vari metodi di iscrizione newsletter al tuo sito.
-Version: 4.5.11
+Version: 4.5.12
 Author: mailrouter
 Text Domain: newsletter-for-wp
 Domain Path: /languages
 License: GPL v3
 
 Newsletter for WordPress
-Copyright (C) 2022, Void Labs snc, info.it
+Copyright (C) 2024, Void Labs snc, info@voidlabs.it
 forked from
 Mailchimp for WordPress
-Copyright (C) 2012-2022, Danny van Kooten, hi.com
+Copyright (C) 2012-2024, Danny van Kooten, hi@dannyvankooten.com
 
 integrates
-Plugin Update Checker Library 4.4
+Plugin Update Checker Library 5.4
 http://w-shadow.com/
-Copyright 2018 Janis Elsts
+Copyright 2024 Janis Elsts
 Released under the MIT license. See license.txt for details.
 
 This program is free software: you can redistribute it and/or modify
@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* PLUGIN AUTOUPDATE */
 require 'plugin-update-checker/plugin-update-checker.php';
-$myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+$myUpdateChecker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
 	'https://github.com/mailrouter/Newsletter-for-Wordpress/',
 	__FILE__,
 	'newsletter-for-wp'
@@ -57,12 +57,7 @@ function _nl4wp_load_plugin()
     }
 
     // bootstrap the core plugin
-    define( 'NL4WP_VERSION', '4.5.11');
-    /* NL_CHANGED - start
-     * imposta la versione pro
-     */
-    define ('NL4WP_PREMIUM_VERSION', '4.5.11');
-    /* NL_CHANGED - end */
+    define( 'NL4WP_VERSION', '4.5.12');
     define('NL4WP_PLUGIN_DIR', dirname(__FILE__) . '/');
     define('NL4WP_PLUGIN_URL', plugins_url('/', __FILE__));
     define('NL4WP_PLUGIN_FILE', __FILE__);
@@ -91,7 +86,7 @@ function _nl4wp_load_plugin()
 
     // Doing cron? Load Usage Tracking class.
     if (isset($_GET['doing_wp_cron']) || (defined('DOING_CRON') && DOING_CRON) || (defined('WP_CLI') && WP_CLI)) {
-        NL4WP_Usage_Tracking::instance()->add_hooks();
+        
     }
 
     // Initialize admin section of plugin

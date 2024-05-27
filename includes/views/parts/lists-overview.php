@@ -47,10 +47,7 @@
             echo sprintf('<tr class="list-details list-%s-details" style="display: none;">', $list->id);
             echo '<td colspan="3" style="padding: 0 20px 40px;">';
 
-            /* NL_COMMENT - Non mostra link editing
-echo sprintf('<p class="alignright" style="margin: 20px 0;"><a href="%s" target="_blank"><span class="dashicons dashicons-edit"></span> ' . __('Edit this list in Newsletter', 'newsletter-for-wp') . '</a></p>', $list->get_web_url());
-*/
-
+            
 
             // Fields
             if (! empty($list->merge_fields)) {

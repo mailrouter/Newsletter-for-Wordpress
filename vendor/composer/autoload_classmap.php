@@ -6,17 +6,14 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'NL4WP_API' => $baseDir . '/includes/api/class-api.php',
     'NL4WP_API_Connection_Exception' => $baseDir . '/includes/api/class-connection-exception.php',
     'NL4WP_API_Exception' => $baseDir . '/includes/api/class-exception.php',
     'NL4WP_API_Resource_Not_Found_Exception' => $baseDir . '/includes/api/class-resource-not-found-exception.php',
     'NL4WP_API_v3' => $baseDir . '/includes/api/class-api-v3.php',
     'NL4WP_API_v3_Client' => $baseDir . '/includes/api/class-api-v3-client.php',
     'NL4WP_Admin' => $baseDir . '/includes/admin/class-admin.php',
-    'NL4WP_Admin_Ads' => $baseDir . '/includes/admin/class-ads.php',
     'NL4WP_Admin_Ajax' => $baseDir . '/includes/admin/class-admin-ajax.php',
     'NL4WP_Admin_Messages' => $baseDir . '/includes/admin/class-admin-messages.php',
-    'NL4WP_Admin_Review_Notice' => $baseDir . '/includes/admin/class-review-notice.php',
     'NL4WP_Admin_Texts' => $baseDir . '/includes/admin/class-admin-texts.php',
     'NL4WP_Admin_Tools' => $baseDir . '/includes/admin/class-admin-tools.php',
     'NL4WP_AffiliateWP_Integration' => $baseDir . '/integrations/affiliatewp/class-affiliatewp.php',
@@ -54,6 +51,7 @@ return array(
     'NL4WP_Integration_Manager' => $baseDir . '/includes/integrations/class-integration-manager.php',
     'NL4WP_Integration_Tags' => $baseDir . '/includes/integrations/class-integration-tags.php',
     'NL4WP_List_Data_Mapper' => $baseDir . '/includes/class-list-data-mapper.php',
+    'NL4WP_Forms_List_Table' => $baseDir . '/includes/forms/class-list-table.php',
     'NL4WP_Newsletter' => $baseDir . '/includes/class-newsletter.php',
     'NL4WP_Newsletter_Interest_Category' => $baseDir . '/includes/newsletter/class-interest-category.php',
     'NL4WP_Newsletter_List' => $baseDir . '/includes/newsletter/class-list.php',
@@ -72,7 +70,6 @@ return array(
     'NL4WP_Tools' => $baseDir . '/includes/class-tools.php',
     'NL4WP_Update_Optin' => $baseDir . '/includes/admin/class-update-optin.php',
     'NL4WP_Upgrade_Routines' => $baseDir . '/includes/admin/class-upgrade-routines.php',
-    'NL4WP_Usage_Tracking' => $baseDir . '/includes/admin/class-usage-tracking.php',
     'NL4WP_User_Integration' => $baseDir . '/includes/integrations/class-user-integration.php',
     'NL4WP_WPForms_Field' => $baseDir . '/integrations/wpforms/class-field.php',
     'NL4WP_WPForms_Integration' => $baseDir . '/integrations/wpforms/class-wpforms.php',

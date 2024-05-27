@@ -4,7 +4,7 @@
 	<div class="row">
 
 		<!-- Main Content -->
-		<div class="main-content col col-4">
+		<div class="main-content col col-6">
 
 			<h1 class="page-title">
 				<?php _e("Add new form", 'newsletter-for-wp'); ?>
@@ -71,14 +71,11 @@
 			</div>
 
 
-			<?php include NL4WP_PLUGIN_DIR . 'includes/views/parts/admin-footer.php'; ?>
+			<?php  ?>
 
 		</div><!-- / Main content -->
 
-		<!-- Sidebar -->
-		<div class="sidebar col col-2">
-			<?php include NL4WP_PLUGIN_DIR . 'includes/views/parts/admin-sidebar.php'; ?>
-		</div>
+		
 
 
 	</div>

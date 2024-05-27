@@ -27,17 +27,14 @@ class ComposerStaticInit2c420f229f0b44a84053c7de0a411c61_nl
     );
 
     public static $classMap = array (
-        'NL4WP_API' => __DIR__ . '/../..' . '/includes/api/class-api.php',
         'NL4WP_API_Connection_Exception' => __DIR__ . '/../..' . '/includes/api/class-connection-exception.php',
         'NL4WP_API_Exception' => __DIR__ . '/../..' . '/includes/api/class-exception.php',
         'NL4WP_API_Resource_Not_Found_Exception' => __DIR__ . '/../..' . '/includes/api/class-resource-not-found-exception.php',
         'NL4WP_API_v3' => __DIR__ . '/../..' . '/includes/api/class-api-v3.php',
         'NL4WP_API_v3_Client' => __DIR__ . '/../..' . '/includes/api/class-api-v3-client.php',
         'NL4WP_Admin' => __DIR__ . '/../..' . '/includes/admin/class-admin.php',
-        'NL4WP_Admin_Ads' => __DIR__ . '/../..' . '/includes/admin/class-ads.php',
         'NL4WP_Admin_Ajax' => __DIR__ . '/../..' . '/includes/admin/class-admin-ajax.php',
         'NL4WP_Admin_Messages' => __DIR__ . '/../..' . '/includes/admin/class-admin-messages.php',
-        'NL4WP_Admin_Review_Notice' => __DIR__ . '/../..' . '/includes/admin/class-review-notice.php',
         'NL4WP_Admin_Texts' => __DIR__ . '/../..' . '/includes/admin/class-admin-texts.php',
         'NL4WP_Admin_Tools' => __DIR__ . '/../..' . '/includes/admin/class-admin-tools.php',
         'NL4WP_AffiliateWP_Integration' => __DIR__ . '/../..' . '/integrations/affiliatewp/class-affiliatewp.php',
@@ -75,6 +72,7 @@ class ComposerStaticInit2c420f229f0b44a84053c7de0a411c61_nl
         'NL4WP_Integration_Manager' => __DIR__ . '/../..' . '/includes/integrations/class-integration-manager.php',
         'NL4WP_Integration_Tags' => __DIR__ . '/../..' . '/includes/integrations/class-integration-tags.php',
         'NL4WP_List_Data_Mapper' => __DIR__ . '/../..' . '/includes/class-list-data-mapper.php',
+        'NL4WP_Forms_List_Table' => __DIR__ . '/../..' . '/includes/forms/class-list-table.php',
         'NL4WP_Newsletter' => __DIR__ . '/../..' . '/includes/class-newsletter.php',
         'NL4WP_Newsletter_Interest_Category' => __DIR__ . '/../..' . '/includes/newsletter/class-interest-category.php',
         'NL4WP_Newsletter_List' => __DIR__ . '/../..' . '/includes/newsletter/class-list.php',
@@ -93,7 +91,6 @@ class ComposerStaticInit2c420f229f0b44a84053c7de0a411c61_nl
         'NL4WP_Tools' => __DIR__ . '/../..' . '/includes/class-tools.php',
         'NL4WP_Update_Optin' => __DIR__ . '/../..' . '/includes/admin/class-update-optin.php',
         'NL4WP_Upgrade_Routines' => __DIR__ . '/../..' . '/includes/admin/class-upgrade-routines.php',
-        'NL4WP_Usage_Tracking' => __DIR__ . '/../..' . '/includes/admin/class-usage-tracking.php',
         'NL4WP_User_Integration' => __DIR__ . '/../..' . '/includes/integrations/class-user-integration.php',
         'NL4WP_WPForms_Field' => __DIR__ . '/../..' . '/integrations/wpforms/class-field.php',
         'NL4WP_WPForms_Integration' => __DIR__ . '/../..' . '/integrations/wpforms/class-wpforms.php',

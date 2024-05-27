@@ -98,7 +98,7 @@ function _nl4wp_integrations_table($integrations)
 	<div class="main-content row">
 
 		<!-- Main Content -->
-		<div class="col col-4">
+		<div class="col col-6">
 
 			<h1 class="page-title">Newsletter for WordPress: <?php _e('Integrations', 'newsletter-for-wp'); ?></h1>
 
@@ -124,10 +124,7 @@ function _nl4wp_integrations_table($integrations)
 
 		</div>
 
-		<!-- Sidebar -->
-		<div class="sidebar col col-2">
-			<?php include NL4WP_PLUGIN_DIR . '/includes/views/parts/admin-sidebar.php'; ?>
-		</div>
+		
 
 	</div>
 

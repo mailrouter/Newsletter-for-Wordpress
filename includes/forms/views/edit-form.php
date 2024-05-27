@@ -30,7 +30,7 @@ $tabs = apply_filters('nl4wp_admin_edit_form_tabs', $tabs);
     <div class="row">
 
         <!-- Main Content -->
-        <div class="main-content col col-5">
+        <div class="main-content col col-6">
 
             <h1 class="page-title">
                 <?php _e("Edit Form", 'newsletter-for-wp'); ?>
@@ -112,14 +112,11 @@ $tabs = apply_filters('nl4wp_admin_edit_form_tabs', $tabs);
             </form><!-- Entire page form wrap -->
 
 
-            <?php include NL4WP_PLUGIN_DIR . 'includes/views/parts/admin-footer.php'; ?>
+            <?php  ?>
 
         </div>
 
-        <!-- Sidebar -->
-        <div class="sidebar col col-1">
-            <?php include NL4WP_PLUGIN_DIR . 'includes/views/parts/admin-sidebar.php'; ?>
-        </div>
+        
 
 
     </div>

@@ -24,20 +24,16 @@ class NL4WP_Admin
     */
     protected $messages;
 
-    /**
-    * @var NL4WP_Admin_Ads
-    */
-    protected $ads;
+    
+    
 
     /**
     * @var NL4WP_Admin_Tools
     */
     protected $tools;
 
-    /**
-    * @var NL4WP_Admin_Review_Notice
-    */
-    protected $review_notice;
+    
+    
 
     /**
     * Constructor
@@ -52,8 +48,8 @@ class NL4WP_Admin
         $this->newsletter = $newsletter;
         $this->messages = $messages;
         $this->plugin_file = plugin_basename(NL4WP_PLUGIN_FILE);
-        $this->ads = new NL4WP_Admin_Ads();
-        $this->review_notice = new NL4WP_Admin_Review_Notice($tools);
+        
+        
         $this->load_translations();
     }
 
@@ -76,9 +72,9 @@ class NL4WP_Admin
         add_action('nl4wp_admin_dismiss_api_key_notice', array( $this, 'dismiss_api_key_notice' ));
         add_action('admin_enqueue_scripts', array( $this, 'enqueue_assets' ));
 
-        $this->ads->add_hooks();
+        
         $this->messages->add_hooks();
-        $this->review_notice->add_hooks();
+        
     }
 
     /**
@@ -247,10 +243,7 @@ class NL4WP_Admin
         // merge with current settings to allow passing partial arrays to this method
         $settings = array_merge($current, $settings);
 
-        // toggle usage tracking
-        if ($settings['allow_usage_tracking'] !== $current['allow_usage_tracking']) {
-            NL4WP_Usage_Tracking::instance()->toggle($settings['allow_usage_tracking']);
-        }
+        
 
         // Make sure not to use obfuscated key
         if (strpos($settings['api_key'], '*') !== false) {
@@ -258,7 +251,7 @@ class NL4WP_Admin
         }
 
         // Sanitize API key
-        $settings['api_key'] = sanitize_text_field($settings['api_key']);
+        $settings['api_key'] = sanitize_textarea_field($settings['api_key']);
 
         // if API key changed, empty Newsletter cache
         if ($settings['api_key'] !== $current['api_key']) {
@@ -442,7 +435,7 @@ class NL4WP_Admin
                     $message .= '<br />' . sprintf(__('Looks like your server is blocked by Newsletter\'s firewall. Please contact Newsletter support and include the following reference number: %s', 'newsletter-for-wp'), $e->data->ref_no);
                 }
 
-                $message .= '<br /><br />' . sprintf('<a href="%s">' . __('Here\'s some info on solving common connectivity issues.', 'newsletter-for-wp') . '</a>', 'https://kb.mc4wp.com/solving-connectivity-issues/#utm_source=wp-plugin&utm_medium=newsletter-for-wp&utm_campaign=settings-notice');
+                
 
                 $this->messages->flash($message, 'error');
                 $connected = false;
@@ -453,7 +446,7 @@ class NL4WP_Admin
         }
 
         $lists = $this->newsletter->get_cached_lists();
-        $obfuscated_api_key = nl4wp_obfuscate_string($api_key);
+        $obfuscated_api_key = preg_replace('/(^|[,\r\n\s]+)([0-9a-f]+-[0-9a-f]{32}-)([0-9a-f]{32})(-[0-9a-z]+)?/', '$1$2********************************$4', $api_key);
         require NL4WP_PLUGIN_DIR . 'includes/views/general-settings.php';
     }
 

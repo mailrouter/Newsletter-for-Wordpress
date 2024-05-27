@@ -171,7 +171,7 @@ class NL4WP_Google_Recaptcha {
             <td>
                 <input type="text" class="widefat" name="nl4wp[grecaptcha_site_key]" id="nl4wp_grecaptcha_site_key" placeholder="<?php echo str_repeat('●', 40); ?>" value="<?php echo esc_attr($global_settings['grecaptcha_site_key']); ?>" />
                 <p class="help">
-                    <?php printf(__('Enter your Google reCAPTCHA keys here. You can <a href="%s">retrieve your keys in the Google reCAPTCHA admin console</a> or read our help article on <a href="%s">how to configure Google reCAPTCHA</a>.', 'newsletter-for-wp'), 'https://g.co/recaptcha/v3', 'https://kb.mc4wp.com/google-recaptcha-forms/'); ?>
+                    <?php printf(__('Enter your Google reCAPTCHA keys here. You can <a href="%s">retrieve your keys in the Google reCAPTCHA admin console</a>.', 'newsletter-for-wp'), 'https://g.co/recaptcha/v3'); ?>
                 </p>
             </td>
         </tr>

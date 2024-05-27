@@ -62,7 +62,7 @@ function validate(evt) {
     field.nextElementSibling.parentElement.removeChild(field.nextElementSibling);
   }
 
-  if (!field.value.match(/^[0-9a-z]+-[0-9a-z]+-[0-9a-z]+$/)) {
+  if (!field.value.match(/^((^|[\r\n\s,]+)[0-9a-f]+-[0-9a-f]{32}-[0-9a-f]{32}(-[0-9a-z]+)?)+\s*$/)) {
     field.parentElement.insertBefore(node, field.nextElementSibling);
   }
 }

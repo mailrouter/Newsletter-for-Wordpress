@@ -297,7 +297,7 @@ class NL4WP_Form_Element
         }
 
         // Start building content string
-        $opening_html = '<!-- Newsletter for WordPress v' . NL4WP_VERSION . ' - https://wordpress.org/plugins/newsletter-for-wp/ -->';
+        $opening_html = '<!-- Newsletter for WordPress v' . NL4WP_VERSION . ' - https://github.com/mailrouter/Newsletter-for-Wordpress/ -->';
         $opening_html .= '<form '. $this->get_form_element_attributes() .'>';
         $before_fields = $this->get_html_before_fields();
         $fields = '';
