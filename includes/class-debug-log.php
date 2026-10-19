@@ -7,42 +7,41 @@
  */
 class NL4WP_Debug_Log
 {
-
     /**
      * Detailed debug information
      */
-    const DEBUG = 100;
+    public const DEBUG = 100;
 
     /**
      * Interesting events
      *
      * Examples: Visitor subscribed
      */
-    const INFO = 200;
+    public const INFO = 200;
 
     /**
      * Exceptional occurrences that are not errors
      *
      * Examples: User already subscribed
      */
-    const WARNING = 300;
+    public const WARNING = 300;
 
     /**
      * Runtime errors
      */
-    const ERROR = 400;
+    public const ERROR = 400;
 
     /**
      * Logging levels from syslog protocol defined in RFC 5424
      *
      * @var array $levels Logging levels
      */
-    protected static $levels = array(
-        self::DEBUG     => 'DEBUG',
-        self::INFO      => 'INFO',
-        self::WARNING   => 'WARNING',
-        self::ERROR     => 'ERROR',
-    );
+    protected static $levels = [
+        self::DEBUG   => 'DEBUG',
+        self::INFO    => 'INFO',
+        self::WARNING => 'WARNING',
+        self::ERROR   => 'ERROR',
+    ];
 
     /**
      * @var string The file to which messages should be written.
@@ -67,7 +66,7 @@ class NL4WP_Debug_Log
      */
     public function __construct($file, $level = self::DEBUG)
     {
-        $this->file = $file;
+        $this->file  = $file;
         $this->level = self::to_level($level);
     }
 
@@ -85,38 +84,50 @@ class NL4WP_Debug_Log
             return false;
         }
 
-        // obfuscate email addresses in log message since log might be public.
-        $message = nl4wp_obfuscate_email_addresses((string) $message);
+        $message = (string) $message;
 
         // first, get rid of everything between "invisible" tags
         $message = preg_replace('/<(?:style|script|head)>.+?<\/(?:style|script|head)>/is', '', $message);
-          
+
         // then, strip tags (while retaining content of these tags)
-        $message = strip_tags($message);
+        $message = wp_strip_all_tags($message);
         $message = trim($message);
+
+        // obfuscate email addresses in log message since log might be public.
+        $message = nl4wp_obfuscate_email_addresses($message);
+
+        /**
+         * Modifies the message that is written to the debug log.
+         * Return an empty string to skip logging this message altogether.
+         *
+         * @param string $message
+         */
+        $message = apply_filters('nl4wp_debug_log_message', $message);
+        if (empty($message)) {
+            return false;
+        }
+
+        $message = nl4wp_truncate_log_message($message);
 
         // generate line
         $level_name = self::get_level_name($level);
-        $datetime = date('Y-m-d H:i:s', (time() - date('Z')) + (get_option('gmt_offset', 0) * 3600));
-        $message = sprintf('[%s] %s: %s', $datetime, $level_name, $message) . PHP_EOL;
+        $datetime   = gmdate('Y-m-d H:i:s', time() + ( get_option('gmt_offset', 0) * HOUR_IN_SECONDS ));
+        $message    = sprintf('[%s] %s: %s', $datetime, $level_name, $message) . PHP_EOL;
 
         // did we open stream yet?
         if (! is_resource($this->stream)) {
-
-            // open stream
-            $this->stream = @fopen($this->file, 'c+');
-
-            // if this failed, bail..
+            // attempt to open stream
+            $this->stream = @fopen($this->file, 'c+'); // phpcs:ignore
             if (! is_resource($this->stream)) {
                 return false;
             }
 
             // make sure first line of log file is a PHP tag + exit statement (to prevent direct file access)
-            $line = fgets($this->stream);
+            $line            = fgets($this->stream);
             $php_exit_string = '<?php exit; ?>';
             if (strpos($line, $php_exit_string) !== 0) {
                 rewind($this->stream);
-                fwrite($this->stream, $php_exit_string . PHP_EOL . $line);
+                fwrite($this->stream, $php_exit_string . PHP_EOL . $line); // phpcs:ignore
             }
 
             // place pointer at end of file
@@ -127,10 +138,24 @@ class NL4WP_Debug_Log
         flock($this->stream, LOCK_EX);
 
         // write the message to the file
-        fwrite($this->stream, $message);
+        fwrite($this->stream, $message); // phpcs:ignore
 
         // unlock file again, but don't close it for remainder of this request
         flock($this->stream, LOCK_UN);
+
+        // Maybe send email on level errors and up
+        if ($level >= self::ERROR) {
+            $opts = nl4wp_get_options();
+            if (! empty($opts['email_on_error'])) {
+                $last_sent = get_transient('nl4wp_error_email_sent');
+                if (! $last_sent) {
+                    $subject = sprintf('[%s] NL4WP Error on your site', get_bloginfo('name'));
+                    $body    = sprintf('A NL4WP error occurred on your site: %s', $message);
+                    wp_mail($opts['email_on_error'], $subject, $body);
+                    set_transient('nl4wp_error_email_sent', time(), DAY_IN_SECONDS);
+                }
+            }
+        }
 
         return true;
     }
@@ -174,7 +199,7 @@ class NL4WP_Debug_Log
     /**
      * Converts PSR-3 levels to local ones if necessary
      *
-     * @param string|int Level number or name (PSR-3)
+     * @param string|int $level Number or name of logging level (PSR-3)
      * @return int
      */
     public static function to_level($level)
@@ -182,9 +207,10 @@ class NL4WP_Debug_Log
         if (is_string($level)) {
             $level = strtoupper($level);
             if (defined(__CLASS__ . '::' . $level)) {
-                return constant(__CLASS__ . '::'  . $level);
+                return constant(__CLASS__ . '::' . $level);
             }
 
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception text is not direct output and is escaped at render time.
             throw new InvalidArgumentException('Level "' . $level . '" is not defined, use one of: ' . implode(', ', array_keys(self::$levels)));
         }
 
@@ -200,6 +226,7 @@ class NL4WP_Debug_Log
     public static function get_level_name($level)
     {
         if (! isset(self::$levels[ $level ])) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception text is not direct output and is escaped at render time.
             throw new InvalidArgumentException('Level "' . $level . '" is not defined, use one of: ' . implode(', ', array_keys(self::$levels)));
         }
 
@@ -213,12 +240,12 @@ class NL4WP_Debug_Log
      */
     public function test()
     {
-        $handle = @fopen($this->file, 'a');
+        $handle   = @fopen($this->file, 'a'); // phpcs:ignore
         $writable = false;
 
         if (is_resource($handle)) {
             $writable = true;
-            fclose($handle);
+            fclose($handle); // phpcs:ignore
         }
 
         return $writable;

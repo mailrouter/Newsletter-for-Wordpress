@@ -9,22 +9,20 @@
  */
 class NL4WP_API_Exception extends Exception
 {
-
-  
     /**
-    * @var object
-    */
-    public $response = array();
+     * @var null|array
+     */
+    public $response;
 
     /**
-    * @var object
-    */
-    public $request = array();
+     * @var null|array
+     */
+    public $request;
 
     /**
-    * @var array
-    */
-    public $response_data = array();
+     * @var null|object
+     */
+    public $response_data;
 
     /**
      * NL4WP_API_Exception constructor.
@@ -39,20 +37,20 @@ class NL4WP_API_Exception extends Exception
     {
         parent::__construct($message, $code);
 
-        $this->request = $request;
-        $this->response = $response;
-
+        $this->request       = $request;
+        $this->response      = $response;
         $this->response_data = $data;
     }
 
     /**
-    * Backwards compatibility for direct property access.
-    * @param string $property
-    * @return mixed
-    */
+     * Backwards compatibility for direct property access.
+     *
+     * @param string $property
+     * @return mixed
+     */
     public function __get($property)
     {
-        if (in_array($property, array( 'title', 'detail', 'errors' ))) {
+        if (in_array($property, ['title', 'detail', 'errors'], true)) {
             if (! empty($this->response_data) && isset($this->response_data->{$property})) {
                 return $this->response_data->{$property};
             }
@@ -81,12 +79,11 @@ class NL4WP_API_Exception extends Exception
 
             // add field specific errors
             if (! empty($this->response_data->errors) && isset($this->response_data->errors[0]->field)) {
-
                 // strip off obsolete msg
                 $string = str_replace('For field-specific details, see the \'errors\' array.', '', $string);
 
                 // generate list of field errors
-                $field_errors = array();
+                $field_errors = [];
                 foreach ($this->response_data->errors as $error) {
                     if (! empty($error->field)) {
                         $field_errors[] = sprintf('- %s : %s', $error->field, $error->message);
@@ -101,19 +98,23 @@ class NL4WP_API_Exception extends Exception
 
         // Add request data
         if (! empty($this->request) && is_array($this->request)) {
-            $string .= "\n" . sprintf('Request: %s %s', $this->request['method'], $this->request['url']);
+            $string .= "\n\n" . sprintf("Request: \n%s %s\n", $this->request['method'], $this->request['url']);
+
+            //          foreach ( $this->request['headers'] as $key => $value ) {
+            //              $string .= sprintf( "%s: %s\n", $key, $value );
+            //          }
 
             if (! empty($this->request['body'])) {
-                $string .= sprintf(' - %s', $this->request['body']);
+                $string .= "\n" . $this->request['body'];
             }
         }
 
         // Add response data
         if (! empty($this->response) && is_array($this->response)) {
-            $response_code = wp_remote_retrieve_response_code($this->response);
+            $response_code    = wp_remote_retrieve_response_code($this->response);
             $response_message = wp_remote_retrieve_response_message($this->response);
-            $response_body = wp_remote_retrieve_body($this->response);
-            $string .= "\n" . sprintf('Response: %d %s - %s', $response_code, $response_message, $response_body);
+            $response_body    = wp_remote_retrieve_body($this->response);
+            $string          .= "\n\n" . sprintf("Response: \n%d %s\n%s", $response_code, $response_message, $response_body);
         }
 
         return $string;

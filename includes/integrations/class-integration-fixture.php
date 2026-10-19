@@ -4,11 +4,12 @@
  * Class NL4WP_Integration_Fixture
  *
  * @since 3.0
- * @ignore
+ * @method is_installed()
+ * @property string $name
+ * @property string $description
  */
 class NL4WP_Integration_Fixture
 {
-
     /**
      * @var string
      */
@@ -22,12 +23,12 @@ class NL4WP_Integration_Fixture
     /**
      * @var bool
      */
-    public $enabled = false;
+    public $enabled;
 
     /**
      * @var bool
      */
-    public $enabled_by_default = true;
+    public $enabled_by_default;
 
     /**
      * @var NL4WP_Integration
@@ -45,12 +46,13 @@ class NL4WP_Integration_Fixture
      * @param bool $enabled_by_default
      * @param array $options
      */
-    public function __construct($slug, $class, $enabled_by_default = false, array $options = array())
+    public function __construct($slug, $class, $enabled_by_default, array $options)
     {
-        $this->slug = $slug;
-        $this->class = $class;
-        $this->enabled = $this->enabled_by_default = $enabled_by_default;
-        $this->options = $options;
+        $this->slug               = $slug;
+        $this->class              = $class;
+        $this->enabled_by_default = $enabled_by_default;
+        $this->enabled            = $enabled_by_default;
+        $this->options            = $options;
 
         if (! empty($options['enabled'])) {
             $this->enabled = true;
@@ -74,18 +76,18 @@ class NL4WP_Integration_Fixture
     /**
      * Tunnel everything to NL4WP_Integration class
      *
-     * @param $name
-     * @param $arguments
+     * @param string $name
+     * @param array $arguments
      *
      * @return NL4WP_Integration
      */
     public function __call($name, $arguments)
     {
-        return call_user_func_array(array( $this->load(), $name ), $arguments);
+        return call_user_func_array([ $this->load(), $name ], $arguments);
     }
 
     /**
-     * @param $name
+     * @param string $name
      *
      * @return string
      */

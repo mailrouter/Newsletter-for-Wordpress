@@ -1,5 +1,7 @@
 <?php
 
+// TODO (March 2027): Remove the "unsubscribe" action and related code in this class, as well as the "action" config setting, since the unsubscribe form type is no longer supported as of version 4.11.2.
+
 /**
  * Class NL4WP_Form
  *
@@ -7,16 +9,27 @@
  *
  * To get a form instance, use `nl4wp_get_form( $id );` where `$id` is the post ID.
  *
- * @access public
  * @since 3.0
  */
 class NL4WP_Form
 {
-
     /**
      * @var array Array of instantiated form objects.
      */
-    public static $instances = array();
+    public static $instances = [];
+
+    /**
+     * @param int $post_id
+     * @throws Exception
+     */
+    public static function throw_not_found_exception($post_id)
+    {
+        // translators: %d is the form post ID.
+        $message = sprintf(__('There is no form with ID %d, perhaps it was deleted?', 'newsletter-for-wp'), $post_id);
+
+        // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception text is not direct output and is escaped at render time.
+        throw new Exception($message);
+    }
 
     /**
      * Get a shared form instance.
@@ -32,9 +45,24 @@ class NL4WP_Form
         } else {
             $post_id = (int) $post;
 
-            if (empty($post_id)) {
-                $post_id = (int) get_option('nl4wp_default_form_id', 0);
+            // if no explicit ID given, query the first published form
+            if ($post_id === 0) {
+                $posts = get_posts([
+                    'post_type' => 'nl4wp-form',
+                    'numberposts' => 1,
+                    'post_status' => 'publish',
+                    'orderby' => 'ID',
+                    'order' => 'ASC',
+                ]);
+                if ($posts) {
+                    $post    = $posts[0];
+                    $post_id = $post->ID;
+                }
             }
+        }
+
+        if ($post_id === 0) {
+            self::throw_not_found_exception($post_id);
         }
 
         if (isset(self::$instances[ $post_id ])) {
@@ -47,13 +75,13 @@ class NL4WP_Form
         }
 
         // check post object
-        if (! is_object($post) || ! isset($post->post_type) || $post->post_type !== 'nl4wp-form') {
-            $message = sprintf(__('There is no form with ID %d, perhaps it was deleted?', 'newsletter-for-wp'), $post_id);
-            throw new Exception($message);
+        if (! $post instanceof WP_Post || $post->post_type !== 'nl4wp-form') {
+            self::throw_not_found_exception($post_id);
         }
 
-        $post_meta = get_post_meta($post_id);
-        $form = new NL4WP_Form($post_id, $post, $post_meta);
+        // get all post meta in single call for performance
+        $post_meta = (array) get_post_meta($post_id);
+        $form      = new NL4WP_Form($post_id, $post, $post_meta);
 
         // store instance
         self::$instances[ $post_id ] = $form;
@@ -79,22 +107,22 @@ class NL4WP_Form
     /**
      * @var array Array of settings
      */
-    public $settings = array();
+    public $settings = [];
 
     /**
      * @var array Array of messages
      */
-    public $messages = array();
+    public $messages = [];
 
     /**
      * @var array Array of notices to be shown when this form is rendered
      */
-    public $notices = array();
+    public $notices = [];
 
     /**
      * @var array Array of error codes
      */
-    public $errors = array();
+    public $errors = [];
 
     /**
      * @var bool Was this form submitted?
@@ -106,22 +134,22 @@ class NL4WP_Form
      *
      * Keys in this array are uppercased and keys starting with _ are stripped.
      */
-    private $data = array();
+    private $data = [];
 
     /**
      * @var array Array of the raw form data that was submitted.
      */
-    public $raw_data = array();
+    public $raw_data = [];
 
     /**
      * @var array
      */
-    public $config = array(
-        'action' => 'subscribe',
-        'lists' => array(),
+    public $config = [
+        'action'     => 'subscribe',
+        'lists'      => [],
         'email_type' => '',
-        'element_id' => ''
-    );
+        'element_id' => '',
+    ];
 
     /**
     * @var string
@@ -138,12 +166,12 @@ class NL4WP_Form
      * @param WP_Post $post
      * @param array $post_meta
      */
-    public function __construct($id, $post, $post_meta = array())
+    public function __construct($id, WP_Post $post, array $post_meta = [])
     {
-        $this->ID = $id = (int) $id;
-        $this->name = $post->post_title;
-        $this->content = $post->post_content;
-        $this->status = $post->post_status;
+        $this->ID       = (int) $id;
+        $this->name     = $post->post_title;
+        $this->content  = $post->post_content;
+        $this->status   = $post->post_status;
         $this->settings = $this->load_settings($post_meta);
         $this->messages = $this->load_messages($post_meta);
 
@@ -158,7 +186,7 @@ class NL4WP_Form
      */
     public function __get($name)
     {
-        $method_name = sprintf("get_%s", $name);
+        $method_name = "get_$name";
         if (method_exists($this, $method_name)) {
             return $this->$method_name();
         }
@@ -182,9 +210,9 @@ class NL4WP_Form
     /**
      * @param string $element_id
      * @param array $config
-     * @return NL4WP_Form_element
+     * @return NL4WP_Form_Element
      */
-    public function get_element($element_id = 'nl4wp-form', $config = array())
+    public function get_element($element_id = 'nl4wp-form', array $config = [])
     {
         return new NL4WP_Form_Element($this, $element_id, $config);
     }
@@ -199,27 +227,22 @@ class NL4WP_Form
      *
      * @return string
      */
-    public function get_html($element_id = 'nl4wp-form', array $config = array())
+    public function get_html($element_id = 'nl4wp-form', array $config = [])
     {
         $element = $this->get_element($element_id, $config);
-        $html = $element->generate_html();
+        $html    = $element->generate_html();
         return $html;
     }
 
 
     /**
-     * @staticvar $defaults
+     * @param array $post_meta
      * @return array
      */
-    protected function load_settings($post_meta = array())
+    protected function load_settings(array $post_meta = [])
     {
-        $form = $this;
-        static $default_settings;
-
-        // get default settings
-        if (! $default_settings) {
-            $default_settings = include NL4WP_PLUGIN_DIR . 'config/default-form-settings.php';
-        }
+        $form             = $this;
+        $default_settings = include NL4WP_PLUGIN_DIR . '/config/default-form-settings.php';
 
         // start with defaults
         $settings = $default_settings;
@@ -231,7 +254,7 @@ class NL4WP_Form
 
             // ensure lists is an array
             if (empty($meta['lists'])) {
-                $meta['lists'] = array();
+                $meta['lists'] = [];
             }
 
             // merge with current settings (defaults)
@@ -252,25 +275,25 @@ class NL4WP_Form
     }
 
     /**
-     * @staticvar $default_messages
+     * @param array $post_meta
      * @return array
      */
-    protected function load_messages($post_meta = array())
+    protected function load_messages(array $post_meta = [])
     {
         $form = $this;
 
         // get default messages
-        $default_messages = include NL4WP_PLUGIN_DIR . 'config/default-form-messages.php';
-    
+        $default_messages = include NL4WP_PLUGIN_DIR . '/config/default-form-messages.php';
+
         // start with default messages
         $messages = $default_messages;
 
         /**
-         * Filters the form messages
+         * Filters the default form messages
          *
          * @since 3.0
          *
-         * @param array $registered_messages
+         * @param array $messages
          * @param NL4WP_Form $form
          */
         $messages = (array) apply_filters('nl4wp_form_messages', $messages, $form);
@@ -278,18 +301,22 @@ class NL4WP_Form
         // for backwards compatiblity, grab text of each message (if is array)
         foreach ($messages as $key => $message) {
             if (is_array($message) && isset($message['text'])) {
-                $messages[$key] = $message['text'];
+                $messages[ $key ] = $message['text'];
             }
         }
 
-        foreach ($messages as $key => $message_text) {
+        // restrict allowed HTML in messages to a safe subset
+        $allowed_attributes = array_fill_keys([ 'class', 'id', 'style', 'href', 'target', 'src', 'width', 'height', 'alt' ], true);
+        $allowed_html       = array_fill_keys([ 'strong', 'b', 'em', 'i', 'a', 'br', 'span', 'img' ], $allowed_attributes);
 
+        foreach ($messages as $key => $message_text) {
             // overwrite default text with text in form meta.
             if (isset($post_meta[ 'text_' . $key ][0])) {
-                $message_text = $post_meta[ 'text_' . $key ][0];
+                $message_text = wp_kses($post_meta[ 'text_' . $key ][0], $allowed_html);
             }
 
-            $messages[$key] = $message_text;
+            // run final value through gettext filter to allow translation of stored setting values
+            $messages[ $key ] = __($message_text, 'newsletter-for-wp'); // phpcs:ignore
         }
 
         return $messages;
@@ -298,13 +325,13 @@ class NL4WP_Form
     /**
      * Does this form has a field of the given type?
      *
-     * @param $type
+     * @param string $type
      *
      * @return bool
      */
     public function has_field_type($type)
     {
-        return in_array(strtolower($type), $this->get_field_types());
+        return in_array(strtolower($type), $this->get_field_types(), true);
     }
 
     /**
@@ -321,6 +348,7 @@ class NL4WP_Form
 
     /**
     * Add notice to this form when it is rendered
+     *
     * @param string $text
     * @param string $type
     */
@@ -336,7 +364,7 @@ class NL4WP_Form
      */
     public function __toString()
     {
-        return nl4wp_show_form($this->ID, array(), false);
+        return nl4wp_show_form($this->ID, [], false);
     }
 
     /**
@@ -347,7 +375,7 @@ class NL4WP_Form
     public function get_redirect_url()
     {
         $form = $this;
-        $url = trim($this->settings['redirect']);
+        $url  = trim($this->settings['redirect']);
 
         /**
          * Filters the redirect URL setting
@@ -375,22 +403,28 @@ class NL4WP_Form
             return true;
         }
 
-        $form = $this;
-        $errors = array();
+        $form   = $this;
+        $errors = [];
 
         if (empty($this->config['lists'])) {
             $errors[] = 'no_lists_selected';
         }
 
-        if (! isset($this->raw_data['_nl4wp_timestamp']) || $this->raw_data['_nl4wp_timestamp'] > (time() - 2)) {
-            $errors[] = 'spam';
-        } elseif (! isset($this->raw_data['_nl4wp_honeypot']) || ! empty($this->raw_data['_nl4wp_honeypot'])) {
-            $errors[] = 'spam';
+        // perform some basic anti-spam checks
+        // User-Agent header should be set and not bot-like
+        if (empty($_SERVER['HTTP_USER_AGENT']) || preg_match('/bot|crawl|spider|seo|lighthouse|facebookexternalhit|preview/i', wp_unslash($_SERVER['HTTP_USER_AGENT']))) {
+            $errors[] = 'spam.user_agent';
+            // _nl4wp_timestamp field should be between 30 days ago (to deal with aggressively cached pages) and 2 seconds ago
+        } elseif (! isset($this->raw_data['_nl4wp_timestamp']) || $this->raw_data['_nl4wp_timestamp'] < (time() - DAY_IN_SECONDS * 90) || $this->raw_data['_nl4wp_timestamp'] > ( time() - 2 )) {
+            $errors[] = 'spam.timestamp';
+            // _nl4wp_honeypot field should be submitted and empty
+        } elseif (! isset($this->raw_data['_nl4wp_honeypot']) || '' !== $this->raw_data['_nl4wp_honeypot']) {
+            $errors[] = 'spam.honeypot';
         }
 
         if (empty($errors)) {
             // validate email field
-            if (empty($this->data['EMAIL']) || ! is_email($this->data['EMAIL'])) {
+            if (false === nl4wp_is_email($this->data['EMAIL'])) {
                 $errors[] = 'invalid_email';
             }
 
@@ -399,7 +433,7 @@ class NL4WP_Form
                 $value = nl4wp_array_get($this->data, $field);
 
                 // check for empty string or array here instead of empty() since we want to allow for "0" values.
-                if ($value === "" || $value === array()) {
+                if ($value === '' || $value === []) {
                     $errors[] = 'required_field_missing';
                     break;
                 }
@@ -419,20 +453,8 @@ class NL4WP_Form
          */
         $errors = (array) apply_filters('nl4wp_form_errors', $errors, $form);
 
-        /**
-         * @ignore
-         * @deprecated 3.0 Use `nl4wp_form_errors` instead
-         */
-        $form_validity = apply_filters('nl4wp_valid_form_request', true, $this->data);
-        if (is_string($form_validity)) {
-            $errors[] = $form_validity;
-        }
-
         // filter out all non-string values
-        $errors = array_filter($errors, 'is_string');
-
-        // set property on self
-        $this->errors = $errors;
+        $this->errors = array_filter($errors, 'is_string');
 
         // return whether we have errors
         return ! $this->has_errors();
@@ -448,18 +470,18 @@ class NL4WP_Form
     public function handle_request(array $data)
     {
         $this->is_submitted = true;
-        $this->raw_data = $data;
-        $this->data = $this->parse_request_data($data);
-        $this->last_event = '';
+        $this->raw_data     = $data;
+        $this->data         = $this->parse_request_data($data);
+        $this->last_event   = '';
 
         // update form configuration from given data
-        $config = array();
-        $map = array(
-            '_nl4wp_lists' => 'lists',
-            '_nl4wp_action' => 'action',
+        $config = [];
+        $map    = [
+            '_nl4wp_lists'           => 'lists',
+            '_nl4wp_action'          => 'action',
             '_nl4wp_form_element_id' => 'element_id',
-            '_nl4wp_email_type' => 'email_type'
-        );
+            '_nl4wp_email_type'      => 'email_type',
+        ];
 
         // use isset here to allow empty lists (which should show a notice)
         foreach ($map as $param_key => $config_key) {
@@ -493,9 +515,9 @@ class NL4WP_Form
      */
     protected function parse_request_data(array $data)
     {
-        $form = $this;
-        $filtered = array();
-        $ignored_field_names = array();
+        $form                = $this;
+        $filtered            = [];
+        $ignored_field_names = [];
 
         /**
         * Filters field names which should be ignored when showing data.
@@ -508,8 +530,12 @@ class NL4WP_Form
         $ignored_field_names = apply_filters('nl4wp_form_ignored_field_names', $ignored_field_names, $form);
 
         foreach ($data as $key => $value) {
+            if (! is_string($key) || strlen($key) > 191) {
+                continue;
+            }
+
             // skip fields in ignored field names
-            if ($key[0] === '_' || in_array($key, $ignored_field_names)) {
+            if ($key === '' || $key[0] === '_' || in_array($key, $ignored_field_names, true)) {
                 continue;
             }
 
@@ -521,7 +547,7 @@ class NL4WP_Form
                 $value = array_filter($value);
             }
 
-            $filtered[$key] = $value;
+            $filtered[ $key ] = $value;
         }
 
         return $filtered;
@@ -543,12 +569,12 @@ class NL4WP_Form
         }
 
         // make sure action is valid
-        if (! in_array($this->config['action'], array( 'subscribe', 'unsubscribe' ))) {
+        if (! in_array($this->config['action'], [ 'subscribe', 'unsubscribe' ], true)) {
             $this->config['action'] = 'subscribe';
         }
 
         // email_type should be a valid value
-        if (! in_array($this->config['email_type'], array( 'html', 'text' ))) {
+        if (! in_array($this->config['email_type'], [ 'html', 'text' ], true)) {
             $this->config['email_type'] = '';
         }
 
@@ -556,14 +582,14 @@ class NL4WP_Form
     }
 
     /**
-     * Get Newsletter lists this form subscribes to
+     * Get ID's of Newsletter lists this form subscribes to
      *
      * @return array
      */
     public function get_lists()
     {
         $lists = $this->config['lists'];
-        $form = $this;
+        $form  = $this;
 
         /**
          * Filters Newsletter lists new subscribers should be added to.
@@ -607,7 +633,7 @@ class NL4WP_Form
     public function add_error($error_code)
     {
         // only add each error once
-        if (! in_array($error_code, $this->errors)) {
+        if (! in_array($error_code, $this->errors, true)) {
             $this->errors[] = $error_code;
         }
     }
@@ -644,6 +670,14 @@ class NL4WP_Form
     }
 
     /**
+     * @return array
+     */
+    public function get_raw_data()
+    {
+        return $this->raw_data;
+    }
+
+    /**
      * Get array of name attributes for the required fields in this form.
      *
      * @return array
@@ -663,7 +697,7 @@ class NL4WP_Form
         $required_fields = explode(',', $required_fields_string);
 
         // EMAIL is not a required field as it has its own validation rules
-        $required_fields = array_diff($required_fields, array( 'EMAIL' ));
+        $required_fields = array_diff($required_fields, [ 'EMAIL' ]);
 
         // filter duplicate & empty values
         $required_fields = array_unique($required_fields);
@@ -673,7 +707,7 @@ class NL4WP_Form
         foreach ($required_fields as $key => $value) {
             $pos = strpos($value, '.');
             if ($pos > 0) {
-                $required_fields[$key] = substr($value, 0, $pos) . strtolower(substr($value, $pos));
+                $required_fields[ $key ] = substr($value, 0, $pos) . strtolower(substr($value, $pos));
             }
         }
 
@@ -736,7 +770,19 @@ class NL4WP_Form
     */
     public function get_message($key)
     {
-        $message = isset($this->messages[ $key]) ? $this->messages[ $key ] : $this->messages['error'] ;
+        // default to generic error message
+        $message = $this->messages['error'];
+
+        // if error key contains a dot, use only part before the dot (example: spam.honeypot)
+        $dot_pos = strpos($key, '.');
+        if ($dot_pos !== false) {
+            $key = substr($key, 0, $dot_pos);
+        }
+
+        // if a more specific message exists for this error key, use that
+        if (isset($this->messages[$key])) {
+            $message = $this->messages[$key];
+        }
 
         if ($key === 'no_lists_selected' && current_user_can('manage_options')) {
             $message .= sprintf(' (<a href="%s">%s</a>)', nl4wp_get_edit_form_url($this->ID, 'settings'), 'edit form settings');
@@ -746,49 +792,40 @@ class NL4WP_Form
     }
 
     /**
-     * Get HTML string for a message, including wrapper element.
-     *
-     * @deprecated 3.1
-     *
-     * @param string $key
-     *
-     * @return string
-     */
-    public function get_message_html($key)
-    {
-        _deprecated_function(__METHOD__, '3.2');
-        return '';
-    }
-
-    /**
-    * Add a notice to this form
-    */
-    public function add_message($key)
-    {
-        _deprecated_function(__METHOD__, '3.3');
-        $this->add_notice($this->get_message($key));
-    }
-
-    /**
      * @since 4.4
      * @return array
      */
     public function get_subscriber_tags()
     {
-        if (empty($this->settings['subscriber_tags'])) {
-            return array();
-        }
+        $tags = [];
 
-        $tags = explode(',', $this->settings['subscriber_tags']);
-        $tags = array_map('trim', $tags);
+        // Add active tags
+        $tags = array_merge($tags, $this->parse_tags_from_setting($this->settings['subscriber_tags'], 'active'));
 
-        // remove empty tag values
-        foreach($tags as $i => $tag) {
-            if ($tag === '') {
-                unset($tags[$i]);
+        // Add inactive (remove) tags
+        $tags = array_merge($tags, $this->parse_tags_from_setting($this->settings['remove_subscriber_tags'], 'inactive'));
+
+        return $tags;
+    }
+
+    /**
+     * Parse comma-separated tags from a setting into Newsletter API format
+     *
+     * @since 4.10.10
+     * @param string $setting_value
+     * @param string $status
+     * @return array
+     */
+    private function parse_tags_from_setting($setting_value, $status)
+    {
+        $tags = [];
+        foreach (explode(',', $setting_value) as $v) {
+            $v = trim($v);
+            if ($v == '') {
+                continue;
             }
+            $tags[] = ['name' => $v, 'status' => $status];
         }
-
-        return array_values($tags);
+        return $tags;
     }
 }

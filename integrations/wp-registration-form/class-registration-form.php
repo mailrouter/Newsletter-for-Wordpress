@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_Registration_Form_Integration
@@ -9,16 +9,15 @@ defined('ABSPATH') or exit;
  */
 class NL4WP_Registration_Form_Integration extends NL4WP_User_Integration
 {
+    /**
+     * @var string
+     */
+    public $name = 'Registration Form';
 
     /**
      * @var string
      */
-    public $name = "Registration Form";
-
-    /**
-     * @var string
-     */
-    public $description = "Subscribes people from your WordPress registration form.";
+    public $description = 'Subscribes people from your WordPress registration form.';
 
     /**
      * @var bool
@@ -31,19 +30,49 @@ class NL4WP_Registration_Form_Integration extends NL4WP_User_Integration
     public function add_hooks()
     {
         if (! $this->options['implicit']) {
-            add_action('login_head', array( $this, 'print_css_reset' ));
-            add_action('um_after_register_fields', array( $this, 'maybe_output_checkbox' ), 20);
-            add_action('register_form', array( $this, 'maybe_output_checkbox' ), 20);
-            add_action('woocommerce_register_form', array( $this, 'maybe_output_checkbox' ), 20);
+            add_action('login_head', [ $this, 'print_css_reset' ]);
+            add_action('um_after_register_fields', [ $this, 'maybe_output_checkbox' ], 20);
+            add_action('register_form', [ $this, 'maybe_output_checkbox' ], 20);
+            add_action('woocommerce_register_form', [ $this, 'maybe_output_checkbox' ], 20);
+            add_action('user_new_form', [ $this, 'maybe_output_user_new_checkbox' ], 20);
         }
 
-        add_action('um_user_register', array( $this, 'subscribe_from_registration' ), 90, 1);
-        add_action('user_register', array( $this, 'subscribe_from_registration' ), 90, 1);
+        add_action('um_user_register', [ $this, 'subscribe_from_registration' ], 90, 1);
+        add_action('user_register', [ $this, 'subscribe_from_registration' ], 90, 1);
 
         if (defined('um_plugin') && class_exists('UM')) {
-            $this->name = 'UltimateMember';
+            $this->name        = 'UltimateMember';
             $this->description = 'Subscribes people from your UltimateMember registration form.';
         }
+    }
+
+    /**
+     * Output checkbox in the admin "Add New User" form.
+     */
+    public function maybe_output_user_new_checkbox($form_type)
+    {
+        if ('add-new-user' !== $form_type || $this->shown) {
+            return;
+        }
+
+        $this->shown = true;
+        $this->output_user_new_checkbox();
+    }
+
+    /**
+     * Output checkbox as a form-table row.
+     */
+    public function output_user_new_checkbox()
+    {
+        $checkbox_id = esc_attr($this->checkbox_name);
+        echo '<table class="form-table" role="presentation">';
+        echo '<tr>';
+        echo '<th scope="row">', esc_html__('Newsletter subscribe', 'newsletter-for-wp'), '</th>';
+        echo '<td>';
+        $this->output_checkbox();
+        echo '</td>';
+        echo '</tr>';
+        echo '</table>';
     }
 
     /**
@@ -66,7 +95,6 @@ class NL4WP_Registration_Form_Integration extends NL4WP_User_Integration
      */
     public function subscribe_from_registration($user_id)
     {
-
         // was sign-up checkbox checked?
         if (! $this->triggered()) {
             return false;

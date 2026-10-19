@@ -5,11 +5,9 @@
  *
  * @since 3.0
  * @ignore
- * @access private
  */
 class NL4WP_Form_Element
 {
-
     /**
      * @var string
      */
@@ -28,7 +26,7 @@ class NL4WP_Form_Element
      * - lists: Customized number of Newsletter list ID's to subscribe to.
      * - email_type: The email type
      */
-    public $config = array();
+    public $config = [];
 
     /**
      * @var bool
@@ -37,17 +35,17 @@ class NL4WP_Form_Element
 
     /**
      * @param NL4WP_Form $form
-     * @param string $ID
-     * @param $config array
+     * @param string $id
+     * @param array $config
      */
-    public function __construct(NL4WP_Form $form, $ID, $config = array())
+    public function __construct(NL4WP_Form $form, $id, array $config = [])
     {
-        $this->form = $form;
-        $this->ID = $ID;
+        $this->form   = $form;
+        $this->ID     = $id;
         $this->config = $config;
 
         $this->is_submitted = $this->form->is_submitted
-                              && $this->form->config['element_id'] == $this->ID;
+                                && $this->form->config['element_id'] === $this->ID;
     }
 
 
@@ -57,7 +55,7 @@ class NL4WP_Form_Element
     protected function get_visible_fields()
     {
         $content = $this->form->content;
-        $form = $this->form;
+        $form    = $this->form;
         $element = $this;
 
         /**
@@ -82,20 +80,20 @@ class NL4WP_Form_Element
     {
 
         // hidden fields
-        $hidden_fields =  '<label style="display: none !important;">' . __('Leave this field empty if you\'re human:', 'newsletter-for-wp') . ' ' . '<input type="text" name="_nl4wp_honeypot" value="" tabindex="-1" autocomplete="off" /></label>';
-        $hidden_fields .= '<input type="hidden" name="_nl4wp_timestamp" value="'. time() . '" />';
-        $hidden_fields .= '<input type="hidden" name="_nl4wp_form_id" value="'. esc_attr($this->form->ID) .'" />';
-        $hidden_fields .= '<input type="hidden" name="_nl4wp_form_element_id" value="'. esc_attr($this->ID) .'" />';
+        $hidden_fields  = '<label style="display: none !important;">' . esc_html__('Leave this field empty if you\'re human:', 'newsletter-for-wp') . ' <input type="text" name="_nl4wp_honeypot" value="" tabindex="-1" autocomplete="off" /></label>';
+        $hidden_fields .= '<input type="hidden" name="_nl4wp_timestamp" value="' . time() . '" />';
+        $hidden_fields .= '<input type="hidden" name="_nl4wp_form_id" value="' . esc_attr((string) $this->form->ID) . '" />';
+        $hidden_fields .= '<input type="hidden" name="_nl4wp_form_element_id" value="' . esc_attr((string) $this->ID) . '" />';
 
         // was "lists" parameter passed in shortcode arguments?
         if (! empty($this->config['lists'])) {
-            $lists_string = is_array($this->config['lists']) ? join(',', $this->config['lists']) : $this->config['lists'];
-            $hidden_fields .= '<input type="hidden" name="_nl4wp_lists" value="'. esc_attr($lists_string) . '" />';
+            $lists_string   = is_array($this->config['lists']) ? join(',', $this->config['lists']) : $this->config['lists'];
+            $hidden_fields .= '<input type="hidden" name="_nl4wp_lists" value="' . esc_attr($lists_string) . '" />';
         }
 
         // was "lists" parameter passed in shortcode arguments?
         if (! empty($this->config['email_type'])) {
-            $hidden_fields .= '<input type="hidden" name="_nl4wp_email_type" value="'. esc_attr($this->config['email_type']) . '" />';
+            $hidden_fields .= '<input type="hidden" name="_nl4wp_email_type" value="' . esc_attr($this->config['email_type']) . '" />';
         }
 
         return (string) $hidden_fields;
@@ -114,8 +112,7 @@ class NL4WP_Form_Element
             return '';
         }
 
-        $html = sprintf('<div class="nl4wp-alert nl4wp-%s"><p>%s</p></div>', esc_attr($notice->type), $notice->text);
-        return $html;
+        return sprintf('<div class="nl4wp-alert nl4wp-%s" role="alert"><p>%s</p></div>', esc_attr($notice->type), $notice->text);
     }
 
     /**
@@ -158,10 +155,10 @@ class NL4WP_Form_Element
     protected function get_response_position()
     {
         $position = 'after';
-        $form = $this->form;
+        $form     = $this->form;
 
         // check if content contains {response} tag
-        if (stripos($this->form->content, '{response}') !== false) {
+        if (strpos($this->form->content, '{response}') !== false) {
             return '';
         }
 
@@ -238,21 +235,21 @@ class NL4WP_Form_Element
      */
     protected function get_form_element_attributes()
     {
-        $form = $this;
+        $form                  = $this;
         $form_action_attribute = null;
 
-        $attributes = array(
-            'id' => $this->ID,
-            'class' => $this->get_css_classes()
-        );
+        $attributes = [
+            'id'    => $this->ID,
+            'class' => $this->get_css_classes(),
+        ];
 
         /**
          * Filters the `action` attribute of the `<form>` element.
          *
          * Defaults to `null`, which means no `action` attribute will be printed.
          *
-         * @param string $form_action_attribute
-         * @param NL4WP_Form $form
+         * @param null|string $form_action_attribute
+         * @param NL4WP_Form_Element $form
          */
         $form_action_attribute = apply_filters('nl4wp_form_action', $form_action_attribute, $form);
         if (is_string($form_action_attribute)) {
@@ -263,14 +260,19 @@ class NL4WP_Form_Element
          * Filters all attributes to be added to the `<form>` element
          *
          * @param array $attributes Key-value pairs of attributes.
-         * @param NL4WP_Form $form
+         * @param NL4WP_Form_Element $form
          */
         $attributes = (array) apply_filters('nl4wp_form_element_attributes', $attributes, $form);
 
         // hardcoded attributes, can not be changed.
-        $attributes['method'] = 'post';
-        $attributes['data-id'] = $this->form->ID;
+        $attributes['method']    = 'post';
+        $attributes['data-id']   = $this->form->ID;
         $attributes['data-name'] = $this->form->name;
+
+        // add typo checker data attribute if enabled
+        if (! empty($this->form->settings['email_typo_check'])) {
+            $attributes['data-typo-check'] = '1';
+        }
 
         // build string of key="value" from array
         $string = '';
@@ -285,7 +287,7 @@ class NL4WP_Form_Element
      * @param array|null $config Use this to override the configuration for this form element
      * @return string
      */
-    public function generate_html(array $config = null)
+    public function generate_html(?array $config = null)
     {
         if ($config) {
             $this->config = $config;
@@ -297,17 +299,18 @@ class NL4WP_Form_Element
         }
 
         // Start building content string
-        $opening_html = '<!-- Newsletter for WordPress v' . NL4WP_VERSION . ' - https://github.com/mailrouter/Newsletter-for-Wordpress/ -->';
-        $opening_html .= '<form '. $this->get_form_element_attributes() .'>';
+        $opening_html  = '<!-- Newsletter for WordPress v' . NL4WP_VERSION . ' - https://github.com/mailrouter/Newsletter-for-Wordpress/ -->';
+        $opening_html .= '<form ' . $this->get_form_element_attributes() . '>';
         $before_fields = $this->get_html_before_fields();
-        $fields = '';
-        $after_fields = $this->get_html_after_fields();
-        $closing_html = '</form><!-- / Newsletter for WordPress Plugin -->';
+        $fields        = '';
+        $after_fields  = $this->get_html_after_fields();
+        $closing_html  = '</form><!-- / Newsletter for WordPress Plugin -->';
 
-        if (! $this->is_submitted
+        if (
+            ! $this->is_submitted
             || ! $this->form->settings['hide_after_success']
-            || $this->form->has_errors()) {
-
+            || $this->form->has_errors()
+        ) {
             // add HTML for fields + wrapper element.
             $fields = '<div class="nl4wp-form-fields">' .
                 $this->get_visible_fields() .
@@ -317,10 +320,10 @@ class NL4WP_Form_Element
 
         // concatenate everything
         $output = $opening_html .
-                  $before_fields .
-                  $fields .
-                  $after_fields .
-                  $closing_html;
+                    $before_fields .
+                    $fields .
+                    $after_fields .
+                    $closing_html;
 
         return $output;
     }
@@ -332,8 +335,8 @@ class NL4WP_Form_Element
      */
     protected function get_css_classes()
     {
-        $classes = array();
-        $form = $this->form;
+        $classes = [];
+        $form    = $this->form;
 
         $classes[] = 'nl4wp-form';
         $classes[] = 'nl4wp-form-' . $form->ID;

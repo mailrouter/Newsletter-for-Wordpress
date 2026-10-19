@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_BuddyPress_Integration
@@ -9,16 +9,15 @@ defined('ABSPATH') or exit;
  */
 class NL4WP_BuddyPress_Integration extends NL4WP_User_Integration
 {
+    /**
+     * @var string
+     */
+    public $name = 'BuddyPress';
 
     /**
      * @var string
      */
-    public $name = "BuddyPress";
-
-    /**
-     * @var string
-     */
-    public $description = "Subscribes users from BuddyPress registration forms.";
+    public $description = 'Subscribes users from BuddyPress registration forms.';
 
 
     /**
@@ -27,7 +26,7 @@ class NL4WP_BuddyPress_Integration extends NL4WP_User_Integration
     public function add_hooks()
     {
         if (! $this->options['implicit']) {
-            add_action('bp_before_registration_submit_buttons', array( $this, 'output_checkbox' ), 20);
+            add_action('bp_before_registration_submit_buttons', [ $this, 'output_checkbox' ], 20);
         }
 
         if (is_multisite()) {
@@ -41,10 +40,10 @@ class NL4WP_BuddyPress_Integration extends NL4WP_User_Integration
              * have responded to the activation email, a value is stored in the signup
              * usermeta data which is retrieved on activation and acted upon.
              */
-            add_filter('bp_signup_usermeta', array( $this, 'store_usermeta' ), 10, 1);
-            add_action('bp_core_activated_user', array( $this, 'subscribe_from_usermeta' ), 10, 3);
+            add_filter('bp_signup_usermeta', [ $this, 'store_usermeta' ], 10, 1);
+            add_action('bp_core_activated_user', [ $this, 'subscribe_from_usermeta' ], 10, 3);
         } else {
-            add_action('bp_core_signup_user', array( $this, 'subscribe_from_form' ), 10, 4);
+            add_action('bp_core_signup_user', [ $this, 'subscribe_from_form' ], 10, 4);
         }
 
         /**
@@ -65,7 +64,7 @@ class NL4WP_BuddyPress_Integration extends NL4WP_User_Integration
          *
          * to perform the subscription at a later point.
          */
-        add_action('nl4wp_integration_buddypress_subscribe_user', array( $this, 'subscribe_buddypress_user' ), 10, 1);
+        add_action('nl4wp_integration_buddypress_subscribe_user', [ $this, 'subscribe_buddypress_user' ], 10, 1);
     }
 
     /**
@@ -134,7 +133,7 @@ class NL4WP_BuddyPress_Integration extends NL4WP_User_Integration
         }
 
         // bail if our usermeta key is not switched on
-        $meta = (isset($userdata['meta'])) ? $userdata['meta'] : array();
+        $meta = ( isset($userdata['meta']) ) ? $userdata['meta'] : [];
         if (empty($meta['nl4wp_subscribe'])) {
             return false;
         }

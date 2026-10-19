@@ -1,6 +1,110 @@
 Changelog
 =========
 
+#### 4.14.1 - Sep 10, 2026
+
+- Require PHP 7.4 or newer and WordPress 5.3 or newer; the package is tested against the WordPress 7.0 series.
+- Remove the legacy Google reCAPTCHA integration. Existing settings are detected and an administrator notice offers cleanup and configuration of Procaptcha.
+- Add Procaptcha as the privacy-friendly anti-bot integration for new configurations.
+- Remove unsubscribe forms for security reasons; existing unsubscribe forms now return an error and write an explanatory log entry.
+- Remove deprecated public hooks and helper functions; extensions should use the current form and integration APIs.
+- Remove the obsolete default-form setting and use the first available form when no form ID is supplied.
+- Remove opt-in usage tracking and drop support for very old browsers as the JavaScript bundles are aligned with WordPress core.
+- Stop requiring jQuery in the frontend form scripts and reduce the client-side bundle size.
+- Add email-domain typo checking and improve validation, escaping, nonce handling, accessibility, and error logging across the administration and forms.
+- Improve compatibility with current versions of WooCommerce, WPForms, Gravity Forms, CheckoutWC, WPML, AMP, and the block editor.
+- Uninstalling the plugin removes its stored options, transients, forms, and form metadata.
+
+#### 4.9.13 - Apr 25, 2024
+
+- Fix issue with Composer classmap throwing a fatal error when an older version of Composer is already loaded.
+- Update third-party JS dependencies.
+- Integrations: Update CheckoutWC hook name for WooCommerce checkbox integration.
+- Forms: Don't show form preview to users without `edit_posts` capability.
+- Forms: Explicitly exclude form preview from search engine indexing.
+- General: Don't unnecessarily go through service contrainer while bootstrapping plugin.
+- General: Remove some unnecessary JavaScript now that browser support has caught up.
+- Add missing label element to the select element for setting the logging level.
+- Our JavaScript assets are now transpiled to support the same set of browsers as WordPress core. This drops support for some very old browsers, but results in smaller bundle sizes for the supported set of browsers.
+- Update third-party JS dependencies to their latest versions.
+- Minor textual improvements.
+- Address some minor codestyle issues.
+- Fix generated HTML for list/audience choice fields.
+- Fallback to default checkbox label if none given. Thanks to [Shojib Khan](https://github.com/kshojib).
+- Improve WooCommerce integration settings page by disabling position field if integration is disabled. Thanks to [Shojib Khan](https://github.com/kshojib).
+- Defend against breaking change in latest WPForms update.
+- Remove Google reCaptcha feature.
+- Fix generated value attribute for fields of type choice (dropdown, checkboxes, radio fields).
+- Fix type of `marketing_permissions` field in API requests. Thanks to [George Korakas](https://github.com/gkorakas-eli).
+- Refactor list overview JS to not depend on Mithril.js anymore.
+- Removed deprecated filter hook `nl4wp_settings_cap`, use `nl4wp_admin_required_capability` instead.
+- Removed deprecated filter hook `nl4wp_merge_vars`, use `nl4wp_form_data` or `nl4wp_integration_data` instead.
+- Removed deprecated filter hook `nl4wp_form_merge_vars`, use `nl4wp_form_data` instead.
+- Removed deprecated filter hook `nl4wp_integration_merge_vars`, use `nl4wp_integration_data` instead.
+- Removed deprecated filter hook `nl4wp_valid_form_request`, use `nl4wp_form_errors` instead.
+- Removed deprecated function `nl4wp_checkbox()`.
+- Removed deprecated function `nl4wp_form()`, use `nl4wp_show_form()` instead.
+- Added filter `nl4wp_debug_log_message` to modify or disable messages that are written to the debug log.
+- Fix color of invalid newsletter service API key notice.
+- Sanitize IP address value from `$_SERVER['REMOTE_ADDR']` too.
+- Minor performance, memory usage & size optimizations for all JavaScript code bundled with this plugin.
+- Improved default styling for the WooCommerce sign-up checkbox integration.
+- Add `<strong>` to allowed HTML elements for GDPR disclaimer text on settings pages.
+- Remove all references to obsolete placeholders.js polyfill.
+- Move the GiveWP sign-up checkbox closer to the email input field. Thanks [Matthew Lewis](https://github.com/Matthew-Lewis).
+- Fix nl4wp_get_request_ip_address() to return an IP address that matches newsletter service's validation format when X-Forwarded-For header contains a port component.
+- Fix nl4wp_get_request_ip_address() to pass new newsletter service validation format. This fixes the "This value is not a valid IP." error some users using a proxy may have been seeing.
+- Fix name of action hook that fires before newsletter service settings rows are displayed on the settings page. Thanks [LoonSongSoftware](https://github.com/LoonSongSoftware).
+- Improve WPML compatibility. Thanks [Sumit Singh](https://github.com/5um17).
+- Fix deprecated function for AMP integration.
+- Only allow unfiltered HTML if user has `unfiltered_html` capability. Please read the below.
+- Add strings from config/ directory to POT file.
+- Add nonce check to AJAX endpoint for refreshing cached newsletter service lists.
+- Add capability check to AJAX endpoint for retrieving list details.
+- Schedule event to refresh cached newsletter service list upon plugin activation.
+- Add nonce verification to all URL's using `_nl4wp_action` query parameter. This fixes a CSRF vulnerability where a malicious website could trick a logged-in admin user in performing unwanted actions. A special thanks to Erwan from [WPScan](https://wpscan.com/) for bringing this issue to our attention.
+- Add `defer` attribute to JS file, so page parsing isn't blocked at all.
+- Rewrite plugin CSS to optimize for selector performance and get rid of some duplication.
+- Allow short-circuiting `nl4wp_subscriber_data` filter by returning `null` or `false`.
+- Use a subdirectory for the default debug log file location, so that it's easier to protect using htaccess.
+- Improved reliability for fetching lists from newsletter service when lists have high stats.member_count property.
+- Fix notice by explicitly setting `permission_callback` on registered REST route.
+- Minor internal code improvements.
+- Plugin now requires PHP 5.6 or higher.
+- Prefix overlay classname to prevent styling collissions with other plugins.
+- Form sign-ups can now add tags to both new and existing subscribers.
+- Update JavaScript dependencies.
+- Register script early to work with Gutenberg preview.
+- Minor code hardening to ensure a default form is always set.
+- Fix icon for Gutenberg block.
+- Simplify code for updating an existing form.
+- Check if className is of type string, fixes a console warning when clicking inside a SVG element.
+- Minor improvements to the AMP implementation to address harmless validation warnings.
+- Add AMP compatibility to sign-up forms, thanks to Claudiu Lodromanean. This uses the [official AMP plugin for WordPress](https://amp-wp.org).
+- Add settings key to WPML config so settings can easily by copied over to translated versions of a form.
+- Optimize size & performance of JavaScript code, resulting in a file that is 40% smaller.
+- Update CodeMirror to its latest version.
+- Escape all string translations.
+- htaccess config for servers running Apache 2.4 or later.
+- Add getter method for raw (unmodified) data on form class.
+- Update MemberPress hook names. Thanks [Ian Heggaton](https://github.com/pixelated-au)!
+- Write .htaccess to directory of debug log file, to prevent file access.
+- Add some convenient hooks for Checkout for WooCommerce.
+- Stop parsing shortcodes in text widgets as WordPress core does this since version 4.9.
+- Add role=alert to form notices.
+- Add setting to pre-check sign-up checkbox for Gravity Forms integrations.
+- Add new position for WooCommerce integration: directly after the billing_email field.
+- Fix PHP notices for submitting a form and saving a form as an administrator.
+- Add proper SVG admin menu icon.
+- Minor overall performance and memory usage improvements.
+- Fixed list cache usage for WPForms, Gravity Forms and Ninja Forms integrations.
+- Improved fetch and cache mechanism for retrieving newsletter service account details, fetching data only when it is required.
+- Updated [Mithril](https://mithril.js.org/) and [CodeMirror](https://codemirror.net/) dependencies.
+- Decreased size of `forms.js` from 22KB to 9KB.
+- No longer requiring jQuery anywhere.
+- Increase API HTTP request timeout to 15 seconds.
+
+
 #### 4.5.12 - May 27, 2024
 
 **Improvements**

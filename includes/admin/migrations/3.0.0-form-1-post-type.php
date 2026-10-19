@@ -1,9 +1,9 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 // get options
-$form_options = get_option('nl4wp_lite_form', array());
+$form_options = get_option('nl4wp_lite_form', []);
 
 // bail if there are no previous options
 if (empty($form_options)) {
@@ -12,16 +12,15 @@ if (empty($form_options)) {
 
 // bail if there are Pro forms already
 $has_forms = get_posts(
-    array(
-        'post_type' => 'nl4wp-form',
+    [
+        'post_type'   => 'nl4wp-form',
         'post_status' => 'publish',
-        'numberposts' => 1
-    )
+        'numberposts' => 1,
+    ]
 );
 
 // There are forms already, don't continue.
 if (! empty($has_forms)) {
-
     // delete option as it apparently exists.
     delete_option('nl4wp_lite_form');
     return;
@@ -29,19 +28,16 @@ if (! empty($has_forms)) {
 
 // create post type for form
 $id = wp_insert_post(
-    array(
-        'post_type'     => 'nl4wp-form',
-        'post_status'   => 'publish',
-        'post_title'         => __('Default sign-up form', 'newsletter-for-wp'),
-        'post_content'  => (empty($form_options['markup'])) ? '' : $form_options['markup'],
-    )
+    [
+        'post_type'    => 'nl4wp-form',
+        'post_status'  => 'publish',
+        'post_title'   => __('Default sign-up form', 'newsletter-for-wp'),
+        'post_content' => ( empty($form_options['markup']) ) ? '' : $form_options['markup'],
+    ]
 );
 
-// set default_form_id
-update_option('nl4wp_default_form_id', $id);
-
 // set form settings
-$setting_keys = array(
+$setting_keys = [
     'css',
     'custom_theme_color',
     'double_optin',
@@ -49,10 +45,10 @@ $setting_keys = array(
     'replace_interests',
     'send_welcome',
     'redirect',
-    'hide_after_success'
-);
+    'hide_after_success',
+];
 
-$settings = array();
+$settings = [];
 
 foreach ($setting_keys as $setting_key) {
     // use isset to account for "0" settings
@@ -69,15 +65,15 @@ if (isset($form_options['lists'])) {
 update_post_meta($id, '_nl4wp_settings', $settings);
 
 // set form message texts
-$message_keys = array(
+$message_keys = [
     'text_subscribed',
     'text_error',
     'text_invalid_email',
     'text_already_subscribed',
     'text_required_field_missing',
     'text_unsubscribed',
-    'text_not_subscribed'
-);
+    'text_not_subscribed',
+];
 
 foreach ($message_keys as $message_key) {
     if (! empty($form_options[ $message_key ])) {

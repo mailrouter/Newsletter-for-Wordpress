@@ -1,76 +1,57 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+
 /**
-* This class takes care of all form related functionality
+* This class takes care of all form assets related functionality
  *
  * @access private
  * @ignore
 */
 class NL4WP_Form_Asset_Manager
 {
+    /**
+     * @var bool Flag to determine whether scripts should be enqueued.
+     */
+    private $load_scripts = false;
 
     /**
-     * @var bool
+     * @var bool Flag to determine whether email typo checker script should be enqueued.
      */
-    protected $load_scripts = false;
-
-    /**
-     * @var string
-     */
-    protected $filename_suffix = '';
-
-    /**
-     * NL4WP_Form_Asset_Manager constructor.
-     */
-    public function __construct()
-    {
-        $this->filename_suffix =(defined('SCRIPT_DEBUG') && SCRIPT_DEBUG) ? '' : '.min';
-    }
+    private $load_typo_checker = false;
 
     /**
      * Add hooks
      */
-    public function hook()
+    public function add_hooks(): void
     {
-        // load checkbox css if necessary
-        add_action('wp_enqueue_scripts', array( $this, 'load_stylesheets' ));
-        add_action('nl4wp_output_form', array( $this, 'before_output_form' ));
-        add_action('wp_footer', array( $this, 'load_scripts' ));
-
-        $this->register_assets();
+        add_action('init', [ $this, 'register_scripts' ]);
+        add_action('wp_enqueue_scripts', [ $this, 'load_stylesheets' ]);
+        add_action('wp_footer', [ $this, 'load_scripts' ]);
+        add_action('nl4wp_output_form', [ $this, 'before_output_form' ]);
+        add_filter('script_loader_tag', [ $this, 'add_defer_attribute' ], 10, 2);
     }
 
     /**
-     * Register the various JS files used by the plugin
+     * Register scripts to be enqueued later.
+     *
+     * @return void
      */
-    public function register_assets()
+    public function register_scripts()
     {
-        $suffix = $this->filename_suffix;
-
-        wp_register_script('nl4wp-forms-api', NL4WP_PLUGIN_URL . 'assets/js/forms-api'.  $this->filename_suffix .'.js', array(), NL4WP_VERSION, true);
-
-        /**
-         * Runs right after all assets (scripts & stylesheets) for forms have been registered
-         *
-         * @since 3.0
-         * @deprecated 3.1.9
-         *
-         * @param string $suffix The suffix to add to the filename, before the file extension. Is usually set to ".min".
-         * @ignore
-         */
-        do_action('nl4wp_register_form_assets', $suffix);
+        wp_register_script('nl4wp-forms-api', nl4wp_plugin_url('assets/js/forms.js'), [], NL4WP_VERSION, true);
+        wp_register_script('nl4wp-email-typo-checker', nl4wp_plugin_url('assets/js/email-typo-checker.js'), [], NL4WP_VERSION, ['strategy' => 'defer', 'in_footer' => true]);
     }
-
 
     /**
      * @param string $stylesheet
-     *
      * @return bool
      */
     public function is_registered_stylesheet($stylesheet)
     {
         $stylesheets = $this->get_registered_stylesheets();
-        return in_array($stylesheet, $stylesheets);
+        return in_array($stylesheet, $stylesheets, true);
     }
 
     /**
@@ -78,10 +59,10 @@ class NL4WP_Form_Asset_Manager
      */
     public function get_registered_stylesheets()
     {
-        return array(
+        return [
             'basic',
-            'themes'
-        );
+            'themes',
+        ];
     }
 
     /**
@@ -91,12 +72,7 @@ class NL4WP_Form_Asset_Manager
      */
     public function get_stylesheet_url($stylesheet)
     {
-        if (! $this->is_registered_stylesheet($stylesheet)) {
-            return '';
-        }
-
-        $suffix = $this->filename_suffix;
-        return NL4WP_PLUGIN_URL . 'assets/css/form-' . $stylesheet . $suffix . '.css';
+        return nl4wp_plugin_url('assets/css/form-' . $stylesheet . '.css');
     }
 
     /**
@@ -106,7 +82,7 @@ class NL4WP_Form_Asset_Manager
      */
     public function get_active_stylesheets()
     {
-        $stylesheets = (array) get_option('nl4wp_form_stylesheets', array());
+        $stylesheets = (array) get_option('nl4wp_form_stylesheets', []);
 
         /**
          * Filters the stylesheets to be loaded
@@ -136,72 +112,70 @@ class NL4WP_Form_Asset_Manager
             }
 
             $handle = 'nl4wp-form-' . $stylesheet;
-            wp_enqueue_style($handle, $this->get_stylesheet_url($stylesheet), array(), NL4WP_VERSION);
-            add_editor_style($this->get_stylesheet_url($stylesheet));
+            $url    = $this->get_stylesheet_url($stylesheet);
+            wp_enqueue_style($handle, $url, [], NL4WP_VERSION);
+            add_editor_style($url);
         }
 
         /**
          * @ignore
          */
         do_action('nl4wp_load_form_stylesheets', $stylesheets);
-
-        return true;
     }
 
     /**
-     * Get configuration object for client-side use.
+     * Get data object for client-side use for after a form is submitted over HTTP POST (not AJAX).
      *
-     * @return array
+     * @return null|array
      */
-    public function get_javascript_config()
+    public function get_submitted_form_data()
     {
         $submitted_form = nl4wp_get_submitted_form();
-        if (! $submitted_form) {
-            return array();
+        if (! $submitted_form instanceof NL4WP_Form) {
+            return null;
         }
 
-        $config = array(
-            'submitted_form' => array(
-                'id' => $submitted_form->ID,
-                'event' => $submitted_form->last_event,
-                'data' => $submitted_form->get_data(),
-                'element_id' => $submitted_form->config['element_id'],
-            )
-        );
+        $data = [
+            'id'         => $submitted_form->ID,
+            'event'      => $submitted_form->last_event,
+            'data'       => $submitted_form->get_data(),
+            'element_id' => $submitted_form->config['element_id'],
+            'auto_scroll' => true,
+        ];
 
         if ($submitted_form->has_errors()) {
-            $config['submitted_form']['errors'] = $submitted_form->errors;
+            $data['errors'] = $submitted_form->errors;
         }
-
-        $auto_scroll = 'default';
 
         /**
          * Filters the `auto_scroll` setting for when a form is submitted.
+         * Set to false to disable scrolling to form.
          *
-         * Accepts the following  values:
-         *
-         * - false
-         * - "default"
-         * - "animated"
-         *
-         * @param boolean|string $auto_scroll
+         * @param boolean $auto_scroll
          * @since 3.0
          */
-        $config['auto_scroll'] = apply_filters('nl4wp_form_auto_scroll', $auto_scroll);
+        $data['auto_scroll'] = apply_filters('nl4wp_form_auto_scroll', $data['auto_scroll']);
 
-        return $config;
+        return $data;
     }
 
     /**
      * Load JavaScript files
      */
-    public function before_output_form()
+    public function before_output_form($form)
     {
-        // print dummy JS
-        $this->print_dummy_javascript();
+        $load_scripts = apply_filters('nl4wp_load_form_scripts', true);
+        if (! $load_scripts) {
+            return;
+        }
 
-        // set flags
+        $this->print_dummy_javascript();
         $this->load_scripts = true;
+
+        // check if this form has typo checker enabled
+        if (! empty($form->settings['email_typo_check'])) {
+            $this->load_typo_checker = true;
+        }
     }
 
     /**
@@ -209,9 +183,8 @@ class NL4WP_Form_Asset_Manager
      */
     public function print_dummy_javascript()
     {
-        $file = dirname(__FILE__) . '/views/js/dummy-api.js';
         echo '<script>';
-        include $file;
+        include __DIR__ . '/views/js/dummy-api.js';
         echo '</script>';
     }
 
@@ -220,34 +193,82 @@ class NL4WP_Form_Asset_Manager
     */
     public function load_scripts()
     {
-        $load_scripts = $this->load_scripts;
-
-        /** @ignore */
-        $load_scripts = apply_filters('nl4wp_load_form_scripts', $load_scripts);
+        $load_scripts = apply_filters('nl4wp_load_form_scripts', $this->load_scripts);
         if (! $load_scripts) {
             return;
         }
 
-        global $wp_scripts;
-
-        // make sure scripts are loaded
+        // load general client-side form API
         wp_enqueue_script('nl4wp-forms-api');
-        wp_localize_script('nl4wp-forms-api', 'nl4wp_forms_config', $this->get_javascript_config());
 
-        // load placeholder polyfill if browser is Internet Explorer
-        wp_enqueue_script('nl4wp-forms-placeholders', NL4WP_PLUGIN_URL . 'assets/js/third-party/placeholders.min.js', array(), NL4WP_VERSION, true);
-        $wp_scripts->add_data('nl4wp-forms-placeholders', 'conditional', 'lte IE 9');
+        // load email typo checker script only if at least one form has it enabled
+        if ($this->load_typo_checker) {
+            wp_enqueue_script('nl4wp-email-typo-checker');
+            wp_localize_script('nl4wp-email-typo-checker', 'nl4wp_email_typo_checker', [
+                // translators: %s is the suggested correct email address.
+                'suggestion_text' => __('Did you mean %s?', 'newsletter-for-wp'),
+                'domains'         => apply_filters('nl4wp_email_typo_checker_domains', [
+                    'gmail.com',
+                    'yahoo.com',
+                    'hotmail.com',
+                    'outlook.com',
+                    'icloud.com',
+                    'aol.com',
+                    'live.com',
+                    'msn.com',
+                    'me.com',
+                    'mac.com',
+                    'googlemail.com',
+                    'ymail.com',
+                    'protonmail.com',
+                    'mail.com',
+                    'gmx.com',
+                    'zoho.com',
+                ]),
+            ]);
+        }
 
-        // print inline scripts depending on printed fields
+        // maybe load JS file for when a form was submitted over HTTP POST
+        $submitted_form_data = $this->get_submitted_form_data();
+        if ($submitted_form_data !== null) {
+            wp_enqueue_script('nl4wp-forms-submitted', nl4wp_plugin_url('assets/js/forms-submitted.js'), [ 'nl4wp-forms-api' ], NL4WP_VERSION, true);
+            wp_add_inline_script(
+                'nl4wp-forms-submitted',
+                'var nl4wp_submitted_form = ' . wp_json_encode($submitted_form_data) . ';',
+                'before'
+            );
+        }
+
+        // print inline scripts
         echo '<script>';
         echo '(function() {';
-        include dirname(__FILE__) . '/views/js/general-form-enhancements.js';
-        include dirname(__FILE__) . '/views/js/url-fields.js';
-        include dirname(__FILE__) . '/views/js/date-fields.js';
+        include __DIR__ . '/views/js/url-fields.js';
         echo '})();';
         echo '</script>';
 
         /** @ignore */
         do_action('nl4wp_load_form_scripts');
+    }
+
+    /**
+     * Adds `defer` attribute to all form-related `<script>` elements so they do not block page rendering.
+     *
+     * @param string $tag
+     * @param string $handle
+     * @return string
+     */
+    public function add_defer_attribute($tag, $handle)
+    {
+        // only act on scripts registered with any of these handles
+        if ($handle !== 'nl4wp-forms-api' && $handle !== 'nl4wp-forms-submitted') {
+            return $tag;
+        }
+
+        // don't add twice
+        if (strpos($tag, ' defer') !== false) {
+            return $tag;
+        }
+
+        return str_replace(' src=', ' defer src=', $tag);
     }
 }

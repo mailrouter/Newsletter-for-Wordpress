@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_User_Integration
@@ -10,7 +10,6 @@ defined('ABSPATH') or exit;
  */
 abstract class NL4WP_User_Integration extends NL4WP_Integration
 {
-
     /**
      * @param WP_User $user
      *
@@ -20,13 +19,13 @@ abstract class NL4WP_User_Integration extends NL4WP_Integration
     {
 
         // start with user_login as name, since that's always known
-        $data = array(
+        $data = [
             'EMAIL' => $user->user_email,
-            'NAME' => $user->user_login,
-        );
+            'NAME'  => $user->user_login,
+        ];
 
         if ('' !== $user->first_name) {
-            $data['NAME'] = $user->first_name;
+            $data['NAME']  = $user->first_name;
             $data['FNAME'] = $user->first_name;
         }
 
@@ -40,10 +39,20 @@ abstract class NL4WP_User_Integration extends NL4WP_Integration
 
         /**
          * @since 3.0
-         * @deprecated 4.0
-         * @ignore
+         * @deprecated 4.0 Use nl4wp_integration_user_data instead
+         * @param array $data
+         * @param WP_User $user
          */
         $data = (array) apply_filters('nl4wp_user_merge_vars', $data, $user);
+
+        /**
+         * Filters the data for user-related integrations
+         *
+         * @since 4.2
+         * @param array $data
+         * @param WP_User $user
+         */
+        $data = (array) apply_filters('nl4wp_integration_user_data', $data, $user);
 
         return $data;
     }

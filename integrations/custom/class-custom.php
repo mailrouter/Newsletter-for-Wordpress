@@ -1,14 +1,14 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_Custom_Integration
+ *
  * @ignore
  */
 class NL4WP_Custom_Integration extends NL4WP_Integration
 {
-
     /**
      * @var string
      */
@@ -17,19 +17,19 @@ class NL4WP_Custom_Integration extends NL4WP_Integration
     /**
      * @var string
      */
-    public $name = "Custom";
+    public $name = 'Custom';
 
     /**
      * @var string
      */
-    public $description = "Integrate with custom third-party forms.";
+    public $description = 'Integrate with custom third-party forms.';
 
     /**
     * Add hooks
     */
     public function add_hooks()
     {
-        add_action('init', array( $this, 'listen'), 50);
+        add_action('init', [ $this, 'listen' ], 50);
     }
 
     /**
@@ -39,14 +39,16 @@ class NL4WP_Custom_Integration extends NL4WP_Integration
      */
     public function checkbox_was_checked()
     {
-        $data = $this->get_data();
-        $value = isset($data[$this->checkbox_name]) ? $data[$this->checkbox_name] : '';
-        $truthy_values = array(1, "1", "yes", true, "true", "y");
+        $data          = $this->get_data();
+        $value         = isset($data[ $this->checkbox_name ]) ? $data[ $this->checkbox_name ] : '';
+        $truthy_values = [ 1, '1', 'yes', true, 'true', 'y' ];
         return in_array($value, $truthy_values, true);
     }
 
     /**
      * Maybe fire a general subscription request
+     *
+     * @return bool|string
      */
     public function listen()
     {
@@ -54,14 +56,30 @@ class NL4WP_Custom_Integration extends NL4WP_Integration
             return false;
         }
 
+        // ignore requests from bots, crawlers and link previews
+        if (empty($_SERVER['HTTP_USER_AGENT']) || preg_match('/bot|crawl|spider|seo|lighthouse|facebookexternalhit|preview/i', wp_unslash($_SERVER['HTTP_USER_AGENT']))) {
+            return false;
+        }
+
+        // ignore requests without an HTTP referrer
+        if (empty($_SERVER['HTTP_REFERER'])) {
+            return false;
+        }
+
+        // ignore requests where HTTP Referer does not contain hostname from home_url
+        $site_hostname = wp_parse_url(get_home_url(), PHP_URL_HOST);
+        if (strpos(wp_unslash($_SERVER['HTTP_REFERER']), $site_hostname) === false) {
+            return false;
+        }
+
         $data = $this->get_data();
 
         // don't run for CF7 or Events Manager requests
         // (since they use the same "nl4wp-subscribe" trigger)
-        $disable_triggers = array(
+        $disable_triggers = [
             '_wpcf7' => '',
-            'action' => 'booking_add'
-        );
+            'action' => 'booking_add',
+        ];
 
         foreach ($disable_triggers as $trigger => $trigger_value) {
             if (isset($data[ $trigger ])) {
@@ -87,7 +105,7 @@ class NL4WP_Custom_Integration extends NL4WP_Integration
     public function process()
     {
         $parser = new NL4WP_Field_Guesser($this->get_data());
-        $data = $parser->combine(array( 'guessed', 'namespaced' ));
+        $data   = $parser->combine([ 'guessed', 'namespaced' ]);
 
         // do nothing if no email was found
         if (empty($data['EMAIL'])) {
@@ -111,6 +129,6 @@ class NL4WP_Custom_Integration extends NL4WP_Integration
      */
     public function get_ui_elements()
     {
-        return array( 'lists', 'double_optin', 'update_existing', 'replace_interests' );
+        return [ 'lists', 'double_optin', 'update_existing', 'replace_interests' ];
     }
 }

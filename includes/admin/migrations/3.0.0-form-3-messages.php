@@ -1,25 +1,26 @@
 <?php
-defined('ABSPATH') or exit;
+
+defined('ABSPATH') || exit;
 
 // find all form posts
 $posts = get_posts(
-    array(
-        'post_type' => 'nl4wp-form',
+    [
+        'post_type'   => 'nl4wp-form',
         'post_status' => 'publish',
-        'numberposts' => -1
-    )
+        'numberposts' => -1,
+    ]
 );
 
 // set form message texts
-$message_keys = array(
+$message_keys = [
     'text_subscribed',
     'text_error',
     'text_invalid_email',
     'text_already_subscribed',
     'text_required_field_missing',
     'text_unsubscribed',
-    'text_not_subscribed'
-);
+    'text_not_subscribed',
+];
 
 foreach ($posts as $post) {
     $settings = get_post_meta($post->ID, '_nl4wp_settings', true);

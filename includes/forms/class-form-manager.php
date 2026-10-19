@@ -1,5 +1,8 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+
 /**
  * This class takes care of all form related functionality
  *
@@ -11,7 +14,6 @@
 */
 class NL4WP_Form_Manager
 {
-
     /**
      * @var NL4WP_Form_Output_Manager
      */
@@ -32,18 +34,27 @@ class NL4WP_Form_Manager
     */
     protected $previewer;
 
-    protected $recaptcha;
+    /**
+     * @var NL4WP_Form_Asset_Manager
+     */
+    protected $assets;
+
+    /**
+     * @var NL4WP_Form_AMP
+     */
+    protected $amp_compatibility;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->output_manager = new NL4WP_Form_Output_Manager();
-        $this->tags = new NL4WP_Form_Tags();
-        $this->listener = new NL4WP_Form_Listener();
-        $this->previewer = new NL4WP_Form_Previewer();
-        $this->recaptcha = new NL4WP_Google_Recaptcha();
+        $this->output_manager    = new NL4WP_Form_Output_Manager();
+        $this->tags              = new NL4WP_Form_Tags();
+        $this->listener          = new NL4WP_Form_Listener();
+        $this->previewer         = new NL4WP_Form_Previewer();
+        $this->assets            = new NL4WP_Form_Asset_Manager();
+        $this->amp_compatibility = new NL4WP_Form_AMP();
     }
 
     /**
@@ -51,15 +62,16 @@ class NL4WP_Form_Manager
      */
     public function add_hooks()
     {
-        add_action('init', array( $this, 'initialize' ));
-        add_action('wp', array( $this, 'init_asset_manager' ), 90);
-        add_action('widgets_init', array( $this, 'register_widget' ));
+        add_action('init', [ $this, 'initialize' ]);
+        add_action('widgets_init', [ $this, 'register_widget' ]);
+        add_action('rest_api_init', [ $this, 'register_endpoint' ]);
 
         $this->listener->add_hooks();
         $this->output_manager->add_hooks();
+        $this->assets->add_hooks();
         $this->tags->add_hooks();
         $this->previewer->add_hooks();
-        $this->recaptcha->add_hooks();
+        $this->amp_compatibility->add_hooks();
     }
 
     /**
@@ -78,9 +90,12 @@ class NL4WP_Form_Manager
             return;
         }
 
-        register_block_type( 'newsletter-for-wp/form', array(
-            'render_callback' => array($this->output_manager, 'shortcode'),
-        ));
+        register_block_type(
+            'newsletter-for-wp/form',
+            [
+                'render_callback' => [ $this->output_manager, 'shortcode' ],
+            ]
+        );
     }
 
     /**
@@ -91,25 +106,16 @@ class NL4WP_Form_Manager
         // register post type
         register_post_type(
             'nl4wp-form',
-            array(
-                'labels' => array(
-                    'name' => 'Newsletter Sign-up Forms',
+            [
+                'labels' => [
+                    'name'          => 'Newsletter Sign-up Forms',
                     'singular_name' => 'Sign-up Form',
-                ),
-                'public' => false
-            )
+                ],
+                'public' => false,
+                'capability_type' => 'nl4wp-form',
+                'map_meta_cap' => true,
+            ]
         );
-    }
-
-    /**
-     * Initialise asset manager
-     *
-     * @hooked `template_redirect`
-     */
-    public function init_asset_manager()
-    {
-        $assets = new NL4WP_Form_Asset_Manager();
-        $assets->hook();
     }
 
     /**
@@ -121,13 +127,62 @@ class NL4WP_Form_Manager
     }
 
     /**
+     * Register an API endpoint for handling a form.
+     */
+    public function register_endpoint()
+    {
+        register_rest_route(
+            'nl4wp/v1',
+            '/form',
+            [
+                'methods'  => 'POST',
+                'permission_callback' => '__return_true',
+                'callback' => [ $this, 'handle_endpoint' ],
+            ]
+        );
+    }
+
+    /**
+     * Process requests to the form endpoint.
+     *
+     * A listener checks every request for a form submit, so we just need to fetch the listener and get its status.
+     */
+    public function handle_endpoint()
+    {
+        $form = nl4wp_get_submitted_form();
+        if (! $form instanceof NL4WP_Form) {
+            return new WP_Error(
+                'not_found',
+                esc_html__('Resource does not exist.', 'newsletter-for-wp'),
+                [
+                    'status' => 404,
+                ]
+            );
+        }
+
+        if ($form->has_errors()) {
+            $message_key = $form->errors[0];
+            $message     = $form->get_message($message_key);
+            return new WP_Error(
+                $message_key,
+                $message,
+                [
+                'status' => 400,
+                ]
+            );
+        }
+
+        return new WP_REST_Response(true, 200);
+    }
+
+    /**
      * @param       $form_id
      * @param array $config
      * @param bool  $echo
      *
      * @return string
      */
-    public function output_form($form_id, $config = array(), $echo = true)
+    public function output_form($form_id, $config = [], $echo = true)
     {
         return $this->output_manager->output_form($form_id, $config, $echo);
     }
@@ -153,6 +208,6 @@ class NL4WP_Form_Manager
      */
     public function get_tags()
     {
-        return $this->tags->get();
+        return $this->tags->all();
     }
 }

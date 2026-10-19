@@ -1,5 +1,8 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+
 /**
  * Class NL4WP_Admin_Messages
  *
@@ -8,7 +11,6 @@
  */
 class NL4WP_Admin_Messages
 {
-
     /**
      * @var array
      */
@@ -24,37 +26,37 @@ class NL4WP_Admin_Messages
      */
     public function add_hooks()
     {
-        add_action('admin_notices', array( $this, 'show' ));
-        register_shutdown_function(array( $this, 'save' ));
+        add_action('admin_notices', [ $this, 'show' ]);
+        register_shutdown_function([ $this, 'save' ]);
     }
 
     private function load()
     {
-        if (is_null($this->bag)) {
-            $this->bag = get_option('nl4wp_flash_messages', array());
+        if ($this->bag === null) {
+            $this->bag = get_option('nl4wp_flash_messages', []);
         }
     }
 
     // empty flash bag
     private function reset()
     {
-        $this->bag = array();
+        $this->bag   = [];
         $this->dirty = true;
     }
 
     /**
      * Flash a message (shows on next pageload)
      *
-     * @param        $message
+     * @param string $message
      * @param string $type
      */
     public function flash($message, $type = 'success')
     {
         $this->load();
-        $this->bag[] = array(
+        $this->bag[] = [
             'text' => $message,
-            'type' => $type
-        );
+            'type' => $type,
+        ];
         $this->dirty = true;
     }
 
@@ -67,8 +69,14 @@ class NL4WP_Admin_Messages
     {
         $this->load();
 
+        $allowed_html = [
+            'a' => [ 'href' => [] ],
+            'br' => [],
+            'strong' => [],
+        ];
+
         foreach ($this->bag as $message) {
-            echo sprintf('<div class="notice notice-%s is-dismissible"><p>%s</p></div>', $message['type'], $message['text']);
+            printf('<div class="notice notice-%s is-dismissible"><p>%s</p></div>', esc_attr($message['type']), wp_kses($message['text'], $allowed_html));
         }
 
         $this->reset();

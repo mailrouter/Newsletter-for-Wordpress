@@ -1,18 +1,18 @@
 <?php
 
+defined('ABSPATH') || exit;
+
 /**
  * Class NL4WP_Integration_Manager
  *
  * @ignore
- * @access private
  */
 class NL4WP_Integration_Manager
 {
-
     /**
      * @var NL4WP_Integration_Fixture[]
      */
-    protected $integrations = array();
+    protected $integrations = [];
 
     /**
      * @var NL4WP_Integration_Tags
@@ -32,9 +32,29 @@ class NL4WP_Integration_Manager
      */
     public function add_hooks()
     {
-        add_action('after_setup_theme', array( $this, 'initialize' ));
+        add_action('after_setup_theme', [ $this, 'initialize' ]);
+        add_action('nl4wp_integration_subscribe', [ $this, 'process_subscribe' ]);
 
         $this->tags->add_hooks();
+    }
+
+    /**
+     * Process background subscription
+     *
+     * @param array $args
+     */
+    public function process_subscribe($args)
+    {
+        if (empty($args['integration_slug'])) {
+            return;
+        }
+
+        try {
+            $integration = $this->get($args['integration_slug']);
+            $integration->process_background_subscribe($args);
+        } catch (Exception $e) {
+            // Integration not found
+        }
     }
 
 
@@ -73,7 +93,8 @@ class NL4WP_Integration_Manager
     public function get($slug)
     {
         if (! isset($this->integrations[ $slug ])) {
-            throw new Exception(sprintf("No integration with slug %s has been registered.", $slug));
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Exception text is not direct output and is escaped at render time.
+            throw new Exception(sprintf('No integration with slug %s has been registered.', $slug));
         }
 
         return $this->integrations[ $slug ]->load();
@@ -88,7 +109,7 @@ class NL4WP_Integration_Manager
      */
     public function register_integration($slug, $class, $enabled = false)
     {
-        $raw_options = $this->get_integration_options($slug);
+        $raw_options                 = $this->get_integration_options($slug);
         $this->integrations[ $slug ] = new NL4WP_Integration_Fixture($slug, $class, $enabled, $raw_options);
     }
 
@@ -119,7 +140,7 @@ class NL4WP_Integration_Manager
     }
 
     /**
-     * @param NL4WP_Integration $integration
+     * @param NL4WP_Integration|NL4WP_Integration_Fixture $integration
      * @return bool
      */
     public function is_installed($integration)
@@ -138,15 +159,16 @@ class NL4WP_Integration_Manager
      */
     public function get_enabled_integrations()
     {
-
         // get all enabled integrations
-        $enabled_integrations = array_filter($this->integrations, array( $this, 'is_enabled' ));
+        $enabled_integrations = array_filter($this->integrations, [ $this, 'is_enabled' ]);
 
         // remove duplicate values, for whatever reason..
         $enabled_integrations = array_unique($enabled_integrations);
 
         // filter out integrations which are not installed
-        $installed_enabled_integrations = array_filter($enabled_integrations, array( $this, 'is_installed' ));
+        $installed_enabled_integrations = array_filter($enabled_integrations, function ($integration) {
+            return $this->is_installed($integration);
+        });
 
         return $installed_enabled_integrations;
     }
@@ -158,7 +180,7 @@ class NL4WP_Integration_Manager
      */
     private function load_options()
     {
-        $options = (array) get_option('nl4wp_integrations', array());
+        $options = (array) get_option('nl4wp_integrations', []);
 
         /**
          * Filters global integration options
@@ -185,6 +207,6 @@ class NL4WP_Integration_Manager
             $options = $this->load_options();
         }
 
-        return isset($options[ $slug ]) ? $options[ $slug ] : array();
+        return isset($options[ $slug ]) ? $options[ $slug ] : [];
     }
 }

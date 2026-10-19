@@ -9,21 +9,25 @@
 */
 class NL4WP_List_Data_Mapper
 {
+    /**
+    * @var array
+    */
+    private $data = [];
 
     /**
     * @var array
     */
-    private $data = array();
-
-    /**
-    * @var array
-    */
-    private $list_ids = array();
+    private $list_ids = [];
 
     /**
     * @var NL4WP_Field_Formatter
     */
     private $formatter;
+
+    /**
+     * @var NL4WP_Newsletter
+     */
+    private $newsletter;
 
     /**
     * @param array $data
@@ -32,12 +36,13 @@ class NL4WP_List_Data_Mapper
     public function __construct(array $data, array $list_ids)
     {
         $this->data = array_change_key_case($data, CASE_UPPER);
-        $this->list_ids = $list_ids;
-        $this->formatter = new NL4WP_Field_Formatter();
-
         if (! isset($this->data['EMAIL'])) {
             throw new InvalidArgumentException('Data needs at least an EMAIL key.');
         }
+
+        $this->list_ids  = $list_ids;
+        $this->formatter = new NL4WP_Field_Formatter();
+        $this->newsletter = new NL4WP_Newsletter();
     }
 
     /**
@@ -45,33 +50,28 @@ class NL4WP_List_Data_Mapper
     */
     public function map()
     {
-        $newsletter = new NL4WP_Newsletter();
-        $map = array();
+        $map = [];
 
         foreach ($this->list_ids as $list_id) {
-            $list = $newsletter->get_list($list_id, true);
-
-            if ($list instanceof NL4WP_Newsletter_List) {
-                $map[ $list_id ] = $this->map_list($list);
-            }
+            $map[ "$list_id" ] = $this->map_list($list_id);
         }
 
         return $map;
     }
 
     /**
-    * @param NL4WP_Newsletter_List $list
-    *
+    * @param string $list_id
     * @return NL4WP_Newsletter_Subscriber
+    * @throws Exception
     */
-    protected function map_list(NL4WP_Newsletter_List $list)
+    protected function map_list($list_id)
     {
-        $subscriber = new NL4WP_Newsletter_Subscriber();
+        $subscriber                = new NL4WP_Newsletter_Subscriber();
         $subscriber->email_address = $this->data['EMAIL'];
 
         // find merge fields
-        foreach ($list->merge_fields as $merge_field) {
-
+        $merge_fields = $this->newsletter->get_list_merge_fields($list_id);
+        foreach ($merge_fields as $merge_field) {
             // skip EMAIL field as that is handled separately (see above)
             if ($merge_field->tag === 'EMAIL') {
                 continue;
@@ -84,7 +84,7 @@ class NL4WP_List_Data_Mapper
 
             // format field value
             $value = $this->data[ $merge_field->tag ];
-            $value = $this->format_merge_field_value($value, $merge_field->field_type, $merge_field->format);
+            $value = $this->format_merge_field_value($merge_field, $value);
 
             // add to map
             $subscriber->merge_fields[ $merge_field->tag ] = $value;
@@ -92,7 +92,8 @@ class NL4WP_List_Data_Mapper
 
         // find interest categories
         if (! empty($this->data['INTERESTS'])) {
-            foreach ($list->interest_categories as $interest_category) {
+            $interest_categories = $this->newsletter->get_list_interest_categories($list_id);
+            foreach ($interest_categories as $interest_category) {
                 foreach ($interest_category->interests as $interest_id => $interest_name) {
                     // straight lookup by ID as key with value copy.
                     if (isset($this->data['INTERESTS'][ $interest_id ])) {
@@ -106,7 +107,7 @@ class NL4WP_List_Data_Mapper
 
                     // look in array with category ID as key.
                     if (isset($this->data['INTERESTS'][ $interest_category->id ])) {
-                        $value = $this->data['INTERESTS'][ $interest_category->id ];
+                        $value  = $this->data['INTERESTS'][ $interest_category->id ];
                         $values = is_array($value) ? $value : array_map('trim', explode('|', $value));
 
                         // find by category ID + interest ID
@@ -115,10 +116,26 @@ class NL4WP_List_Data_Mapper
                         }
 
                         // find by category ID + interest name
-                        if (in_array($interest_name, $values)) {
+                        if (in_array($interest_name, $values, true)) {
                             $subscriber->interests[ $interest_id ] = true;
                         }
                     }
+                }
+            }
+        }
+
+        // add GDPR marketing permissions
+        if (! empty($this->data['MARKETING_PERMISSIONS'])) {
+            $values                = $this->data['MARKETING_PERMISSIONS'];
+            $values                = is_array($values) ? $values : explode(',', $values);
+            $values                = array_map('trim', $values);
+            $marketing_permissions = $this->newsletter->get_list_marketing_permissions($list_id);
+            foreach ($marketing_permissions as $mp) {
+                if (in_array($mp->marketing_permission_id, $values, true) || in_array($mp->text, $values, true)) {
+                    $subscriber->marketing_permissions[] = (object) [
+                        'marketing_permission_id' => $mp->marketing_permission_id,
+                        'enabled'                 => true,
+                    ];
                 }
             }
         }
@@ -134,18 +151,22 @@ class NL4WP_List_Data_Mapper
 
 
     /**
-    * @param mixed $field_value
-    * @param string $field_type
-    * @param string $field_format
+     * @param object $merge_field
+     * @param string $value
      *
-    * @return mixed
+     * @return mixed
     */
-    private function format_merge_field_value($field_value, $field_type, $field_format = '')
+    private function format_merge_field_value($merge_field, $value)
     {
-        $field_type = strtolower($field_type);
+        $field_type = strtolower($merge_field->type);
+
+        // Convert arrays to comma-separated strings for all non-address fields
+        if (is_array($value) && $field_type == 'text') {
+            $value = join(', ', $value);
+        }
 
         if (method_exists($this->formatter, $field_type)) {
-            $field_value = call_user_func(array($this->formatter, $field_type), $field_value, $field_format);
+            $value = call_user_func([ $this->formatter, $field_type ], $value, $merge_field->options);
         }
 
         /**
@@ -154,11 +175,11 @@ class NL4WP_List_Data_Mapper
         * Use this to format a field value according to the field type (in Newsletter).
         *
         * @since 3.0
-        * @param string $field_value The value
+        * @param string $value The value
         * @param string $field_type The type of the field (in Newsletter)
         */
-        $field_value = apply_filters('nl4wp_format_field_value', $field_value, $field_type);
+        $value = apply_filters('nl4wp_format_field_value', $value, $field_type);
 
-        return $field_value;
+        return $value;
     }
 }

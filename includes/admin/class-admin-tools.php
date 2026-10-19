@@ -2,8 +2,7 @@
 
 class NL4WP_Admin_Tools
 {
-
-     /**
+    /**
      * @return string
      */
     public function get_plugin_page()
@@ -12,9 +11,7 @@ class NL4WP_Admin_Tools
             return '';
         }
 
-        $prefix = 'newsletter-for-wp';
-        $page = ltrim(substr($_GET['page'], strlen($prefix)), '-');
-        return $page;
+        return ltrim(substr(wp_unslash($_GET['page']), strlen('newsletter-for-wp')), '-');
     }
 
     /**
@@ -25,8 +22,8 @@ class NL4WP_Admin_Tools
     public function on_plugin_page($page = null)
     {
         // any settings page
-        if (is_null($page)) {
-            return isset($_GET['page']) && strpos($_GET['page'], 'newsletter-for-wp') === 0;
+        if ($page === null) {
+            return isset($_GET['page']) && strpos(wp_unslash($_GET['page']), 'newsletter-for-wp') === 0;
         }
 
         // specific page
@@ -51,14 +48,6 @@ class NL4WP_Admin_Tools
     public function get_required_capability()
     {
         $capability = 'manage_options';
-
-        /**
-         * Filters the required user capability to access the settings pages & dashboard widgets.
-         *
-         * @ignore
-         * @deprecated 3.0
-         */
-        $capability = apply_filters('nl4wp_settings_cap', $capability);
 
         /**
          * Filters the required user capability to access the Newsletter for WordPress' settings pages, view the dashboard widgets.

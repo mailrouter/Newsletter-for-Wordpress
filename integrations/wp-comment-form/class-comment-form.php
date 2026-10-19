@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_Comment_Form_Integration
@@ -9,7 +9,6 @@ defined('ABSPATH') or exit;
  */
 class NL4WP_Comment_Form_Integration extends NL4WP_Integration
 {
-
     /**
      * @var bool
      */
@@ -18,12 +17,12 @@ class NL4WP_Comment_Form_Integration extends NL4WP_Integration
     /**
      * @var string
      */
-    public $name = "Comment Form";
+    public $name = 'Comment Form';
 
     /**
      * @var string
      */
-    public $description = "Subscribes people from your WordPress comment form.";
+    public $description = 'Subscribes people from your WordPress comment form.';
 
     /**
      * Add hooks
@@ -32,14 +31,14 @@ class NL4WP_Comment_Form_Integration extends NL4WP_Integration
     {
         if (! $this->options['implicit']) {
             // hooks for outputting the checkbox
-            add_filter('comment_form_submit_field', array( $this, 'add_checkbox_before_submit_button' ), 90);
+            add_filter('comment_form_submit_field', [ $this, 'add_checkbox_before_submit_button' ], 90);
 
-            add_action('thesis_hook_after_comment_box', array( $this, 'maybe_output_checkbox' ), 90);
-            add_action('comment_form', array( $this, 'maybe_output_checkbox' ), 90);
+            add_action('thesis_hook_after_comment_box', [ $this, 'maybe_output_checkbox' ], 90);
+            add_action('comment_form', [ $this, 'maybe_output_checkbox' ], 90);
         }
 
         // hooks for checking if we should subscribe the commenter
-        add_action('comment_post', array( $this, 'subscribe_from_comment' ), 40, 2);
+        add_action('comment_post', [ $this, 'subscribe_from_comment' ], 40, 2);
     }
 
     /**
@@ -89,11 +88,11 @@ class NL4WP_Comment_Form_Integration extends NL4WP_Integration
 
         $comment = get_comment($comment_id);
 
-        $data = array(
-            'EMAIL' => $comment->comment_author_email,
-            'NAME' => $comment->comment_author,
+        $data = [
+            'EMAIL'    => $comment->comment_author_email,
+            'NAME'     => $comment->comment_author,
             'OPTIN_IP' => $comment->comment_author_IP,
-        );
+        ];
 
         return $this->subscribe($data, $comment_id);
     }
@@ -112,7 +111,7 @@ class NL4WP_Comment_Form_Integration extends NL4WP_Integration
     public function get_object_link($object_id)
     {
         $comment = get_comment($object_id);
-        
+
         if (! $comment) {
             return '';
         }

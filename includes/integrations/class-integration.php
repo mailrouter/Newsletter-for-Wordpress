@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') || exit;
+
 /**
  * Class NL4WP_Integration
  *
@@ -7,13 +9,10 @@
  *
  * Extend this class and implement the `add_hooks` method to get a settings page.
  *
- * @access public
  * @since 3.0
- * @abstract
  */
 abstract class NL4WP_Integration
 {
-
     /**
      * @var string Name of this integration.
      */
@@ -32,12 +31,22 @@ abstract class NL4WP_Integration
     /**
      * @var array Array of settings
      */
-    public $options = array();
+    public $options = [];
 
     /**
      * @var string Name attribute for the checkbox element. Will be created from slug if empty.
      */
     protected $checkbox_name = '';
+
+    /**
+     * @var string[]
+     */
+    public $checkbox_classes = [];
+
+    /**
+     * @var string[]
+     */
+    public $wrapper_classes = [];
 
     /**
      * Constructor
@@ -47,11 +56,11 @@ abstract class NL4WP_Integration
      */
     public function __construct($slug, array $options)
     {
-        $this->slug = $slug;
+        $this->slug    = $slug;
         $this->options = $this->parse_options($options);
 
         // if checkbox name is not set, set a good custom value
-        if (empty($this->checkbox_name)) {
+        if ($this->checkbox_name === '') {
             $this->checkbox_name = '_nl4wp_subscribe_' . $this->slug;
         }
     }
@@ -63,18 +72,18 @@ abstract class NL4WP_Integration
      */
     protected function get_default_options()
     {
-        return array(
-            'css'           => 0,
-            'double_optin'  => 1,
-            'enabled'       => 0,
-            'implicit'      => 0,
-            'label'         => __('Sign me up for the newsletter!', 'newsletter-for-wp'),
-            'lists'         => array(),
-            'precheck'      => 0,
+        return [
+            'css'               => 0,
+            'double_optin'      => 1,
+            'enabled'           => 0,
+            'implicit'          => 0,
+            'label'             => __('Sign me up for the newsletter!', 'newsletter-for-wp'),
+            'lists'             => [],
+            'precheck'          => 0,
             'replace_interests' => 0,
-            'update_existing' => 0,
-            'wrap_p' => 1
-        );
+            'update_existing'   => 0,
+            'wrap_p'            => 1,
+        ];
     }
 
     /**
@@ -87,12 +96,7 @@ abstract class NL4WP_Integration
         $slug = $this->slug;
 
         $default_options = $this->get_default_options();
-        $options = array_merge($default_options, $options);
-
-        /**
-        * @deprecated Use nl4wp_integration_{$slug}_options instead
-        */
-        $options = (array) apply_filters('nl4wp_' . $slug . '_integration_options', $options);
+        $options         = array_merge($default_options, $options);
 
         /**
          * Filters options for a specific integration
@@ -119,7 +123,7 @@ abstract class NL4WP_Integration
     protected function add_required_hooks()
     {
         if ($this->options['css'] && ! $this->options['implicit']) {
-            add_action('wp_head', array( $this, 'print_css_reset' ));
+            add_action('wp_head', [ $this, 'print_css_reset' ]);
         }
     }
 
@@ -148,13 +152,13 @@ abstract class NL4WP_Integration
      */
     public function print_css_reset()
     {
-        $suffix = defined('SCRIPT_DEBUG') ? '' : '.min';
-        $css = file_get_contents(NL4WP_PLUGIN_DIR . 'assets/css/checkbox-reset' . $suffix . '.css');
+        $css = file_get_contents(NL4WP_PLUGIN_DIR . '/assets/css/checkbox-reset.css');
 
         // replace selector by integration specific selector so the css affects just this checkbox
         $css = str_ireplace('__INTEGRATION_SLUG__', $this->slug, $css);
 
-        printf('<style type="text/css">%s</style>', $css);
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS must be printed as raw stylesheet content.
+        printf('<style>%s</style>', $css);
     }
 
     /**
@@ -165,7 +169,17 @@ abstract class NL4WP_Integration
     public function get_label_text()
     {
         $integration = $this;
-        $label = $this->options['label'];
+        $label       = $this->options['label'];
+
+        if (empty($label)) {
+            $default_options = $this->get_default_options();
+            $label           = $default_options['label'];
+        }
+
+        // run saved value through gettext filter
+        // this allows people to use a plugin like Loco Translate to translate this message
+        // without updating the setting itself
+        $label = __($label, 'newsletter-for-wp'); // phpcs:ignore
 
         /**
          * Filters the checkbox label
@@ -188,7 +202,21 @@ abstract class NL4WP_Integration
     public function checkbox_was_checked()
     {
         $data = $this->get_data();
-        return (isset($data[ $this->checkbox_name ]) && $data[ $this->checkbox_name ] == 1);
+        return isset($data[ $this->checkbox_name ]) && (int) $data[ $this->checkbox_name ] === 1;
+    }
+
+    /**
+     * Get a string of attributes for the HTML element wrapping the checkbox + label
+     *
+     * @return string
+     */
+    protected function get_wrapper_attributes()
+    {
+        $classes    = join(' ', $this->wrapper_classes);
+        $html_attrs = [
+            'class' => "nl4wp-checkbox nl4wp-checkbox-{$this->slug} $classes",
+        ];
+        return $this->array_to_attr_string($html_attrs);
     }
 
     /**
@@ -199,12 +227,16 @@ abstract class NL4WP_Integration
     protected function get_checkbox_attributes()
     {
         $integration = $this;
-        $slug = $this->slug;
+        $slug        = $this->slug;
 
-        $attributes = array();
+        $attributes = [];
 
         if ($this->options['precheck']) {
             $attributes['checked'] = 'checked';
+        }
+
+        if (! empty($this->checkbox_classes)) {
+            $attributes['class'] = join(' ', $this->checkbox_classes);
         }
 
         /**
@@ -227,12 +259,7 @@ abstract class NL4WP_Integration
          */
         $attributes = (array) apply_filters('nl4wp_integration_' . $slug . '_checkbox_attributes', $attributes, $integration);
 
-        $string = '';
-        foreach ($attributes as $key => $value) {
-            $string .= sprintf('%s="%s"', $key, esc_attr($value));
-        }
-
-        return $string;
+        return $this->array_to_attr_string($attributes);
     }
 
     /**
@@ -240,17 +267,18 @@ abstract class NL4WP_Integration
      */
     public function output_checkbox()
     {
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Checkbox HTML is intentionally rendered.
         echo $this->get_checkbox_html();
     }
 
     /**
-     * Get HTML for the checkbox
+     * Get HTML string for the checkbox row (incl. wrapper, label, etc.)
      *
      * @return string
      */
     public function get_checkbox_html()
     {
-        $show_checkbox = empty($this->options['implicit']);
+        $show_checkbox    = empty($this->options['implicit']);
         $integration_slug = $this->slug;
 
         /**
@@ -260,38 +288,39 @@ abstract class NL4WP_Integration
          * @param string $integration_slug
          */
         $show_checkbox = (bool) apply_filters('nl4wp_integration_show_checkbox', $show_checkbox, $integration_slug);
-
         if (! $show_checkbox) {
             return '';
         }
 
         ob_start();
 
-        echo sprintf('<!-- Newsletter for WordPress v%s -  -->', NL4WP_VERSION);
+        echo '<!-- Newsletter for WordPress v', esc_html(NL4WP_VERSION), ' -  -->';
 
         /** @ignore */
         do_action('nl4wp_integration_before_checkbox_wrapper', $this);
 
         /** @ignore */
-        do_action('nl4wp_integration_'. $this->slug .'_before_checkbox_wrapper', $this);
+        do_action('nl4wp_integration_' . $this->slug . '_before_checkbox_wrapper', $this);
 
-        $wrapper_tag = $this->options['wrap_p'] ? 'p' : 'span';
+        $wrapper_tag   = $this->options['wrap_p'] ? 'p' : 'span';
+        $wrapper_attrs = $this->get_wrapper_attributes();
 
         // Hidden field to make sure "0" is sent to server
-        echo sprintf('<input type="hidden" name="%s" value="0" />', esc_attr($this->checkbox_name));
-
-        echo sprintf('<%s class="nl4wp-checkbox nl4wp-checkbox-%s">', $wrapper_tag, esc_attr($this->slug));
+        echo '<input type="hidden" name="', esc_attr($this->checkbox_name), '" value="0" />';
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper attributes are escaped in array_to_attr_string().
+        printf('<%1$s %2$s>', tag_escape($wrapper_tag), $wrapper_attrs);
         echo '<label>';
-        echo sprintf('<input type="checkbox" name="%s" value="1" %s />', esc_attr($this->checkbox_name), $this->get_checkbox_attributes());
-        echo sprintf('<span>%s</span>', $this->get_label_text());
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Checkbox attributes are escaped in array_to_attr_string().
+        echo '<input type="checkbox" name="', esc_attr($this->checkbox_name), '" value="1" ', $this->get_checkbox_attributes(), '>';
+        echo '<span>', wp_kses_post($this->get_label_text()), '</span>';
         echo '</label>';
-        echo sprintf('</%s>', $wrapper_tag);
+        printf('</%s>', tag_escape($wrapper_tag));
 
         /** @ignore */
         do_action('nl4wp_integration_after_checkbox_wrapper', $this);
 
         /** @ignore */
-        do_action('nl4wp_integration_'. $this->slug .'_after_checkbox_wrapper', $this);
+        do_action('nl4wp_integration_' . $this->slug . '_after_checkbox_wrapper', $this);
         echo '<!-- / Newsletter for WordPress -->';
 
         $html = ob_get_clean();
@@ -305,9 +334,9 @@ abstract class NL4WP_Integration
      */
     public function get_lists()
     {
-        $data = $this->get_data();
+        $data        = $this->get_data();
         $integration = $this;
-        $slug = $this->slug;
+        $slug        = $this->slug;
 
         // get checkbox lists options
         $lists = $this->options['lists'];
@@ -367,15 +396,8 @@ abstract class NL4WP_Integration
      */
     protected function subscribe(array $data, $related_object_id = 0)
     {
-        $integration = $this;
-        $slug = $this->slug;
-        $newsletter = new NL4WP_Newsletter();
-        $log = $this->get_log();
+        $log      = $this->get_log();
         $list_ids = $this->get_lists();
-
-        /** @var NL4WP_Newsletter_Subscriber $subscriber */
-        $subscriber = null;
-        $result = false;
 
         // validate lists
         if (empty($list_ids)) {
@@ -398,27 +420,58 @@ abstract class NL4WP_Integration
          * @param array $data
          * @param int $related_object_id
          */
-        $data = apply_filters("nl4wp_integration_{$slug}_data", $data, $related_object_id);
+        $data = apply_filters("nl4wp_integration_{$this->slug}_data", $data, $related_object_id);
 
-        /**
-         * @ignore
-         * @deprecated 4.0
-         */
-        $data = apply_filters('nl4wp_merge_vars', $data);
+        $args = [
+            'integration_slug'  => $this->slug,
+            'data'              => $data,
+            'related_object_id' => $related_object_id,
+            'list_ids'          => $list_ids,
+            'ip_signup'         => nl4wp_get_request_ip_address(),
+            'email_type'        => nl4wp_get_email_type(),
+            'options'           => [
+                'double_optin'      => $this->options['double_optin'],
+                'update_existing'   => $this->options['update_existing'],
+                'replace_interests' => $this->options['replace_interests'],
+            ],
+        ];
 
-        /**
-         * @deprecated 4.0
-         * @ignore
-         */
-        $data = apply_filters('nl4wp_integration_merge_vars', $data, $integration);
+        if (function_exists('as_enqueue_async_action')) {
+            as_enqueue_async_action('nl4wp_integration_subscribe', [$args]);
+        } else {
+            wp_schedule_single_event(time(), 'nl4wp_integration_subscribe', [$args]);
+        }
 
-        /**
-         * @deprecated 4.0
-         * @ignore
-         */
-        $data = apply_filters("nl4wp_integration_{$slug}_merge_vars", $data, $integration);
+        return true;
+    }
 
-        $email_type = nl4wp_get_email_type();
+    /**
+     * Process background subscription
+     *
+     * @param array $args
+     * @return boolean
+     */
+    public function process_background_subscribe(array $args)
+    {
+        $data              = $args['data'];
+        $related_object_id = $args['related_object_id'];
+        $list_ids          = $args['list_ids'];
+        $email_type        = $args['email_type'];
+        $ip_signup         = $args['ip_signup'];
+        $options           = $this->options;
+
+        if (! empty($args['options']) && is_array($args['options'])) {
+            $options = array_merge($options, $args['options']);
+        }
+
+        $integration = $this;
+        $slug        = $this->slug;
+        $newsletter   = new NL4WP_Newsletter();
+        $log         = $this->get_log();
+
+        /** @var null|NL4WP_Newsletter_Subscriber $subscriber */
+        $subscriber = null;
+        $result     = false;
 
         $mapper = new NL4WP_List_Data_Mapper($data, $list_ids);
 
@@ -426,12 +479,15 @@ abstract class NL4WP_Integration
         $map = $mapper->map();
 
         foreach ($map as $list_id => $subscriber) {
-            $subscriber->status = $this->options['double_optin'] ? 'pending' : 'subscribed';
+            $subscriber->status     = $options['double_optin'] ? 'pending' : 'subscribed';
             $subscriber->email_type = $email_type;
-            $subscriber->ip_signup = nl4wp_get_request_ip_address();
+            $subscriber->ip_signup  = $ip_signup;
 
-            /** @ignore (documented elsewhere) */
+            /** @ignore documented elsewhere */
             $subscriber = apply_filters('nl4wp_subscriber_data', $subscriber);
+            if (! $subscriber instanceof NL4WP_Newsletter_Subscriber) {
+                continue;
+            }
 
             /**
              * Filters subscriber data before it is sent to Newsletter. Only fires for integration requests.
@@ -439,6 +495,9 @@ abstract class NL4WP_Integration
              * @param NL4WP_Newsletter_Subscriber $subscriber
              */
             $subscriber = apply_filters('nl4wp_integration_subscriber_data', $subscriber);
+            if (! $subscriber instanceof NL4WP_Newsletter_Subscriber) {
+                continue;
+            }
 
             /**
              * Filters subscriber data before it is sent to Newsletter. Only fires for integration requests.
@@ -449,16 +508,18 @@ abstract class NL4WP_Integration
              * @param int $related_object_id
              */
             $subscriber = apply_filters("nl4wp_integration_{$slug}_subscriber_data", $subscriber, $related_object_id);
+            if (! $subscriber instanceof NL4WP_Newsletter_Subscriber) {
+                continue;
+            }
 
-            $result = $newsletter->list_subscribe($list_id, $subscriber->email_address, $subscriber->to_array(), $this->options['update_existing'], $this->options['replace_interests']);
+            $result = $newsletter->list_subscribe($list_id, $subscriber->email_address, $subscriber->to_array(), $options['update_existing'], $options['replace_interests']);
         }
 
         // if result failed, show error message
         if (! $result) {
-
             // log error
-            if ($newsletter->get_error_code() == 214) {
-                $log->warning(sprintf("%s > %s is already subscribed to the selected list(s)", $this->name, $subscriber->email_address));
+            if ((int) $newsletter->get_error_code() === 214) {
+                $log->warning(sprintf('%s > %s is already subscribed to the selected list(s)', $this->name, $subscriber->email_address));
             } else {
                 $log->error(sprintf('%s > Newsletter API Error: %s', $this->name, $newsletter->get_error_message()));
             }
@@ -482,7 +543,7 @@ abstract class NL4WP_Integration
          */
         do_action('nl4wp_integration_subscribed', $integration, $subscriber->email_address, $subscriber->merge_fields, $map, $related_object_id);
 
-        return $result;
+        return true;
     }
 
     /**
@@ -508,13 +569,13 @@ abstract class NL4WP_Integration
     /**
      * Does integration have the given UI element?
      *
-     * @param $element
+     * @param string $element
      * @return bool
      */
     public function has_ui_element($element)
     {
         $elements = $this->get_ui_elements();
-        return in_array($element, $elements);
+        return in_array($element, $elements, true);
     }
 
     /**
@@ -545,8 +606,26 @@ abstract class NL4WP_Integration
      */
     public function get_data()
     {
-        $data = array_merge((array) $_GET, (array) $_POST);
-        return $data;
+        // phpcs:ignore WordPress.Security.NonceVerification -- explicitly not using a nonce here
+        return array_merge((array) $_GET, (array) $_POST);
+    }
+
+    /**
+     * Converts an array to an attribute string (foo="bar" bar="foo") with escaped values.
+     *
+     * @param array $attrs
+     * @return string
+     */
+    protected function array_to_attr_string(array $attrs)
+    {
+        $str = '';
+        foreach ($attrs as $key => $value) {
+            $str .= $key;
+            $str .= '="';
+            $str .= esc_attr($value);
+            $str .= '"';
+        }
+        return $str;
     }
 
     /**
@@ -554,14 +633,14 @@ abstract class NL4WP_Integration
      */
     protected function get_log()
     {
-        return nl4wp('log');
+        return nl4wp_get_service('log');
     }
 
     /**
-     * @return NL4WP_API_v3
+     * @return NL4WP_API_V3
      */
     protected function get_api()
     {
-        return nl4wp('api');
+        return nl4wp_get_service('api');
     }
 }

@@ -3,10 +3,11 @@
 Plugin Name: Newsletter for WordPress
 Plugin URI: https://github.com/mailrouter/Newsletter-for-Wordpress/
 Description: Newsletter for WordPress by mailrouter. Aggiunge vari metodi di iscrizione newsletter al tuo sito.
-Version: 4.5.12
+Version: 4.14.1
 Author: mailrouter
 Text Domain: newsletter-for-wp
 Domain Path: /languages
+Requires PHP: 7.4
 License: GPL v3
 
 Newsletter for WordPress
@@ -16,9 +17,9 @@ Mailchimp for WordPress
 Copyright (C) 2012-2024, Danny van Kooten, hi@dannyvankooten.com
 
 integrates
-Plugin Update Checker Library 5.4
+Plugin Update Checker Library 5.7
 http://w-shadow.com/
-Copyright 2024 Janis Elsts
+Copyright 2026 Janis Elsts
 Released under the MIT license. See license.txt for details.
 
 This program is free software: you can redistribute it and/or modify
@@ -33,6 +34,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+phpcs:disable:PSR1.Files.SideEffects.FoundWithSymbols
  */
 
 /* PLUGIN AUTOUPDATE */
@@ -44,112 +47,81 @@ $myUpdateChecker = YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChe
 );
 /* end */
 // Prevent direct file access
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
-/** @ignore */
-function _nl4wp_load_plugin()
-{
+// bootstrap main plugin
+add_action('plugins_loaded', function () {
     global $nl4wp;
 
-    // Don't run if Newsletter for WP Pro 2.x is activated
-    if (defined('NL4WP_VERSION')) {
-        return false;
+    // don't run if Newsletter for WP Pro 2.x is activated
+    // don't run if PHP version is lower than 7.4.0
+    if (defined('NL4WP_VERSION') || PHP_VERSION_ID < 70400) {
+        return;
     }
 
     // bootstrap the core plugin
-    define( 'NL4WP_VERSION', '4.5.12');
-    define('NL4WP_PLUGIN_DIR', dirname(__FILE__) . '/');
-    define('NL4WP_PLUGIN_URL', plugins_url('/', __FILE__));
+    define( 'NL4WP_VERSION', '4.14.1');
+    define('NL4WP_PLUGIN_DIR', __DIR__);
     define('NL4WP_PLUGIN_FILE', __FILE__);
 
-    // load autoloader if function not yet exists (for compat with sitewide autoloader)
-    if (! function_exists('nl4wp')) {
-        require_once NL4WP_PLUGIN_DIR . 'vendor/autoload_52.php';
-    }
+    require __DIR__ . '/autoload.php';
+    require __DIR__ . '/includes/default-actions.php';
+    require __DIR__ . '/includes/default-filters.php';
 
     /**
-     * @global NL4WP_Container $GLOBALS['nl4wp']
-     * @name $nl4wp
+     * @var NL4WP_Container $nl4wp
      */
-    $nl4wp = nl4wp();
+    $nl4wp        = nl4wp_get_container();
     $nl4wp['api'] = 'nl4wp_get_api_v3';
-    $nl4wp['request'] = array( 'NL4WP_Request', 'create_from_globals' );
     $nl4wp['log'] = 'nl4wp_get_debug_log';
 
     // forms
-    $nl4wp['forms'] = new NL4WP_Form_Manager();
-    $nl4wp['forms']->add_hooks();
+    $form_manager = new NL4WP_Form_Manager();
+    $form_manager->add_hooks();
+    $nl4wp['forms'] = $form_manager;
+
+    // campaign archive
 
     // integration core
-    $nl4wp['integrations'] = new NL4WP_Integration_Manager();
-    $nl4wp['integrations']->add_hooks();
+    $integration_manager = new NL4WP_Integration_Manager();
+    $integration_manager->add_hooks();
+    $nl4wp['integrations'] = $integration_manager;
 
-    // Doing cron? Load Usage Tracking class.
-    if (isset($_GET['doing_wp_cron']) || (defined('DOING_CRON') && DOING_CRON) || (defined('WP_CLI') && WP_CLI)) {
-        
-    }
+    $opts = nl4wp_get_options();
 
     // Initialize admin section of plugin
     if (is_admin()) {
+        require __DIR__ . '/includes/admin/class-legacy-captcha-notice.php';
+        (new NL4WP_Admin_Legacy_Captcha_Notice())->add_hooks();
         $admin_tools = new NL4WP_Admin_Tools();
 
-        if (defined('DOING_AJAX') && DOING_AJAX) {
+        if (wp_doing_ajax()) {
             $ajax = new NL4WP_Admin_Ajax($admin_tools);
             $ajax->add_hooks();
         } else {
-            $messages = new NL4WP_Admin_Messages();
+            $messages                = new NL4WP_Admin_Messages();
             $nl4wp['admin.messages'] = $messages;
 
-            $newsletter = new NL4WP_Newsletter();
-
-            $admin = new NL4WP_Admin($admin_tools, $messages, $newsletter);
-            $admin->add_hooks();
-
-            $forms_admin = new NL4WP_Forms_Admin($messages, $newsletter);
-            $forms_admin->add_hooks();
-
-            $integrations_admin = new NL4WP_Integration_Admin($nl4wp['integrations'], $messages, $newsletter);
-            $integrations_admin->add_hooks();
+            (new NL4WP_Admin($admin_tools, $messages))->add_hooks();
+            (new NL4WP_Forms_Admin($messages))->add_hooks();
+            (new NL4WP_Integration_Admin($integration_manager, $messages))->add_hooks();
         }
+    } else {
     }
 
-    return true;
-}
+    // bootstrap integrations
+    require __DIR__ . '/integrations/bootstrap.php';
+}, 8);
 
-// bootstrap custom integrations
-function _nl4wp_bootstrap_integrations()
-{
-    require_once NL4WP_PLUGIN_DIR . 'integrations/bootstrap.php';
-}
+// schedule the action hook to refresh the stored Newsletter lists on a daily basis
+register_activation_hook(__FILE__, function () {
+    $timezone = wp_timezone();
+    $datetime = new DateTimeImmutable('tomorrow', $timezone);
+    $datetime = $datetime->setTime(wp_rand(0, 6), wp_rand(0, 59));
+    wp_schedule_event($datetime->getTimestamp(), 'daily', 'nl4wp_refresh_newsletter_lists');
+});
 
-add_action('plugins_loaded', '_nl4wp_load_plugin', 8);
-add_action('plugins_loaded', '_nl4wp_bootstrap_integrations', 90);
-
-/**
- * Flushes transient cache & schedules refresh hook.
- *
- * @ignore
- * @since 3.0
- */
-function _nl4wp_on_plugin_activation()
-{
-    $time_string = sprintf("tomorrow 0%d:%d%d", rand(0, 8), rand(0, 5), rand(0, 9));
-    wp_schedule_event(strtotime($time_string), 'daily', 'nl4wp_refresh_newsletter_lists');
-}
-
-/**
- * Clears scheduled hook for refreshing Newsletter lists.
- *
- * @ignore
- * @since 4.0.3
- */
-function _nl4wp_on_plugin_deactivation()
-{
-    global $wpdb;
+// remove scheduled hook when plugin is deactivated
+register_deactivation_hook(__FILE__, function () {
     wp_clear_scheduled_hook('nl4wp_refresh_newsletter_lists');
-
-    $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE 'nl4wp_newsletter_list_%'");
-}
-
-register_activation_hook(__FILE__, '_nl4wp_on_plugin_activation');
-register_deactivation_hook(__FILE__, '_nl4wp_on_plugin_deactivation');
+});

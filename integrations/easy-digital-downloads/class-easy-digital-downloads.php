@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_Easy_Digital_Downloads_Integration
@@ -9,30 +9,25 @@ defined('ABSPATH') or exit;
  */
 class NL4WP_Easy_Digital_Downloads_Integration extends NL4WP_Integration
 {
+    /**
+     * @var string
+     */
+    public $name = 'Easy Digital Downloads';
 
     /**
      * @var string
      */
-    public $name = "Easy Digital Downloads";
+    public $description = 'Subscribes your Easy Digital Downloads customers.';
 
-    /**
-     * @var string
-     */
-    public $description = "Subscribes your Easy Digital Downloads customers.";
-
-    /**
-     *
-     */
     public function add_hooks()
     {
         if (! $this->options['implicit']) {
-
             // TODO: Allow more positions
-            add_action('edd_purchase_form_user_info_fields', array( $this, 'output_checkbox' ), 1);
-            add_action('edd_payment_meta', array( $this, 'save_checkbox_value' ));
+            add_action('edd_purchase_form_user_info_fields', [ $this, 'output_checkbox' ], 1);
+            add_action('edd_payment_meta', [ $this, 'save_checkbox_value' ]);
         }
 
-        add_action('edd_complete_purchase', array( $this, 'subscribe_from_edd'), 50);
+        add_action('edd_complete_purchase', [ $this, 'subscribe_from_edd' ], 50);
     }
 
     /**
@@ -89,9 +84,9 @@ class NL4WP_Easy_Digital_Downloads_Integration extends NL4WP_Integration
         }
 
         $email = (string) edd_get_payment_user_email($payment_id);
-        $data = array(
-            'EMAIL' => $email
-        );
+        $data  = [
+            'EMAIL' => $email,
+        ];
 
         // add first and last name to merge vars, if given
         $user_info = (array) edd_get_payment_meta_user_info($payment_id);

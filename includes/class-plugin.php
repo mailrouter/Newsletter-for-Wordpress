@@ -4,13 +4,13 @@
  * Class NL4WP_Plugin
  *
  * Helper class for easy access to information like the plugin file or plugin directory.
+ * Used in NL4WP Premium.
  *
  * @access public
  * @ignore
  */
 class NL4WP_Plugin
 {
-
     /**
      * @var string The plugin version.
      */
@@ -27,7 +27,7 @@ class NL4WP_Plugin
      */
     public function __construct($file, $version)
     {
-        $this->file = $file;
+        $this->file    = $file;
         $this->version = $version;
     }
 

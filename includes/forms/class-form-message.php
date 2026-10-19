@@ -8,7 +8,6 @@
  */
 class NL4WP_Form_Notice
 {
-
     /**
      * @var string
      */

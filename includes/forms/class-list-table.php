@@ -67,7 +67,7 @@ class NL4WP_Forms_List_Table extends WP_List_Table
 
         return array(
             '' => sprintf('<a href="%s" class="%s">%s</a> (%d)', remove_query_arg(array('post_status')), $current === '' ? 'current' : '', __('All'), $count_others),
-            'trash' => sprintf('<a href="%s" class="%s">%s</a> (%d)', add_query_arg(array('post_status' => 'trash' )), $current == 'trash' ? 'current' : '', __('Trash'), $counts->trash),
+            'trash' => sprintf('<a href="%s" class="%s">%s</a> (%d)', add_query_arg(array('post_status' => 'trash' )), $current == 'trash' ? 'current' : '', __('Trash', 'newsletter-for-wp'), $counts->trash),
         );
     }
 
@@ -81,7 +81,7 @@ class NL4WP_Forms_List_Table extends WP_List_Table
             $actions['untrash'] = __('Restore');
             $actions['delete'] = __('Delete Permanently');
         } else {
-            $actions['duplicate'] = __('Duplicate');
+            $actions['duplicate'] = __('Duplicate', 'newsletter-for-wp');
             $actions['trash'] = __('Move to Trash');
         }
         return $actions;
@@ -106,11 +106,12 @@ class NL4WP_Forms_List_Table extends WP_List_Table
     public function get_columns()
     {
         return array(
-            'cb'       => '<input type="checkbox" />',
-            'form_name'    => __('Form', 'newsletter-for-wp'),
-            'ID'            => __('ID', 'newsletter-for-wp'),
-            'shortcode'     => __('Shortcode', 'newsletter-for-wp'),
+            'cb'        => '<input type="checkbox" />',
+            'form_name' => __('Form', 'newsletter-for-wp'),
+            'ID'        => __('ID', 'newsletter-for-wp'),
+            'shortcode' => __('Shortcode', 'newsletter-for-wp'),
         );
+
     }
 
     /**
@@ -204,17 +205,33 @@ class NL4WP_Forms_List_Table extends WP_List_Table
         return sprintf('<input type="text" onfocus="this.select();" readonly="readonly" value="%s">', esc_attr('[nl4wp_form id="' . $form->ID . '"]'));
     }
 
+
     /**
      *
      */
     public function process_bulk_action()
     {
         $action = $this->current_action();
-        if (empty($action)) {
+        if (! in_array($action, array('trash', 'untrash', 'delete', 'duplicate'), true)) {
             return false;
         }
 
-        $forms = (array) $_REQUEST['forms'];
+        check_admin_referer('bulk-forms');
+
+        $capability = (string) apply_filters('nl4wp_admin_required_capability', 'manage_options');
+        if (! current_user_can($capability)) {
+            wp_die(__('You are not allowed to edit this item.'));
+        }
+
+        $forms = array_unique(array_map('absint', (array) wp_unslash($_REQUEST['forms'] ?? array())));
+        // Validate the entire batch before modifying any post.
+        foreach ($forms as $form_id) {
+            $post = get_post($form_id);
+            $post_capability = $action === 'duplicate' ? 'edit_post' : 'delete_post';
+            if (! $post || $post->post_type !== 'nl4wp-form' || ! current_user_can($post_capability, $form_id)) {
+                wp_die(__('You are not allowed to edit this item.'));
+            }
+        }
 
         switch ($action) {
 

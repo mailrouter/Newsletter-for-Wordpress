@@ -1,5 +1,8 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+
 /**
  * Class NL4WP_Admin_Texts
  *
@@ -8,6 +11,10 @@
  */
 class NL4WP_Admin_Texts
 {
+    /**
+     * @var string
+     */
+    protected $plugin_file;
 
     /**
      * @param string $plugin_file
@@ -24,29 +31,11 @@ class NL4WP_Admin_Texts
     {
         global $pagenow;
 
-        add_filter('admin_footer_text', array( $this, 'footer_text' ));
-
         // Hooks for Plugins overview page
         if ($pagenow === 'plugins.php') {
-            add_filter('plugin_action_links_' . $this->plugin_file, array( $this, 'add_plugin_settings_link' ), 10, 2);
-            add_filter('plugin_row_meta', array( $this, 'add_plugin_meta_links'), 10, 2);
+            add_filter('plugin_action_links_' . $this->plugin_file, [ $this, 'add_plugin_settings_link' ], 10, 2);
+            add_filter('plugin_row_meta', [ $this, 'add_plugin_meta_links' ], 10, 2);
         }
-    }
-
-    /**
-     * Ask for a plugin review in the WP Admin footer, if this is one of the plugin pages.
-     *
-     * @param $text
-     *
-     * @return string
-     */
-    public function footer_text($text)
-    {
-        if (! empty($_GET['page']) && strpos($_GET['page'], 'newsletter-for-wp') === 0) {
-            //$text = sprintf('If you enjoy using <strong>Newsletter for WordPress</strong>, please <a href="%s" target="_blank">leave us a ★★★★★ rating</a>. A <strong style="text-decoration: underline;">huge</strong> thank you in advance!', 'https://wordpress.org/support/view/plugin-reviews/newsletter-for-wp?rate=5#postform'); /* NL_CHANGED */
-        }
-
-        return $text;
     }
 
     /**
@@ -63,7 +52,7 @@ class NL4WP_Admin_Texts
             return $links;
         }
 
-        $settings_link = '<a href="' . admin_url('admin.php?page=newsletter-for-wp') . '">'. __('Settings', 'newsletter-for-wp') . '</a>';
+        $settings_link = sprintf('<a href="%s">%s</a>', admin_url('admin.php?page=newsletter-for-wp'), esc_html__('Settings', 'newsletter-for-wp'));
         array_unshift($links, $settings_link);
         return $links;
     }
@@ -82,7 +71,6 @@ class NL4WP_Admin_Texts
             return $links;
         }
 
-        
 
         /**
          * Filters meta links shown on the Plugins overview page
@@ -93,7 +81,7 @@ class NL4WP_Admin_Texts
          * @param array $links
          * @ignore
          */
-        $links = (array) apply_filters('nl4wp_admin_plugin_meta_links', $links);
+        $links = apply_filters('nl4wp_admin_plugin_meta_links', $links);
 
         return $links;
     }

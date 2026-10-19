@@ -7,7 +7,6 @@
  */
 class NL4WP_Queue
 {
-
     /**
      * @var NL4WP_Queue_Job[]
      */
@@ -24,6 +23,11 @@ class NL4WP_Queue
     protected $dirty = false;
 
     /**
+     * @var int
+     */
+    private const MAX_JOB_COUNT = 1000;
+
+    /**
      * NL4WP_Ecommerce_Queue constructor.
      *
      * @param string $option_name
@@ -32,7 +36,7 @@ class NL4WP_Queue
     {
         $this->option_name = $option_name;
 
-        register_shutdown_function(array( $this, 'save' ));
+        register_shutdown_function([ $this, 'save' ]);
     }
 
     /**
@@ -40,14 +44,18 @@ class NL4WP_Queue
      */
     protected function load()
     {
-        $jobs = get_option($this->option_name, array());
+        if ($this->jobs !== null) {
+            return;
+        }
+
+        $jobs = get_option($this->option_name, []);
 
         if (! is_array($jobs)) {
-            $jobs = array();
+            $jobs = [];
         } else {
-            $valid_jobs = array();
+            $valid_jobs = [];
 
-            foreach($jobs as $i => $obj) {
+            foreach ($jobs as $i => $obj) {
                 // filter invalid data from array
                 if (! is_object($obj) || empty($obj->data)) {
                     continue;
@@ -57,7 +65,7 @@ class NL4WP_Queue
                 if ($obj instanceof NL4WP_Queue_Job) {
                     $job = $obj;
                 } else {
-                    $job = new NL4WP_Queue_Job($obj->data);
+                    $job     = new NL4WP_Queue_Job($obj->data);
                     $job->id = $obj->id;
                 }
 
@@ -77,10 +85,7 @@ class NL4WP_Queue
      */
     public function all()
     {
-        if (is_null($this->jobs)) {
-            $this->load();
-        }
-
+        $this->load();
         return $this->jobs;
     }
 
@@ -92,9 +97,7 @@ class NL4WP_Queue
      */
     public function put($data)
     {
-        if (is_null($this->jobs)) {
-            $this->load();
-        }
+        $this->load();
 
         // check if we already have a job with same data
         foreach ($this->jobs as $job) {
@@ -103,10 +106,16 @@ class NL4WP_Queue
             }
         }
 
-        // add job to queue
-        $job = new NL4WP_Queue_Job($data);
+        // if we have more than MAX_JOB_COUNT jobs, remove first job item.
+        // this protects against an ever-growing job list, but also potentially loses jobs if the queue is not processed soon enough.
+        if (count($this->jobs) > self::MAX_JOB_COUNT) {
+            array_shift($this->jobs);
+        }
+
+        // add job to end of jobs array
+        $job          = new NL4WP_Queue_Job($data);
         $this->jobs[] = $job;
-        $this->dirty = true;
+        $this->dirty  = true;
         return true;
     }
 
@@ -117,9 +126,7 @@ class NL4WP_Queue
      */
     public function get()
     {
-        if (is_null($this->jobs)) {
-            $this->load();
-        }
+        $this->load();
 
         // do we have jobs?
         if (count($this->jobs) === 0) {
@@ -135,16 +142,14 @@ class NL4WP_Queue
      */
     public function delete(NL4WP_Queue_Job $job)
     {
-        if (is_null($this->jobs)) {
-            $this->load();
-        }
+        $this->load();
 
         $index = array_search($job, $this->jobs, true);
 
         // check for "false" here, as 0 is a valid index.
         if ($index !== false) {
             unset($this->jobs[ $index ]);
-            $this->jobs = array_values($this->jobs);
+            $this->jobs  = array_values($this->jobs);
             $this->dirty = true;
         }
     }
@@ -154,16 +159,14 @@ class NL4WP_Queue
      */
     public function reschedule(NL4WP_Queue_Job $job)
     {
-        if (is_null($this->jobs)) {
-            $this->load();
-        }
+        $this->load();
 
         // delete job from start of queue
         $this->delete($job);
 
         // add job to end of queue
         $this->jobs[] = $job;
-        $this->dirty = true;
+        $this->dirty  = true;
     }
 
     /**
@@ -171,7 +174,7 @@ class NL4WP_Queue
      */
     public function reset()
     {
-        $this->jobs = array();
+        $this->jobs  = [];
         $this->dirty = true;
     }
 
@@ -180,7 +183,7 @@ class NL4WP_Queue
      */
     public function save()
     {
-        if (! $this->dirty || is_null($this->jobs)) {
+        if (! $this->dirty || $this->jobs === null) {
             return false;
         }
 

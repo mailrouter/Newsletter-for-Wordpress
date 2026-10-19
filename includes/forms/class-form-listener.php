@@ -1,5 +1,8 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+
 /**
  * Class NL4WP_Form_Listener
  *
@@ -8,7 +11,6 @@
  */
 class NL4WP_Form_Listener
 {
-
     /**
      * @var NL4WP_Form The submitted form instance
      */
@@ -16,31 +18,27 @@ class NL4WP_Form_Listener
 
     public function add_hooks()
     {
-        add_action('init', array( $this, 'listen' ));
+        add_action('init', [$this, 'action_init'], 10, 0);
     }
 
-    /**
-     * Listen for submitted forms
-     * @return bool
-     */
-    public function listen()
+    public function action_init()
     {
-        if (empty($_POST['_nl4wp_form_id'])) {
-            return false;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- forms are for logged-out visitors, explicitly not using a nonce here
+        $form_data = $_POST;
+        if (empty($form_data['_nl4wp_form_id'])) {
+            return;
         }
 
         // get form instance
         try {
-            $form_id = (int) $_POST['_nl4wp_form_id'];
-            $form = nl4wp_get_form($form_id);
+            $form_id = (int) $form_data['_nl4wp_form_id'];
+            $form    = nl4wp_get_form($form_id);
         } catch (Exception $e) {
-            return false;
+            return;
         }
 
         // sanitize request data
-        $request_data = $_POST;
-        $request_data = nl4wp_sanitize_deep($request_data);
-        $request_data = stripslashes_deep($request_data);
+        $request_data = nl4wp_sanitize_deep($form_data);
 
         // bind request to form & validate
         $form->handle_request($request_data);
@@ -52,24 +50,23 @@ class NL4WP_Form_Listener
         // did form have errors?
         if (! $form->has_errors()) {
             switch ($form->get_action()) {
-                case "subscribe":
+                case 'subscribe':
                     $this->process_subscribe_form($form);
-                break;
+                    break;
 
-                case "unsubscribe":
-                   $this->process_unsubscribe_form($form);
-                break;
+                case 'unsubscribe':
+                    $this->process_unsubscribe_form($form);
+                    break;
             }
         } else {
             foreach ($form->errors as $error_code) {
                 $form->add_notice($form->get_message($error_code), 'error');
             }
 
-            $this->get_log()->info(sprintf("Form %d > Submitted with errors: %s", $form->ID, join(', ', $form->errors)));
+            $this->get_log()->info(sprintf('Form %d > Submitted with errors: %s', $form->ID, join(', ', $form->errors)));
         }
 
         $this->respond($form);
-        return true;
     }
 
     /**
@@ -77,28 +74,16 @@ class NL4WP_Form_Listener
      *
      * @param NL4WP_Form $form
      */
-    public function process_subscribe_form(NL4WP_Form $form)
+    public function process_subscribe_form(NL4WP_Form $form): void
     {
-        $result = false;
-        $newsletter = new NL4WP_Newsletter();
+        $result     = false;
+        $newsletter  = new NL4WP_Newsletter();
         $email_type = $form->get_email_type();
-        $data = $form->get_data();
+        $data       = $form->get_data();
         $ip_address = nl4wp_get_request_ip_address();
 
-        /** @var NL4WP_Newsletter_Subscriber $subscriber */
+        /** @var null|NL4WP_Newsletter_Subscriber $subscriber */
         $subscriber = null;
-
-        /**
-         * @ignore
-         * @deprecated 4.0
-         */
-        $data = apply_filters('nl4wp_merge_vars', $data);
-
-        /**
-         * @ignore
-         * @deprecated 4.0
-         */
-        $data = (array) apply_filters('nl4wp_form_merge_vars', $data, $form);
 
         // create a map of all lists with list-specific data
         $mapper = new NL4WP_List_Data_Mapper($data, $form->get_lists());
@@ -108,24 +93,32 @@ class NL4WP_Form_Listener
 
         // loop through lists
         foreach ($map as $list_id => $subscriber) {
-            $subscriber->status = $form->settings['double_optin'] ? 'pending' : 'subscribed';
+            $subscriber->status     = $form->settings['double_optin'] ? 'pending' : 'subscribed';
             $subscriber->email_type = $email_type;
-            $subscriber->ip_signup = $ip_address;
-            $subscriber->tags = $form->get_subscriber_tags();
+            $subscriber->ip_signup  = $ip_address;
+            $subscriber->tags       = $form->get_subscriber_tags();
 
             /**
              * Filters subscriber data before it is sent to Newsletter. Fires for both form & integration requests.
              *
              * @param NL4WP_Newsletter_Subscriber $subscriber
+             * @param string $list_id ID of the Newsletter list this subscriber will be added/updated in
              */
-            $subscriber = apply_filters('nl4wp_subscriber_data', $subscriber);
+            $subscriber = apply_filters('nl4wp_subscriber_data', $subscriber, $list_id);
+            if (! $subscriber instanceof NL4WP_Newsletter_Subscriber) {
+                continue;
+            }
 
             /**
              * Filters subscriber data before it is sent to Newsletter. Only fires for form requests.
              *
              * @param NL4WP_Newsletter_Subscriber $subscriber
+             * @param string $list_id ID of the Newsletter list this subscriber will be added/updated in
              */
-            $subscriber = apply_filters('nl4wp_form_subscriber_data', $subscriber);
+            $subscriber = apply_filters('nl4wp_form_subscriber_data', $subscriber, $list_id);
+            if (! $subscriber instanceof NL4WP_Newsletter_Subscriber) {
+                continue;
+            }
 
             // send a subscribe request to Newsletter for each list
             $result = $newsletter->list_subscribe($list_id, $subscriber->email_address, $subscriber->to_array(), $form->settings['update_existing'], $form->settings['replace_interests']);
@@ -135,13 +128,13 @@ class NL4WP_Form_Listener
 
         // do stuff on failure
         if (! is_object($result) || empty($result->id)) {
-            $error_code = $newsletter->get_error_code();
+            $error_code    = $newsletter->get_error_code();
             $error_message = $newsletter->get_error_message();
 
-            if ($newsletter->get_error_code() == 214) {
+            if ((int) $newsletter->get_error_code() === 214) {
                 $form->add_error('already_subscribed');
                 $form->add_notice($form->messages['already_subscribed'], 'notice');
-                $log->warning(sprintf("Form %d > %s is already subscribed to the selected list(s)", $form->ID, $data['EMAIL']));
+                $log->warning(sprintf('Form %d > %s is already subscribed to the selected list(s)', $form->ID, $data['EMAIL']));
             } else {
                 $form->add_error($error_code);
                 $form->add_notice($form->messages['error'], 'error');
@@ -164,7 +157,7 @@ class NL4WP_Form_Listener
         if ($result->status === 'subscribed' && $result->was_already_on_list) {
             $form->last_event = 'updated_subscriber';
             $form->add_notice($form->messages['updated'], 'success');
-            $log->info(sprintf("Form %d > Successfully updated %s", $form->ID, $data['EMAIL']));
+            $log->info(sprintf('Form %d > Successfully updated %s', $form->ID, $data['EMAIL']));
 
             /**
              * Fires right after a form was used to update an existing subscriber.
@@ -179,7 +172,18 @@ class NL4WP_Form_Listener
         } else {
             $form->last_event = 'subscribed';
             $form->add_notice($form->messages['subscribed'], 'success');
-            $log->info(sprintf("Form %d > Successfully subscribed %s", $form->ID, $data['EMAIL']));
+            $log->info(sprintf('Form %d > Successfully subscribed %s', $form->ID, $data['EMAIL']));
+
+            /**
+             * Fires right after a form was used to add a new subscriber.
+             *
+             * @since 4.8.13
+             *
+             * @param NL4WP_Form $form Instance of the submitted form
+             * @param string $email
+             * @param array $data
+             */
+            do_action('nl4wp_form_added_subscriber', $form, $subscriber->email_address, $data);
         }
 
         /**
@@ -198,41 +202,18 @@ class NL4WP_Form_Listener
     /**
      * @param NL4WP_Form $form
      */
-    public function process_unsubscribe_form(NL4WP_Form $form)
+    public function process_unsubscribe_form(NL4WP_Form $form): void
     {
-        $newsletter = new NL4WP_Newsletter();
-        $log = $this->get_log();
-        $result = null;
-        $data = $form->get_data();
+        $form->add_error('unauthorized');
+        $this->get_log()->warning(
+            sprintf('Form %d > Unsubscribe forms used but this feature is no longer supported because of security implications', $form->ID)
+        );
+        _deprecated_function('NL4WP_Form_Listener::process_unsubscribe_form', '4.11.2', 'Unsubscribe forms are no longer supported');
 
-        // unsubscribe from each list
-        foreach ($form->get_lists() as $list_id) {
-            $result = $newsletter->list_unsubscribe($list_id, $data['EMAIL']);
-        }
-
-        if (! $result) {
-            $form->add_notice($form->messages['error'], 'error');
-            $log->error(sprintf('Form %d > Newsletter API error: %s', $form->ID, $newsletter->get_error_message()));
-
-            // bail
-            return;
-        }
-
-        // Success! Unsubscribed.
-        $form->last_event = 'unsubscribed';
-        $form->add_notice($form->messages['unsubscribed'], 'notice');
-        $log->info(sprintf("Form %d > Successfully unsubscribed %s", $form->ID, $data['EMAIL']));
-
-
-        /**
-         * Fires right after a form was used to unsubscribe.
-         *
-         * @since 3.0
-         *
-         * @param NL4WP_Form $form Instance of the submitted form.
-         * @param string $email
-         */
-        do_action('nl4wp_form_unsubscribed', $form, $data['EMAIL']);
+        // This feature was removed in version 4.11.2 and unsubscribe forms are now no longer functional
+        // We log the message here to give site admins a chance to remove the forms from their site
+        // and we don't want to silently turn them into subscribe forms
+        // TODO (Mar 2027): Remove this method entirely in a future major release, along with the "unsubscribe" action and related code in the NL4WP_Form class.
     }
 
     /**
@@ -297,10 +278,8 @@ class NL4WP_Form_Listener
          */
         do_action('nl4wp_form_respond', $form);
 
-        // do stuff on success (non-AJAX only)
-        if ($success && (! defined('DOING_AJAX') || ! DOING_AJAX)) {
-
-            // do we want to redirect?
+        // do stuff on success (if form was submitted over plain HTTP, not for AJAX or REST requests)
+        if ($success && ! $this->request_wants_json()) {
             $redirect_url = $form->get_redirect_url();
             if (! empty($redirect_url)) {
                 wp_redirect($redirect_url);
@@ -309,12 +288,21 @@ class NL4WP_Form_Listener
         }
     }
 
+    private function request_wants_json()
+    {
+        if (isset($_SERVER['HTTP_ACCEPT']) && false !== strpos(wp_unslash($_SERVER['HTTP_ACCEPT']), 'application/json')) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
-     * @return NL4WP_API_v3
+     * @return NL4WP_API_V3
      */
     protected function get_api()
     {
-        return nl4wp('api');
+        return nl4wp_get_service('api');
     }
 
     /**
@@ -322,6 +310,6 @@ class NL4WP_Form_Listener
      */
     protected function get_log()
     {
-        return nl4wp('log');
+        return nl4wp_get_service('log');
     }
 }

@@ -1,6 +1,9 @@
 <?php
-return array(
-    'api_key' => '',
-    'allow_usage_tracking' => 0,
-    'debug_log_level' => 'warning',
-);
+
+defined('ABSPATH') || exit;
+
+return [
+    'api_key'                    => '',
+    'debug_log_level'            => 'warning',
+    'email_on_error'             => '',
+];

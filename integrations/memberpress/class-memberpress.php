@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_MemberPress_Integration
@@ -9,16 +9,15 @@ defined('ABSPATH') or exit;
  */
 class NL4WP_MemberPress_Integration extends NL4WP_Integration
 {
+    /**
+     * @var string
+     */
+    public $name = 'MemberPress';
 
     /**
      * @var string
      */
-    public $name = "MemberPress";
-
-    /**
-     * @var string
-     */
-    public $description = "Subscribes people from MemberPress register forms.";
+    public $description = 'Subscribes people from MemberPress register forms.';
 
 
     /**
@@ -27,10 +26,17 @@ class NL4WP_MemberPress_Integration extends NL4WP_Integration
     public function add_hooks()
     {
         if (! $this->options['implicit']) {
-            add_action('mepr_checkout_before_submit', array( $this, 'output_checkbox' ));
+            if (has_action('mepr_checkout_before_submit')) {
+                add_action('mepr_checkout_before_submit', [ $this, 'output_checkbox' ]);
+            } else {
+                add_action('mepr-checkout-before-submit', [ $this, 'output_checkbox' ]);
+            }
         }
-
-        add_action('mepr_signup', array( $this, 'subscribe_from_memberpress' ), 5);
+        if (has_action('mepr_signup')) {
+            add_action('mepr_signup', [ $this, 'subscribe_from_memberpress' ], 5);
+        } else {
+            add_action('mepr-signup', [ $this, 'subscribe_from_memberpress' ], 5);
+        }
     }
 
 
@@ -51,11 +57,11 @@ class NL4WP_MemberPress_Integration extends NL4WP_Integration
 
         $user = get_userdata($txn->user_id);
 
-        $data = array(
+        $data = [
             'EMAIL' => $user->user_email,
             'FNAME' => $user->first_name,
-            'LNAME' => $user->last_name
-        );
+            'LNAME' => $user->last_name,
+        ];
 
         // subscribe using email and name
         return $this->subscribe($data, $txn->id);

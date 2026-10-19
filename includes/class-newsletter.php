@@ -1,60 +1,58 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+
 /**
-* @access private
-* @ignore
-*/
+ * Helper class for dealing with common API requests.
+ */
 class NL4WP_Newsletter
 {
-
     /**
-    * @var string
-    */
+     * @var mixed
+     */
     public $error_code = '';
 
     /**
-    * @var string
-    */
+     * @var string
+     */
     public $error_message = '';
 
     /**
-    *
-    * Sends a subscription request to the Newsletter API
-    *
-    * @param string  $list_id           The list id to subscribe to
-    * @param string  $email_address             The email address to subscribe
-    * @param array    $args
-    * @param boolean $update_existing   Update information if this email is already on list?
-    * @param boolean $replace_interests Replace interest groupings, only if update_existing is true.
-    *
-    * @return object
-    */
-    public function list_subscribe($list_id, $email_address, array $args = array(), $update_existing = false, $replace_interests = true)
+     *
+     * Sends a subscription request to the Newsletter API
+     *
+     * @param string $list_id The list id to subscribe to
+     * @param string $email_address The email address to subscribe
+     * @param array $args
+     * @param bool $update_existing Update information if this email is already on list?
+     * @param bool $replace_interests Replace interest groupings, only if update_existing is true.
+     *
+     * @return null|object
+     * @throws Exception
+     */
+    public function list_subscribe($list_id, $email_address, array $args = [], $update_existing = false, $replace_interests = true)
     {
         $this->reset_error();
-
-        $default_args = array(
-            'status' => 'pending',
+        $default_args         = [
+            'status'        => 'pending',
             'email_address' => $email_address,
-            'interests' => array(),
-            'merge_fields' => array(),
-        );
-        $already_on_list = false;
+        ];
+        $existing_member_data = null;
 
         // setup default args
-        $args = $args + $default_args;
+        $args = array_merge($default_args, $args);
+        $api  = $this->get_api();
 
         // first, check if subscriber is already on the given list
         try {
-            $existing_member_data = $this->get_api()->get_list_member($list_id, $email_address);
-
+            $existing_member_data = $api->get_list_member($list_id, $email_address);
             if ($existing_member_data->status === 'subscribed') {
-                $already_on_list = true;
-
                 // if we're not supposed to update, bail.
                 if (! $update_existing) {
-                    $this->error_code = 214;
+                    $this->error_code    = 214;
                     $this->error_message = 'That subscriber already exists.';
+
                     return null;
                 }
 
@@ -69,62 +67,134 @@ class NL4WP_Newsletter
                         $existing_interests = array_fill_keys(array_keys($existing_interests), false);
                     }
 
-                    // TODO: Use array_replace here (PHP 5.3+)
-                    $new_interests = $args['interests'];
-                    $args['interests'] = $existing_interests;
-                    foreach ($new_interests as $interest_id => $interest_status) {
-                        $args['interests']["{$interest_id}"] = $interest_status;
-                    }
+                    $args['interests'] = array_replace($existing_interests, $args['interests']);
                 }
-            } elseif ($args['status']  === 'pending' && $existing_member_data->status === 'pending') {
+            } elseif ($args['status'] === 'pending' && $existing_member_data->status === 'pending') {
                 // this ensures that a new double opt-in email is send out
-                $this->get_api()->update_list_member($list_id, $email_address, array(
-                    'email_address' => $email_address,
-                    'status' => 'unsubscribed',
-                ));
+                $api->update_list_member(
+                    $list_id,
+                    $email_address,
+                    [
+                        'status' => 'unsubscribed',
+                    ]
+                );
             }
         } catch (NL4WP_API_Resource_Not_Found_Exception $e) {
             // subscriber does not exist (not an issue in this case)
         } catch (NL4WP_API_Exception $e) {
             // other errors.
-            $this->error_code = $e->getCode();
+            $this->error_code    = $e->getCode();
             $this->error_message = $e;
             return null;
         }
 
         try {
-            $data = $this->get_api()->add_list_member($list_id, $args);
+            // Extract tags from args before subscriber creation/update
+            $tags = [];
+            if (isset($args['tags']) && is_array($args['tags'])) {
+                $tags = $args['tags'];
+                unset($args['tags']);
+            }
+
+            if ($existing_member_data) {
+                $data                      = $api->update_list_member($list_id, $email_address, $args);
+                $data->was_already_on_list = $existing_member_data->status === 'subscribed';
+            } else {
+                $data                      = $api->add_new_list_member($list_id, $args);
+                $data->was_already_on_list = false;
+            }
+
+            // update subscriber tags, if supplied
+            $this->update_subscriber_tags($list_id, $email_address, $tags);
         } catch (NL4WP_API_Exception $e) {
-            $this->error_code = $e->getCode();
+            $this->error_code    = $e->getCode();
             $this->error_message = $e;
             return null;
         }
-
-        $data->was_already_on_list = $already_on_list;
 
         return $data;
     }
 
     /**
-    * Changes the subscriber status to "unsubscribed"
-    *
-    * @param string $list_id
-    * @param string $email_address
-    *
-    * @return boolean
-    */
+     * Format tags to send to Newsletter.
+     *
+     * @param $tags array new tags to add
+     * @return array
+     * @since 4.7.9
+     */
+    private function merge_and_format_member_tags($tags)
+    {
+        $formatted_tags = [];
+        foreach ($tags as $tag) {
+            if (is_string($tag)) {
+                $formatted_tags[] = [
+                    'name' => $tag,
+                    'status' => 'active',
+                ];
+            } elseif (is_array($tag) && isset($tag['name'])) {
+                $formatted_tags[] = [
+                    'name' => $tag['name'],
+                    'status' => isset($tag['status']) ? $tag['status'] : 'active',
+                ];
+            }
+        }
+
+        return $formatted_tags;
+    }
+
+    /**
+     * Post the tags on a list member.
+     *
+     * @param $newsletter_list_id string The list id to subscribe to
+     * @param $email_address Email of the Newsletter susbcriber
+     * @param $tags array tags to set for the user (can include 'status' key)
+     * @return bool
+     * @throws Exception
+     * @since 4.10.10
+     */
+    private function update_subscriber_tags($newsletter_list_id, $email_address, array $tags)
+    {
+        // do nothing if no tags given
+        if (count($tags) === 0) {
+            return true;
+        }
+
+        $api  = $this->get_api();
+        $data = [
+                'tags' => $this->merge_and_format_member_tags($tags),
+        ];
+
+        try {
+            $api->update_list_member_tags($newsletter_list_id, $email_address, $data);
+        } catch (NL4WP_API_Exception $ex) {
+            // fail silently
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Changes the subscriber status to "unsubscribed"
+     *
+     * @param string $list_id
+     * @param string $email_address
+     *
+     * @return boolean
+     */
     public function list_unsubscribe($list_id, $email_address)
     {
         $this->reset_error();
 
         try {
-            $this->get_api()->update_list_member($list_id, $email_address, array( 'status' => 'unsubscribed' ));
+            $this->get_api()->update_list_member($list_id, $email_address, [ 'status' => 'unsubscribed' ]);
         } catch (NL4WP_API_Resource_Not_Found_Exception $e) {
             // if email wasn't even on the list: great.
             return true;
         } catch (NL4WP_API_Exception $e) {
-            $this->error_code = $e->getCode();
+            $this->error_code    = $e->getCode();
             $this->error_message = $e;
+
             return false;
         }
 
@@ -132,39 +202,14 @@ class NL4WP_Newsletter
     }
 
     /**
-    * Deletes the subscriber from the given list.
-    *
-    * @param string $list_id
-    * @param string $email_address
-    *
-    * @return boolean
-    */
-    public function list_unsubscribe_delete($list_id, $email_address)
-    {
-        $this->reset_error();
-
-        try {
-            $this->get_api()->delete_list_member($list_id, $email_address);
-        } catch (NL4WP_API_Resource_Not_Found_Exception $e) {
-            // if email wasn't even on the list: great.
-            return true;
-        } catch (NL4WP_API_Exception $e) {
-            $this->error_code = $e->getCode();
-            $this->error_message = $e;
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-    * Checks if an email address is on a given list with status "subscribed"
-    *
-    * @param string $list_id
-    * @param string $email_address
-    *
-    * @return boolean
-    */
+     * Checks if an email address is on a given list with status "subscribed"
+     *
+     * @param string $list_id
+     * @param string $email_address
+     *
+     * @return boolean
+     * @throws Exception
+     */
     public function list_has_subscriber($list_id, $email_address)
     {
         try {
@@ -176,256 +221,291 @@ class NL4WP_Newsletter
         return ! empty($data->id) && $data->status === 'subscribed';
     }
 
-
     /**
-    * Empty the Lists cache
-    */
-    public function empty_cache()
+     * @param string $list_id
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function get_list_merge_fields($list_id)
     {
-        global $wpdb;
+        $transient_key = "nl4wp_list_{$list_id}_mf";
+        $cached        = get_transient($transient_key);
+        if (is_array($cached)) {
+            return $cached;
+        }
 
-        delete_option('nl4wp_newsletter_list_ids');
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE 'nl4wp_newsletter_list_%'");
-        delete_transient('nl4wp_list_counts');
+        $api = $this->get_api();
+
+        try {
+            // fetch list merge fields
+            $merge_fields = $api->get_list_merge_fields(
+                $list_id,
+                [
+                    'count'  => 100,
+                    'fields' => 'merge_fields.name,merge_fields.tag,merge_fields.type,merge_fields.required,merge_fields.default_value,merge_fields.options,merge_fields.public',
+                ]
+            );
+        } catch (NL4WP_API_Exception $e) {
+            return [];
+        }
+
+        // add EMAIL field
+        array_unshift(
+            $merge_fields,
+            (object) [
+                'tag'      => 'EMAIL',
+                'name'     => __('Email address', 'newsletter-for-wp'),
+                'required' => true,
+                'type'     => 'email',
+                'options'  => [],
+                'public'   => true,
+            ]
+        );
+
+        set_transient($transient_key, $merge_fields, HOUR_IN_SECONDS * 24);
+
+        return $merge_fields;
     }
 
     /**
-    * Get Newsletter lists from cache.
-    *
-    * @param boolean deprecated parameter.
-    * @return array
-    */
-    public function get_cached_lists()
+     * @param string $list_id
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function get_list_interest_categories($list_id)
     {
-        return $this->get_lists(false);
+        $transient_key = "nl4wp_list_{$list_id}_ic";
+        $cached        = get_transient($transient_key);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $api = $this->get_api();
+
+        try {
+            // fetch list interest categories
+            $interest_categories = $api->get_list_interest_categories(
+                $list_id,
+                [
+                    'count'  => 100,
+                    'fields' => 'categories.id,categories.title,categories.type',
+                ]
+            );
+        } catch (NL4WP_API_Exception $e) {
+            return [];
+        }
+
+        foreach ($interest_categories as $interest_category) {
+            $interest_category->interests = [];
+
+            try {
+                // fetch groups for this interest
+                $interests_data = $api->get_list_interest_category_interests(
+                    $list_id,
+                    $interest_category->id,
+                    [
+                        'count'  => 100,
+                        'fields' => 'interests.id,interests.name',
+                    ]
+                );
+                foreach ($interests_data as $interest_data) {
+                    $interest_category->interests[ (string) $interest_data->id ] = $interest_data->name;
+                }
+            } catch (NL4WP_API_Exception $e) {
+                // ignore
+            }
+        }
+
+        set_transient($transient_key, $interest_categories, HOUR_IN_SECONDS * 24);
+
+        return $interest_categories;
     }
 
     /**
-    * Get a specific Newsletter list from local DB.
-    *
-    * @param string $list_id
-    * @return NL4WP_Newsletter_List
-    */
-    public function get_cached_list($list_id)
+     * Gets marketing permissions from a Newsletter list.
+     * The list needs to have at least 1 member for this to work.
+     *
+     * @param string $list_id
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function get_list_marketing_permissions($list_id)
     {
-        return $this->get_list($list_id, false);
+        $transient_key = "nl4wp_list_{$list_id}_mp";
+        $cached        = get_transient($transient_key);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        try {
+            $api  = $this->get_api();
+            $data = $api->get_list_members(
+                $list_id,
+                [
+                    'fields' => [ 'members.marketing_permissions' ],
+                    'count'  => 1,
+                ]
+            );
+
+            $marketing_permissions = [];
+            if (count($data->members) > 0 && isset($data->members[0]->marketing_permissions)) {
+                foreach ($data->members[0]->marketing_permissions as $mp) {
+                    $marketing_permissions[] = (object) [
+                        'marketing_permission_id' => $mp->marketing_permission_id,
+                        'text'                    => $mp->text,
+                    ];
+                }
+            }
+        } catch (NL4WP_API_Exception $e) {
+            return [];
+        }
+
+        set_transient($transient_key, $marketing_permissions, HOUR_IN_SECONDS * 24);
+        return $marketing_permissions;
     }
 
     /**
-    * Get Newsletter lists, from cache or remote API.
-    *
-    * @param boolean $force Whether to force a result by hitting Newsletter API
-    * @return array
-    */
-    public function get_lists($force = true)
+     * Get Newsletter lists, from cache or remote API.
+     *
+     * @param boolean $skip_cache Whether to force a result by hitting Newsletter API
+     *
+     * @return array
+     */
+    public function get_lists($skip_cache = false)
     {
+        $cache_key = 'nl4wp_newsletter_lists';
+        $cached    = get_transient($cache_key);
 
-        // first, get all list id's
-        $list_ids = $this->get_list_ids($force);
+        if (is_array($cached) && ! $skip_cache) {
+            return $cached;
+        }
 
-        // then, fill $lists array with individual list details
-        $lists = array();
-        foreach ($list_ids as $list_id) {
-            $list = $this->get_list($list_id, $force);
-            $lists["{$list_id}"] = $list;
+        $lists = $this->fetch_lists();
+
+        /**
+         * Filters the cache time for Newsletter lists configuration, in seconds. Defaults to 24 hours.
+         */
+        $cache_ttl = (int) apply_filters('nl4wp_lists_count_cache_time', HOUR_IN_SECONDS * 24);
+
+        // make sure cache ttl is not lower than 60 seconds
+        $cache_ttl = max(60, $cache_ttl);
+        set_transient($cache_key, $lists, $cache_ttl);
+
+        return $lists;
+    }
+
+    private function fetch_lists()
+    {
+        $client             = $this->get_api()->get_client();
+        $lists_data         = [];
+        $offset             = 0;
+        $count              = 10;
+        $exceptions_skipped = 0;
+
+        // increase total time limit to 3 minutes
+        @set_time_limit(180);
+
+        // increase HTTP timeout to 30s as Newsletter is super slow to calculate dynamic fields
+        add_filter(
+            'nl4wp_http_request_args',
+            function ($args) {
+                $args['timeout'] = 30;
+                return $args;
+            }
+        );
+
+        // collect all lists in separate HTTP requests
+        do {
+            $data = null;
+            try {
+                $data = $client->get(
+                    '/lists',
+                    [
+                        'count'  => $count,
+                        'offset' => $offset,
+                        'fields' => 'total_items,lists.id,lists.name,lists.web_id,lists.stats.member_count,lists.marketing_permissions',
+                    ]
+                );
+
+                $lists_data = array_merge($lists_data, $data->lists);
+                $offset    += $count;
+            } catch (NL4WP_API_Connection_Exception $e) {
+                // ignore timeout errors as this is likely due to newsletter being slow to calculate the lists.stats.member_count property
+                // keep going so we can at least pull-in all other lists
+                $offset += $count;
+                ++$exceptions_skipped;
+
+                // failsafe against infinite loop
+                // bail after 5 skipped exceptions
+                if ($exceptions_skipped >= 5) {
+                    break;
+                }
+
+                continue;
+            } catch (NL4WP_API_Exception $e) {
+                // break on other errors, like "API key missing"etc.
+                break;
+            }
+        } while ($data && $data->total_items >= $offset);
+
+        // key by list ID
+        $lists = [];
+        foreach ($lists_data as $list_data) {
+            $lists["$list_data->id"] = $list_data;
         }
 
         return $lists;
     }
 
     /**
-    * @param string $list_id
-    *
-    * @return NL4WP_Newsletter_List
-    */
-    private function fetch_list($list_id)
+     * @param string $list_id
+     *
+     * @return object|null
+     */
+    public function get_list($list_id)
     {
-        try {
-            $list_data = $this->get_api()->get_list($list_id, array( 'fields' => 'id,name,stats,web_id,campaign_defaults.from_name,campaign_defaults.from_email' ));
+        $lists = $this->get_lists();
 
-            // create local object
-            $list = new NL4WP_Newsletter_List($list_data->id, $list_data->name);
-            $list->subscriber_count = $list_data->stats->member_count;
-            $list->web_id = $list_data->web_id;
-            $list->campaign_defaults = $list_data->campaign_defaults;
-
-            // get merge fields (if any)
-            if ($list_data->stats->merge_field_count > 0) {
-                $field_data = $this->get_api()->get_list_merge_fields($list->id, array( 'count' => 100, 'fields' => 'merge_fields.name,merge_fields.tag,merge_fields.type,merge_fields.required,merge_fields.default_value,merge_fields.options,merge_fields.public' ));
-
-                // hydrate data into object
-                foreach ($field_data as $data) {
-                    $object = NL4WP_Newsletter_Merge_Field::from_data($data);
-                    $list->merge_fields[] = $object;
-                }
-            }
-
-            // get interest categories
-            $interest_categories_data = $this->get_api()->get_list_interest_categories($list->id, array( 'count' => 100, 'fields' => 'categories.id,categories.title,categories.type' ));
-            foreach ($interest_categories_data as $interest_category_data) {
-                $interest_category = NL4WP_Newsletter_Interest_Category::from_data($interest_category_data);
-
-                // fetch groups for this interest
-                $interests_data = $this->get_api()->get_list_interest_category_interests($list->id, $interest_category->id, array( 'count' => 100, 'fields' => 'interests.id,interests.name'));
-                foreach ($interests_data as $interest_data) {
-                    $interest_category->interests[ (string) $interest_data->id ] = $interest_data->name;
-                }
-
-                $list->interest_categories[] = $interest_category;
-            }
-        } catch (NL4WP_API_Exception $e) {
-            return null;
-        }
-
-        // save in option
-        update_option('nl4wp_newsletter_list_' . $list_id, $list, false);
-        return $list;
+        return isset($lists["$list_id"]) ? $lists["$list_id"] : null;
     }
 
     /**
-    * Get Newsletter list ID's
-    *
-    * @param bool $force Force result by hitting Newsletter API
-    * @return array
-    */
-    public function get_list_ids($force = false)
+     * Fetch lists data from Newsletter.
+     */
+    public function refresh_lists()
     {
-        $list_ids = (array) get_option('nl4wp_newsletter_list_ids', array());
+        $lists = $this->get_lists(true);
 
-        if (empty($list_ids) && $force) {
-            $list_ids = $this->fetch_list_ids();
+        foreach ($lists as $list_id => $list) {
+            // delete cached merge fields
+            delete_transient("nl4wp_list_{$list_id}_mf");
+
+            // delete cached interest categories
+            delete_transient("nl4wp_list_{$list_id}_ic");
+
+            // delete cached marketing permissions
+            delete_transient("nl4wp_list_{$list_id}_mp");
         }
 
-        return $list_ids;
-    }
-
-    /**
-    * @return array
-    */
-    public function fetch_list_ids()
-    {
-        /**
-         * Filters the amount of Newsletter lists to fetch.
-         *
-         * If you increase this, it might be necessary to increase your PHP configuration to allow for a higher max_execution_time.
-         *
-         * @param int
-         */
-        $limit = apply_filters('nl4wp_newsletter_list_limit', 200);
-
-        try {
-            $lists_data = $this->get_api()->get_lists(array( 'count' => $limit, 'fields' => 'lists.id' ));
-        } catch (NL4WP_API_Exception $e) {
-            return array();
-        }
-
-        $list_ids = wp_list_pluck($lists_data, 'id');
-
-        // store list id's
-        update_option('nl4wp_newsletter_list_ids', $list_ids, false);
-
-        return $list_ids;
-    }
-
-    /**
-    * Fetch list ID's + lists from Newsletter.
-    *
-    * @return bool
-    */
-    public function fetch_lists()
-    {
-        // try to increase time limit as this can take a while
-        @set_time_limit(600);
-        $list_ids = $this->fetch_list_ids();
-
-        // randomize array order
-        shuffle($list_ids);
-
-        // fetch individual list details
-        foreach ($list_ids as $list_id) {
-            $list = $this->fetch_list($list_id);
-        }
-
-        return ! empty($list_ids);
-    }
-
-    /**
-    * Get a given Newsletter list
-    *
-    * @param string $list_id
-    * @param bool $force Whether to force a result by hitting remote API
-    * @return NL4WP_Newsletter_List
-    */
-    public function get_list($list_id, $force = false)
-    {
-        $list = get_option('nl4wp_newsletter_list_' . $list_id);
-
-        if (empty($list) && $force) {
-            $list = $this->fetch_list($list_id);
-        }
-
-        if (empty($list)) {
-            return new NL4WP_Newsletter_List($list_id, 'Unknown List');
-        }
-
-        return $list;
-    }
-
-    /**
-    * Get an array of list_id => number of subscribers
-    *
-    * @return array
-    */
-    public function get_subscriber_counts()
-    {
-        $list_counts = get_transient('nl4wp_list_counts');
-        if (is_array($list_counts)) {
-            return $list_counts;
-        }
-
-        // transient not valid, fetch from API
-        try {
-            $lists = $this->get_api()->get_lists(array( 'count' => 100, 'fields' => 'lists.id,lists.stats' ));
-        } catch (NL4WP_API_Exception $e) {
-            return array();
-        }
-
-        $list_counts = array();
-
-        // we got a valid response
-        foreach ($lists as $list) {
-            $list_counts["{$list->id}"] = $list->stats->member_count;
-        }
-
-
-        /**
-        * Filters the cache time for Newsletter lists configuration, in seconds. Defaults to 3600 seconds (1 hour).
-        *
-        * @since 2.0
-        * @param int $seconds
-        */
-        $transient_lifetime = (int) apply_filters('nl4wp_lists_count_cache_time', 3600);
-
-        // make sure transient lifetime is not lower than 60 seconds
-        $transient_lifetime = max(60, $transient_lifetime);
-        set_transient('nl4wp_list_counts', $list_counts, $transient_lifetime);
-
-        return $list_counts;
+        return ! empty($lists);
     }
 
 
     /**
-    * Returns number of subscribers on given lists.
-    *
-    * @param array|string $list_ids Array of list ID's, or single string.
-    * @return int Total # subscribers for given lists.
-    */
+     * Returns number of subscribers on given lists.
+     *
+     * @param array|string $list_ids Array of list ID's, or single string.
+     *
+     * @return int Total # subscribers for given lists.
+     */
     public function get_subscriber_count($list_ids)
     {
-
         // make sure we're getting an array
         if (! is_array($list_ids)) {
-            $list_ids = array( $list_ids );
+            $list_ids = [ $list_ids ];
         }
 
         // if we got an empty array, return 0
@@ -433,63 +513,69 @@ class NL4WP_Newsletter
             return 0;
         }
 
-        // get total number of subscribers for all lists
-        $counts = $this->get_subscriber_counts();
+        $lists = $this->get_lists();
 
         // start calculating subscribers count for all given list ID's combined
         $count = 0;
-        foreach ($list_ids as $id) {
-            $count += (isset($counts["{$id}"])) ? $counts["{$id}"] : 0;
+        foreach ($list_ids as $list_id) {
+            if (! isset($lists["$list_id"])) {
+                continue;
+            }
+
+            $list   = $lists["$list_id"];
+            $count += $list->stats->member_count;
         }
 
         /**
-        * Filters the total subscriber_count for the given List ID's.
-        *
-        * @since 2.0
-        * @param string $count
-        * @param array $list_ids
-        */
+         * Filters the total subscriber_count for the given List ID's.
+         *
+         * @param float|int $count
+         * @param array $list_ids
+         *
+         * @since 2.0
+         */
         return apply_filters('nl4wp_subscriber_count', $count, $list_ids);
     }
 
     /**
-    * Resets error properties.
-    */
+     * Resets error properties.
+     */
     public function reset_error()
     {
         $this->error_message = '';
-        $this->error_code = '';
+        $this->error_code    = '';
     }
 
     /**
-    * @return bool
-    */
+     * @return bool
+     */
     public function has_error()
     {
         return ! empty($this->error_code);
     }
 
     /**
-    * @return string
-    */
+     * @return string
+     */
     public function get_error_message()
     {
         return $this->error_message;
     }
 
     /**
-    * @return string
-    */
+     * @return mixed
+     */
     public function get_error_code()
     {
         return $this->error_code;
     }
 
     /**
-    * @return NL4WP_API_v3
-    */
+     * @return NL4WP_API_V3
+     * @throws Exception
+     */
     private function get_api()
     {
-        return nl4wp('api');
+        return nl4wp_get_service('api');
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+
 /**
  * Gets an array of all registered integrations
  *
@@ -10,7 +13,7 @@
  */
 function nl4wp_get_integrations()
 {
-    return nl4wp('integrations')->get_all();
+    return nl4wp_get_service('integrations')->get_all();
 }
 
 /**
@@ -25,7 +28,7 @@ function nl4wp_get_integrations()
  */
 function nl4wp_get_integration($slug)
 {
-    return nl4wp('integrations')->get($slug);
+    return nl4wp_get_service('integrations')->get($slug);
 }
 
 /**
@@ -41,7 +44,7 @@ function nl4wp_get_integration($slug)
  */
 function nl4wp_register_integration($slug, $class, $always_enabled = false)
 {
-    return nl4wp('integrations')->register_integration($slug, $class, $always_enabled);
+    return nl4wp_get_service('integrations')->register_integration($slug, $class, $always_enabled);
 }
 
 /**
@@ -53,5 +56,5 @@ function nl4wp_register_integration($slug, $class, $always_enabled = false)
  */
 function nl4wp_deregister_integration($slug)
 {
-    nl4wp('integrations')->deregister_integration($slug);
+    nl4wp_get_service('integrations')->deregister_integration($slug);
 }

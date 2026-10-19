@@ -7,7 +7,6 @@
  */
 class NL4WP_Queue_Job
 {
-
     /**
      * @var string
      */
@@ -35,7 +34,7 @@ class NL4WP_Queue_Job
      */
     public function __construct($data)
     {
-        $this->id = (string) microtime(true) . rand(1, 10000);
+        $this->id   = (string) microtime(true) . wp_rand(1, 10000);
         $this->data = $data;
     }
 }

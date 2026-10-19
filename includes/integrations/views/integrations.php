@@ -1,37 +1,43 @@
-<?php defined('ABSPATH') or exit;
-/** @var NL4WP_Integration_Fixture[] $enabled_integrations */
-/** @var NL4WP_Integration_Fixture[] $available_integrations */
-/** @var NL4WP_Integration $integration */
-function _nl4wp_integrations_table_row($integration) {
+<?php
+
+defined('ABSPATH') || exit;
+
+/** @param NL4WP_Integration_Fixture $integration */
+function _nl4wp_integrations_table_row($integration)
+{
     ?>
-    <tr style="<?php if (! $integration->is_installed()) {
-        echo 'opacity: 0.4;';
-    } ?>">
+    <tr
+    <?php
+    if (! $integration->is_installed()) {
+        echo ' style="opacity: 0.6;"';
+    }
+    ?>
+        >
 
-        <!-- Integration Name -->
         <td>
-
             <?php
             if ($integration->is_installed()) {
-                printf('<strong><a href="%s" title="%s">%s</a></strong>', esc_attr(add_query_arg(array( 'integration' => $integration->slug ))), __('Configure this integration', 'newsletter-for-wp'), $integration->name);
+                $href  = add_query_arg([ 'integration' => $integration->slug ]);
+                $title = esc_attr__('Configure this integration', 'newsletter-for-wp');
+                printf('<strong><a href="%s" title="%s">%s</a></strong>', esc_url($href), esc_attr($title), esc_html($integration->name));
             } else {
-                echo $integration->name;
-            } ?>
-
-
+                echo esc_html($integration->name);
+            }
+            ?>
         </td>
         <td class="desc">
             <?php
-            _e($integration->description, 'newsletter-for-wp'); ?>
+            echo esc_html($integration->description);
+            ?>
         </td>
         <td>
             <?php
             if ($integration->enabled && $integration->is_installed()) {
-                echo '<span class="green">' . __('Active', 'newsletter-for-wp') . '</span>';
-            } elseif($integration->is_installed()) {
-                echo '<span class="neutral">' . __('Inactive', 'newsletter-for-wp') . '</span>';
+                echo '<span class="nl4wp-status positive">', esc_html__('Active', 'newsletter-for-wp'), '</span>';
+            } elseif ($integration->is_installed()) {
+                echo '<span class="nl4wp-status neutral">', esc_html__('Inactive', 'newsletter-for-wp'), '</span>';
             } else {
-                echo '<span class="red">' . __('Not installed', 'newsletter-for-wp') . '</span>';
+                echo '<span>', esc_html__('Not installed', 'newsletter-for-wp'), '</span>';
             }
             ?>
         </td>
@@ -48,29 +54,27 @@ function _nl4wp_integrations_table_row($integration) {
 function _nl4wp_integrations_table($integrations)
 {
     ?>
-	<table class="nl4wp-table widefat striped">
+    <table class="nl4wp-table widefat striped">
+        <thead>
+        <tr>
+            <th><?php echo esc_html__('Name', 'newsletter-for-wp'); ?></th>
+            <th><?php echo esc_html__('Description', 'newsletter-for-wp'); ?></th>
+            <th><?php echo esc_html__('Status', 'newsletter-for-wp'); ?></th>
+        </tr>
+        </thead>
+        <tbody>
 
-		<thead>
-		<tr>
-			<th><?php _e('Name', 'newsletter-for-wp'); ?></th>
-			<th><?php _e('Description', 'newsletter-for-wp'); ?></th>
-            <th><?php _e('Status', 'newsletter-for-wp'); ?></th>
-		</tr>
-		</thead>
-
-		<tbody>
-
-		<?php
+        <?php
         // active & enabled integrations first
         foreach ($integrations as $integration) {
-            if ( $integration->is_installed() && $integration->enabled) {
+            if ($integration->is_installed() && $integration->enabled) {
                 _nl4wp_integrations_table_row($integration);
             }
         }
 
         // active & disabled integrations next
         foreach ($integrations as $integration) {
-            if ( $integration->is_installed() && ! $integration->enabled) {
+            if ($integration->is_installed() && ! $integration->enabled) {
                 _nl4wp_integrations_table_row($integration);
             }
         }
@@ -82,50 +86,36 @@ function _nl4wp_integrations_table($integrations)
             }
         }
         ?>
-
-		</tbody>
-	</table><?php
+        </tbody>
+    </table>
+    <?php
 }
 ?>
 <div id="nl4wp-admin" class="wrap nl4wp-settings">
+    <p class="nl4wp-breadcrumbs">
+        <span class="prefix"><?php echo esc_html__('You are here: ', 'newsletter-for-wp'); ?></span>
+        <a href="<?php echo esc_url(admin_url('admin.php?page=newsletter-for-wp')); ?>">Newsletter for WordPress</a> &rsaquo;
+        <span class="current-crumb"><strong><?php echo esc_html__('Integrations', 'newsletter-for-wp'); ?></strong></span>
+    </p>
 
-	<p class="breadcrumbs">
-		<span class="prefix"><?php echo __('You are here: ', 'newsletter-for-wp'); ?></span>
-		<a href="<?php echo admin_url('admin.php?page=newsletter-for-wp'); ?>">Newsletter for WordPress</a> &rsaquo;
-		<span class="current-crumb"><strong><?php _e('Integrations', 'newsletter-for-wp'); ?></strong></span>
-	</p>
+    <div class="nl4wp-row">
+        <div class="nl4wp-col nl4wp-col-4">
+            <h1 class="nl4wp-page-title">Newsletter for WordPress: <?php echo esc_html__('Integrations', 'newsletter-for-wp'); ?></h1>
 
-	<div class="main-content row">
+            <h2 style="display: none;"></h2>
+            <?php settings_errors(); ?>
 
-		<!-- Main Content -->
-		<div class="col col-6">
+            <p>
+                <?php echo esc_html__('The table below shows all available integrations.', 'newsletter-for-wp'); ?>
+                <?php echo esc_html__('Click on the name of an integration to edit all settings specific to that integration.', 'newsletter-for-wp'); ?>
+            </p>
 
-			<h1 class="page-title">Newsletter for WordPress: <?php _e('Integrations', 'newsletter-for-wp'); ?></h1>
-
-			<h2 style="display: none;"></h2>
-			<?php settings_errors(); ?>
-
-			<p>
-				<?php _e('The table below shows all available integrations.', 'newsletter-for-wp'); ?>
-				<?php _e('Click on the name of an integration to edit all settings specific to that integration.', 'newsletter-for-wp'); ?>
-			</p>
-
-			<form action="<?php echo admin_url('options.php'); ?>" method="post">
-
-				<?php settings_fields('nl4wp_integrations_settings'); ?>
-
-				<h3><?php _e('Integrations', 'newsletter-for-wp'); ?></h3>
-				<?php _nl4wp_integrations_table($integrations); ?>
-
-                <p><?php echo __("Greyed out integrations will become available after installing & activating the corresponding plugin.", 'newsletter-for-wp'); ?></p>
-
-
+            <form action="<?php echo esc_url(admin_url('options.php')); ?>" method="post">
+                <?php settings_fields('nl4wp_integrations_settings'); ?>
+                <h3><?php echo esc_html__('Integrations', 'newsletter-for-wp'); ?></h3>
+                <?php _nl4wp_integrations_table($integrations); ?>
+                <p><?php echo esc_html__('Greyed out integrations will become available after installing & activating the corresponding plugin.', 'newsletter-for-wp'); ?></p>
             </form>
-
-		</div>
-
-		
-
-	</div>
-
+        </div>
+    </div>
 </div>

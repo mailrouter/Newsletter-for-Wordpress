@@ -1,39 +1,39 @@
 <?php
-defined('ABSPATH') or exit;
 
-$global_options = (array) get_option('nl4wp_form', array());
+defined('ABSPATH') || exit;
+
+$global_options = (array) get_option('nl4wp_form', []);
 
 // find all form posts
 $posts = get_posts(
-    array(
-        'post_type' => 'nl4wp-form',
+    [
+        'post_type'   => 'nl4wp-form',
         'post_status' => 'publish',
-        'numberposts' => -1
-    )
+        'numberposts' => -1,
+    ]
 );
 
-$css_map = array(
-    'default'       => 'basic',
-    'custom'        => 'styles-builder',
-    'light'         => 'theme-light',
-    'dark'          => 'theme-dark',
-    'red'           => 'theme-red',
-    'green'         => 'theme-green',
-    'blue'          => 'theme-blue',
-    'custom-color'  => 'theme-custom-color'
-);
+$css_map = [
+    'default'      => 'basic',
+    'custom'       => 'styles-builder',
+    'light'        => 'theme-light',
+    'dark'         => 'theme-dark',
+    'red'          => 'theme-red',
+    'green'        => 'theme-green',
+    'blue'         => 'theme-blue',
+    'custom-color' => 'theme-custom-color',
+];
 
-$stylesheets = array();
+$stylesheets = [];
 
 foreach ($posts as $post) {
-
     // get form options from post meta directly
     $options = (array) get_post_meta($post->ID, '_nl4wp_settings', true);
 
     // store all global options in scoped form settings
     // do this BEFORE changing css key, so we take that as well.
     foreach ($global_options as $key => $value) {
-        if (strlen($value) > 0 && (! isset($options[ $key ]) || strlen($options[ $key ]) == 0)) {
+        if (strlen($value) > 0 && ( ! isset($options[ $key ]) || strlen($options[ $key ]) == 0 )) {
             $options[ $key ] = $value;
         }
     }

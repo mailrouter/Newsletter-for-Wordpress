@@ -19,6 +19,9 @@ function service_invoke_jsonwp($method, $service_api_key, $timestamp, $nonce, $h
         );
 
         $referer = service_get_referer();
+        # in alcuni casi il get_referer non trova l'host, ma su WP si può fare così
+        # TODO: per testarlo dovrei togliere il get_referer qui sopra
+        if (empty($referer)) $referer = add_query_arg($GLOBALS['wp']->query_vars, home_url($GLOBALS['wp']->request));
         if (!empty($referer)) $headers['Referer'] = $referer;
 
         $url = ($GLOBALS['service_wrapper_method'] == 'https' ? 'https://' : 'http://').$service_host.'/'.$GLOBALS['service_wrapper_jsonrpc_url'].'/'.$method;
@@ -52,6 +55,8 @@ function service_invoke_jsonwp($method, $service_api_key, $timestamp, $nonce, $h
 
 class NL4WP_API_v3_Client {
 /** File da cambiare per il supporto API Newsletter **/
+    private const TRACK_ENABLE_TAG = 'TRACK_ENABLE';
+
     /**
      * @var string
      */
@@ -138,7 +143,7 @@ class NL4WP_API_v3_Client {
 
     private function init($listid) {
         if (count($this->api_keys) < $listid) {
-            throw new NL4WP_API_Exception( "Unconfigured list: " . $resource, 005 );
+            throw new NL4WP_API_Exception( "Unconfigured list: " . $listid, 005 );
         }
         service_init($this->api_keys[$listid - 1]);
 
@@ -179,7 +184,7 @@ class NL4WP_API_v3_Client {
 
             if ($args !== array('fields' => 'account_id') /* 4.5.5 */ && $args !== array() /* 4.1.15 */)
             {
-                throw new NL4WP_API_Exception( 'Unexpected arguments for '.$mthod.' '.$resource, 999, false, false, $args ); // da verificare
+                throw new NL4WP_API_Exception( 'Unexpected arguments for '.$method.' '.$resource, 999, false, false, $args ); // da verificare
             }
 
             // non viene realmente usato, ma qui di fatto controlliamo tutte le chiavi API
@@ -243,12 +248,26 @@ class NL4WP_API_v3_Client {
 
                         }
 
+                    // resource "/lists/#LISTID#/members"
+                    } else if ($respath[2] == 'members' && count($respath) == 3) {
+                        return $this->handle_lists_members_collection_call($list_id, $args, $method, $resource);
+
                     // resource "/lists/#LISTID#/members/#UID#"
                     } else if ($respath[2] == 'members' && count($respath) == 4) {
 
                         // gestione ad hoc della richiesta di check utente
                         $emailtocheck = base64_decode($respath[3]);
                         return $this->handle_lists_members_call($list_id, $emailtocheck, $args, $method, $resource);
+
+                    // resource "/lists/#LISTID#/members/#UID#/tags"
+                    } else if ($respath[2] == 'members' && count($respath) == 5 && $respath[4] == 'tags') {
+                        $emailtocheck = base64_decode($respath[3]);
+                        return $this->handle_lists_member_tags_call($list_id, $emailtocheck, $args, $method, $resource);
+
+                    // resource "/lists/#LISTID#/members/#UID#/actions/delete-permanent"
+                    } else if ($respath[2] == 'members' && count($respath) == 6 && $respath[4] == 'actions' && $respath[5] == 'delete-permanent') {
+                        $emailtocheck = base64_decode($respath[3]);
+                        return $this->handle_lists_members_delete_call($list_id, $emailtocheck, $args, $method, $resource);
 
                     }
                 }
@@ -305,7 +324,9 @@ class NL4WP_API_v3_Client {
                     if ($f == 'campaign_defaults.from_email') $ret->campaign_defaults->from_email = 'mittente@example.com';
                     break;
                 case 'lists.marketing_permissions': /* Whether or not the list has marketing permissions (eg. GDPR) enabled. */
-                    $ret->marketing_permissions = true;
+                    // Voxmail has no Newsletter-style, per-contact marketing permissions.
+                    // Expose the list as a valid audience without GDPR permissions.
+                    $ret->marketing_permissions = false;
                     break;
                 default: throw new NL4WP_API_Exception( 'Unsupported field for '.$resource.': '.$f, 999, false, false, $args );
             }
@@ -319,10 +340,10 @@ class NL4WP_API_v3_Client {
         $this->init($list_id); // inizializzazione API service
         $result = service_user_profile_fields_list();
         $this->optionallyRaiseException($method, $resource, $result, 'service_user_profile_fields_list', $args);
-         
-        if ($result) {
-            $merge_vars = array();
-            $id = 1;
+
+        $merge_vars = array();
+        $id = 1;
+        if (is_array($result)) {
             foreach ($result as $merge_var) {
                 if ($merge_var['visibility'] == 'hidden' || $merge_var['visibility'] =='public' || $merge_var['visibility'] == 'register' || $merge_var['visibility'] == 'register_required') {
 
@@ -353,13 +374,34 @@ class NL4WP_API_v3_Client {
                     $mv->public = ($merge_var['visibility'] !== 'hidden') ? 1 : 0;
 
                     if (isset($merge_var['options']))
-                        $mv->options = (object) array('choices' => $merge_var['options'] ? explode("\n", $merge_var['options']) : '');
+                        $mv->options = (object) array('choices' => $merge_var['options'] ? explode("\n", $merge_var['options']) : array());
 
                     $merge_vars[] = $mv;
                 }
             }
-            return (object) array('merge_fields' => $merge_vars);
-        } else return (object) array();
+        }
+
+        // Voxmail's enable-tracking switch is not exposed as a profile field.
+        // Publish it as a synthetic single-choice field so NL4WP can expose it
+        // in forms and integrations. The values must be non-empty strings:
+        // NL4WP intentionally drops empty values while mapping submissions.
+        $merge_vars[] = (object) array(
+            'id'       => $id++,
+            'required' => 0,
+            'name'     => __('Enable tracking', 'newsletter-for-wp'),
+            'tag'      => self::TRACK_ENABLE_TAG,
+            'helptext' => __('Select whether email tracking should be enabled for this subscriber.', 'newsletter-for-wp'),
+            'type'     => 'radio',
+            'options'  => (object) array(
+                'choices' => array(
+                    'yes' => __('Yes', 'newsletter-for-wp'),
+                    'no'  => __('No', 'newsletter-for-wp'),
+                ),
+            ),
+            'public'   => 1,
+        );
+
+        return (object) array('merge_fields' => $merge_vars);
     }
 
     private function fetch_interest_categories($list_id, &$args, $method, $resource) {
@@ -399,97 +441,308 @@ class NL4WP_API_v3_Client {
         return (object) array('interests' => []);
     }
 
+    /**
+     * Handle the collection endpoint used by Newsletter 4.9.x.
+     *
+     * Newsletter uses GET /members to discover the marketing permission
+     * definitions and POST /members to create a new subscriber. Voxmail has
+     * no equivalent marketing-permissions model, so the GET response is an
+     * empty member collection and the POST path creates the user directly.
+     */
+    private function handle_lists_members_collection_call($list_id, &$args, $method, $resource) {
+        $this->init($list_id);
+
+        if ($method === 'GET') {
+            $ret = (object) array('members' => array());
+            $fields = isset($args['fields']) ? $args['fields'] : '';
+            $fields = is_array($fields) ? implode(',', $fields) : (string) $fields;
+            if (strpos($fields, 'total_items') !== false) {
+                $ret->total_items = 0;
+            }
+            return $ret;
+        }
+
+        if ($method !== 'POST') {
+            throw new NL4WP_API_Exception( "Unsupported method " . $method . " for " . $resource, 004 );
+        }
+
+        $email = isset($args['email_address']) ? $args['email_address'] : '';
+        if ($email === '') {
+            throw new NL4WP_API_Exception( "Missing email address for " . $resource, 999, false, false, $args );
+        }
+
+        $data_to = $this->build_user_data($args, $email, true);
+        $status = isset($args['status']) ? $args['status'] : 'pending';
+        if ($status === 'pending') {
+            $servicemethod = 'service_user_subscribe';
+            $result = service_user_subscribe($data_to, !empty($args['ip_signup']) ? $args['ip_signup'] : false);
+        } elseif ($status === 'subscribed') {
+            $servicemethod = 'service_user_create';
+            $result = service_user_create($data_to);
+        } else {
+            throw new NL4WP_API_Exception( "Unsupported subscriber status " . $status, 999, false, false, $args );
+        }
+
+        $this->assert_service_result($method, $resource, $result, $servicemethod, $args);
+        return (object) (array('id' => $result) + $args);
+    }
+
+    private function build_user_data($args, $emailtocheck = '', $include_tags = true, $include_removed_interests = false) {
+        $email = !empty($args['email_address']) ? $args['email_address'] : $emailtocheck;
+        $data_to = array(
+            'mail' => $email,
+            'privacy' => 1, // Voxmail has one general privacy flag, not Newsletter marketing permissions.
+        );
+
+        $merge_fields = !empty($args['merge_fields']) ? (array) $args['merge_fields'] : array();
+        foreach ($merge_fields as $key => $value) {
+            if (strtoupper((string) $key) === self::TRACK_ENABLE_TAG) {
+                $tracking_enabled = $this->normalize_tracking_enable($value);
+                if ($tracking_enabled !== null) {
+                    $data_to['track_disable'] = !$tracking_enabled;
+                }
+                continue;
+            }
+
+            switch ($key) {
+                case 'FNAME':
+                    $data_to['profile_name'] = $value;
+                    break;
+                case 'LNAME':
+                    $data_to['profile_surname'] = $value;
+                    break;
+                default:
+                    if (is_array($value)) {
+                        $value = 1;
+                    }
+                    $data_to[strtolower($key)] = $value;
+                    break;
+            }
+        }
+
+        $audiences = array();
+        $interests = !empty($args['interests']) ? (array) $args['interests'] : array();
+        foreach ($interests as $key => $value) {
+            if ($value) {
+                $audiences[] = (string) $key;
+            } elseif ($include_removed_interests) {
+                if (!isset($data_to['-audiences'])) {
+                    $data_to['-audiences'] = array();
+                }
+                $data_to['-audiences'][] = (string) $key;
+            }
+        }
+
+        // There is no separate Voxmail tag model in this adapter. Preserve the
+        // existing project behaviour by representing active tags as audiences.
+        if ($include_tags && !empty($args['tags'])) {
+            foreach ((array) $args['tags'] as $value) {
+                if (is_array($value)) {
+                    $value = isset($value['name']) ? $value['name'] : '';
+                }
+                if ($value) {
+                    $audiences[] = (string) $value;
+                }
+            }
+        }
+
+        if (!empty($audiences)) {
+            $data_to['audiences'] = implode(',', array_unique($audiences));
+        }
+        if (!empty($data_to['-audiences'])) {
+            $data_to['-audiences'] = implode(',', array_unique($data_to['-audiences']));
+        }
+
+        // marketing_permissions is intentionally ignored: Voxmail has no
+        // equivalent per-contact permission model.
+        return $data_to;
+    }
+
+    /**
+     * Normalize the synthetic TRACK_ENABLE merge field.
+     *
+     * Keep the result nullable: an omitted or unknown value must not change
+     * an existing Voxmail subscriber, and an omitted value lets Voxmail apply
+     * its default (tracking enabled).
+     *
+     * @param mixed $value
+     * @return bool|null
+     */
+    private function normalize_tracking_enable($value) {
+        if (is_array($value)) {
+            $value = reset($value);
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        $value = strtolower(trim((string) $value));
+        if (in_array($value, array('yes', 'si', 'sì', 'true', 'enabled', 'enable', 'on', '1'), true)) {
+            return true;
+        }
+        if (in_array($value, array('no', 'false', 'disabled', 'disable', 'off', '0'), true)) {
+            return false;
+        }
+
+        return null;
+    }
+
+    private function assert_service_result($method, $resource, &$result, $servicemethod, array $args) {
+        $this->optionallyRaiseException($method, $resource, $result, $servicemethod, $args);
+        if ($result === false) {
+            throw new NL4WP_API_Exception( 'Unexpected status in '.$method.' '.$resource.': '.service_errormessage(), service_errorcode(), false, false, $args );
+        }
+    }
+
     private function handle_lists_members_call($list_id, $emailtocheck, &$args, $method, $resource) {
         $this->get_log()->debug( sprintf( "%s %s %s", $method, $emailtocheck, print_r($args, true) ) );
         $this->init($list_id); // inizializzazione API service
 
         $ip = !empty($args['ip_signup']) ? $args['ip_signup'] : false;
-        switch ($method) {
+        $status = isset($args['status']) ? $args['status'] : 'subscribed';
 
+        switch ($method) {
             case 'GET':
                 $result = service_user_load($emailtocheck);
                 $this->optionallyRaiseException($method, $resource, $result, 'service_user_load', $args);
 
-                //check esistenza
                 if (is_array($result)) {
-                    // gestione gruppi
-                    $interests=explode(',', $result['audiences']);
+                    $interests = !empty($result['audiences']) ? explode(',', $result['audiences']) : array();
                     $inter = (object) array();
-                    foreach ($interests as $value) if (!empty($value)) $inter->{$value} = 1;
-                    $ret = (object) array(
-                        'id' => $result['uid'], 
-                        'email_address' => $result['mail'], 
-                        'unique_email_id' => $result['uid'], 
-                        'status' => $result['mail_disable'] == 0 ? 'subscribed' : '',
-                        'interests' => $inter
+                    foreach ($interests as $value) {
+                        if (!empty($value)) {
+                            $inter->{$value} = 1;
+                        }
+                    }
+                    return (object) array(
+                        'id' => $result['uid'],
+                        'email_address' => $result['mail'],
+                        'unique_email_id' => $result['uid'],
+                        'status' => isset($result['mail_disable']) && $result['mail_disable'] == 0 ? 'subscribed' : '',
+                        'interests' => $inter,
                     );
-                    return $ret;
-                } else throw new NL4WP_API_Exception( 'Unexpected status in '.$method.' '.$resource.': '.service_errormessage(), service_errorcode(), false, false, $args );
-            break;
+                }
+                throw new NL4WP_API_Exception( 'Unexpected status in '.$method.' '.$resource.': '.service_errormessage(), service_errorcode(), false, false, $args );
 
             case 'PUT':
-                $data_to = array('mail' => $args['email_address']);
-                foreach($args['merge_fields'] as $key => $value) switch ($key) {
-                    case 'FNAME': $data_to['profile_name'] = $value; break;
-                    case 'LNAME': $data_to['profile_surname'] = $value; break;
-                    default:
-                        if (is_array($value)) $value = 1;
-                        $data_to[strtolower($key)] = $value;
-                    break;
-                }
-                foreach ($args['interests'] as $key => $value) if ($value)
-                    $data_to['audiences'] = $key . (!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
-
-                if (!empty($args['tags'])) foreach ($args['tags'] as $value) if ($value)
-                    $data_to['audiences'] = $value.(!empty($data_to['audiences']) ? ','.$data_to['audiences'] : '');
-                               
-                $data_to['privacy'] = 1; // forzatura Privacy
-                $method = 'user.subscribe';
-                if ($args['status'] == 'pending') { //GESTIONE DOUBLE OPTIN!!
-                    $this->get_log()->debug( sprintf( "CALL service_user_subscribe %s %s", print_r($data_to, true), $ip ) );
+                // Kept for callers using the pre-4.9.13 upsert path.
+                $data_to = $this->build_user_data($args, $emailtocheck, true, true);
+                if ($status === 'pending') {
+                    $servicemethod = 'service_user_subscribe';
                     $result = service_user_subscribe($data_to, $ip);
-                } else {
-                    $this->get_log()->debug( sprintf( "CALL service_user_create %s", print_r($data_to, true) ) );
+                } elseif ($status === 'subscribed') {
+                    $servicemethod = 'service_user_create';
                     $result = service_user_create($data_to);
-                    $method = 'user.create';
+                } else {
+                    throw new NL4WP_API_Exception( "Unsupported subscriber status " . $status, 999, false, false, $args );
                 }
-                
-                if (!$result) {
-                    if ($args['status'] == 'subscribed') { //se arriva qui, vuol dire che l'utente è da aggiornare
-                        // gestione degli interessi da togliere
-                        foreach ($args['interests'] as $key => $value) if (!$value)
-                            $data_to['-audiences']=$key.','.$data_to['-audiences'];
 
-                        $this->get_log()->debug( sprintf( "CALL service_user_update %s %s", $data_to["mail"], print_r($data_to, true) ) );
-                        $result = service_user_update($data_to["mail"],$data_to);
-                        $this->optionallyRaiseException($method, $resource, $result, 'service_user_update', $args);
-
-                    } else throw new NL4WP_API_Exception( 'Unexpected status in '.$method.' '.$resource.': '.service_errormessage(), service_errorcode(), false, false, $args );
+                $this->optionallyRaiseException($method, $resource, $result, $servicemethod, $args);
+                if ($result === false && $status === 'subscribed') {
+                    $result = service_user_update($data_to['mail'], $data_to);
+                    $this->assert_service_result($method, $resource, $result, 'service_user_update', $args);
+                } else {
+                    $this->assert_service_result($method, $resource, $result, $servicemethod, $args);
                 }
-                $ret = array('id' => $result) + $args;
-                return (object) $ret;
-            break;
+                return (object) (array('id' => $result) + $args);
 
             case 'PATCH':
-                if ($args['status'] == 'unsubscribed') { //al momento viene usato solo per la disicrizione
-                    $this->get_log()->debug( sprintf( "CALL service_user_unsubscribe %s %s", $emailtocheck, $ip ) );
+                if ($status === 'unsubscribed') {
                     $result = service_user_unsubscribe($emailtocheck, $ip);
-                    $this->optionallyRaiseException($method, $resource, $result, 'service_user_unsubscribe', $args);
-
-                    $ret = array('id' => $result) + $args;
-                    return (object) $ret;
+                    $this->assert_service_result($method, $resource, $result, 'service_user_unsubscribe', $args);
+                    return (object) (array('id' => $result) + $args);
                 }
-            break;
 
-            /*
-                case 'DELETE'  per la cancellazione ( vedi delete_list_member )
-                NL4WP_API_Resource_Not_Found_Exception  se non esiste
-                NL4WP_API_Exception   se non riesce
-                si aspetta un void, quindi non importa che ritorno nulla.
-            */
+                $data_to = $this->build_user_data($args, $emailtocheck, false, true);
+                if ($status === 'pending') {
+                    $result = service_user_subscribe($data_to, $ip);
+                    $servicemethod = 'service_user_subscribe';
+                } else {
+                    $result = service_user_update($emailtocheck, $data_to);
+                    $servicemethod = 'service_user_update';
+                }
+                $this->assert_service_result($method, $resource, $result, $servicemethod, $args);
+                return (object) (array('id' => $result) + $args);
+
+            case 'DELETE':
+                return $this->handle_lists_members_delete_call($list_id, $emailtocheck, $args, $method, $resource);
         }
 
         throw new NL4WP_API_Exception( "Unsupported method " . $method . " for " . $resource, 004 );
+    }
+
+    private function handle_lists_members_delete_call($list_id, $emailtocheck, &$args, $method, $resource) {
+        $this->init($list_id);
+
+        try {
+            $result = service_user_unsubscribe($emailtocheck, !empty($args['ip_signup']) ? $args['ip_signup'] : false);
+            $this->assert_service_result($method, $resource, $result, 'service_user_unsubscribe', $args);
+        } catch (NL4WP_API_Resource_Not_Found_Exception $e) {
+            // The requested contact is already gone; DELETE is idempotent.
+            return (object) array('id' => 0);
+        }
+
+        $result = service_user_erase($emailtocheck);
+        $this->assert_service_result($method, $resource, $result, 'service_user_erase', $args);
+        return (object) array('id' => $result);
+    }
+
+    private function handle_lists_member_tags_call($list_id, $emailtocheck, &$args, $method, $resource) {
+        $this->init($list_id);
+
+        if ($method === 'GET') {
+            $result = service_user_load($emailtocheck);
+            $this->optionallyRaiseException($method, $resource, $result, 'service_user_load', $args);
+            $tags = array();
+            if (is_array($result) && !empty($result['audiences'])) {
+                foreach (explode(',', $result['audiences']) as $tag) {
+                    if ($tag !== '') {
+                        $tags[] = (object) array('id' => $tag, 'name' => $tag);
+                    }
+                }
+            }
+            return (object) array('tags' => $tags, 'total_items' => count($tags));
+        }
+
+        if ($method !== 'POST') {
+            throw new NL4WP_API_Exception( "Unsupported method " . $method . " for " . $resource, 004 );
+        }
+
+        $add = array();
+        $remove = array();
+        foreach (!empty($args['tags']) ? (array) $args['tags'] : array() as $tag) {
+            if (is_array($tag)) {
+                $name = isset($tag['name']) ? $tag['name'] : '';
+                $status = isset($tag['status']) ? $tag['status'] : 'active';
+            } else {
+                $name = $tag;
+                $status = 'active';
+            }
+            if ($name === '') {
+                continue;
+            }
+            if ($status === 'inactive') {
+                $remove[] = $name;
+            } else {
+                $add[] = $name;
+            }
+        }
+
+        $data_to = array();
+        if (!empty($add)) {
+            $data_to['audiences'] = implode(',', array_unique($add));
+        }
+        if (!empty($remove)) {
+            $data_to['-audiences'] = implode(',', array_unique($remove));
+        }
+        if (empty($data_to)) {
+            return (object) array('tags' => array());
+        }
+
+        $result = service_user_update($emailtocheck, $data_to);
+        $this->assert_service_result($method, $resource, $result, 'service_user_update', $args);
+        return (object) array('tags' => !empty($args['tags']) ? $args['tags'] : array());
     }
 
     /**

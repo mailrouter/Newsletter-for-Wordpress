@@ -7,37 +7,35 @@
  */
 class NL4WP_Field_Formatter
 {
-
     /**
      * @param mixed $value
-     * @param string $format
+     * @param object $options
      * @return array
      */
-    public function address($value, $format = null)
+    public function address($value, $options = null)
     {
         // auto-format if this is a string
         if (is_string($value)) {
-
             // addr1, addr2, city, state, zip, country
             $address_pieces = explode(',', $value);
             $address_pieces = array_filter($address_pieces);
             $address_pieces = array_values($address_pieces);
 
             // try to fill it.... this is a long shot
-            $value = array(
+            $value = [
                 'addr1' => $address_pieces[0],
                 'city'  => isset($address_pieces[1]) ? $address_pieces[1] : '',
                 'state' => isset($address_pieces[2]) ? $address_pieces[2] : '',
                 'zip'   => isset($address_pieces[3]) ? $address_pieces[3] : '',
-            );
+            ];
 
             if (! empty($address_pieces[4])) {
                 $value['country'] = $address_pieces[4];
             }
         } elseif (is_array($value)) {
             // merge with array of empty defaults to allow skipping certain fields
-            $default = array_fill_keys(array( 'addr1', 'city', 'state', 'zip' ), '');
-            $value = array_merge($default, $value);
+            $default = array_fill_keys([ 'addr1', 'city', 'state', 'zip' ], '');
+            $value   = array_merge($default, $value);
         }
 
         return $value;
@@ -45,11 +43,13 @@ class NL4WP_Field_Formatter
 
     /**
      * @param mixed $value
-     * @param string $format
+     * @param object $options
      * @return string
      */
-    public function birthday($value, $format = 'MM/DD')
+    public function birthday($value, $options = null)
     {
+        $format = is_object($options) && isset($options->date_format) ? $options->date_format : 'MM/DD';
+
         if (is_array($value)) {
             // allow for "day" and "month" fields
             if (isset($value['month']) && isset($value['day'])) {
@@ -66,30 +66,29 @@ class NL4WP_Field_Formatter
         }
 
         // always use slashes as delimiter, so next part works
-        $value = str_replace(array( '.', '-' ), '/', $value);
+        $value = str_replace([ '.', '-' ], '/', $value);
 
         // if format = DD/MM  OR if first part is definitely a day value (>12), then flip order
         // this allows `strtotime` to understand `dd/mm` values
         $values = explode('/', $value);
-        if ($format === 'DD/MM' || ($values[0] > 12 && $values[0] <= 31 && isset($values[1]) && $values[1] <= 12)) {
+        if ($format === 'DD/MM' || ( $values[0] > 12 && $values[0] <= 31 && isset($values[1]) && $values[1] <= 12 )) {
             $values = array_reverse($values);
-            $value = join('/', $values);
+            $value  = join('/', $values);
         }
 
         // Newsletter expects a MM/DD format, regardless of their display preference
-        $value = (string) date('m/d', strtotime($value));
+        $value = (string) gmdate('m/d', strtotime($value));
         return $value;
     }
 
     /**
      * @param mixed $value
-     * @param string $format
+     * @param object $options
      * @return string
      */
-    public function date($value, $format = 'Y-m-d')
+    public function date($value, $options = null)
     {
         if (is_array($value)) {
-
             // allow for "year", "month" and "day" keys
             if (isset($value['year']) && isset($value['month']) && isset($value['day'])) {
                 $value = $value['year'] . '/' . $value['month'] . '/' . $value['day'];
@@ -104,23 +103,24 @@ class NL4WP_Field_Formatter
             return $value;
         }
 
-        return (string) date('Y-m-d', strtotime($value));
+        // Newsletter expects a Y-m-d format no matter the display preference
+        return (string) gmdate('Y-m-d', strtotime($value));
     }
 
     /**
      * @param string $value
-     * @param string $format
+     * @param object $options
      * @return string
      */
-    public function language($value, $format = null)
+    public function language($value, $options = null)
     {
         $value = trim($value);
 
-        $exceptions = array(
+        $exceptions = [
             'pt_PT',
             'es_ES',
             'fr_CA',
-        );
+        ];
 
         if (! in_array($value, $exceptions, true)) {
             $value = substr($value, 0, 2);
@@ -131,12 +131,12 @@ class NL4WP_Field_Formatter
 
     /**
      * @param mixed $value
-     * @param string $format
+     * @param object $options
      * @return bool
      */
-    public function boolean($value, $format = null)
+    public function boolean($value, $options = null)
     {
-        $falsey = array( 'false', '0' );
+        $falsey = [ 'false', '0' ];
 
         if (in_array($value, $falsey, true)) {
             return false;

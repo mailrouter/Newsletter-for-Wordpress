@@ -1,8 +1,10 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+
 class NL4WP_Admin_Ajax
 {
-
     /**
      * @var NL4WP_Admin_Tools
      */
@@ -20,23 +22,50 @@ class NL4WP_Admin_Ajax
 
     /**
      * Hook AJAX actions
+     *
+     * @return void
      */
     public function add_hooks()
     {
-        add_action('wp_ajax_nl4wp_renew_newsletter_lists', array( $this, 'refresh_newsletter_lists' ));
+        add_action('wp_ajax_nl4wp_get_list_details', [ $this, 'get_list_details' ]);
     }
 
+
     /**
-     * Empty lists cache & fetch lists again.
+     * Retrieve details (merge fields and interest categories) for one or multiple lists in Newsletter
+     *
+     * @throws NL4WP_API_Exception
      */
-    public function refresh_newsletter_lists()
+    public function get_list_details()
     {
-        if (! $this->tools->is_user_authorized()) {
-            wp_send_json(false);
+        check_ajax_referer('nl4wp-ajax');
+
+        if (! $this->tools->is_user_authorized() || empty($_GET['ids'])) {
+            wp_send_json_error();
         }
 
+        $list_ids  = array_map(function ($raw) {
+            return preg_replace('/[^a-z0-9]/', '', $raw);
+        }, (array) explode(',', wp_unslash($_GET['ids'])));
+        $data      = [];
         $newsletter = new NL4WP_Newsletter();
-        $success = $newsletter->fetch_lists();
-        wp_send_json($success);
+        foreach ($list_ids as $list_id) {
+            $data[] = (object) [
+                'id'                  => $list_id,
+                'merge_fields'        => $newsletter->get_list_merge_fields($list_id),
+                'interest_categories' => $newsletter->get_list_interest_categories($list_id),
+                'marketing_permissions' => $newsletter->get_list_marketing_permissions($list_id),
+            ];
+        }
+
+        if (isset($_GET['format']) && $_GET['format'] === 'html') {
+            $merge_fields          = $data[0]->merge_fields;
+            $interest_categories   = $data[0]->interest_categories;
+            $marketing_permissions = $data[0]->marketing_permissions;
+            require NL4WP_PLUGIN_DIR . '/includes/views/parts/lists-overview-details.php';
+        } else {
+            wp_send_json($data);
+        }
+        exit;
     }
 }

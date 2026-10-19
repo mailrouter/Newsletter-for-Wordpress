@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_WPForms_Integration
@@ -9,16 +9,15 @@ defined('ABSPATH') or exit;
  */
 class NL4WP_WPForms_Integration extends NL4WP_Integration
 {
+    /**
+     * @var string
+     */
+    public $name = 'WPForms';
 
     /**
      * @var string
      */
-    public $name = "WPForms";
-
-    /**
-     * @var string
-     */
-    public $description = "Subscribe visitors from your WPForms forms.";
+    public $description = 'Subscribe visitors from your WPForms forms.';
 
 
     /**
@@ -26,7 +25,7 @@ class NL4WP_WPForms_Integration extends NL4WP_Integration
      */
     public function add_hooks()
     {
-        add_action('wpforms_process', array( $this, 'listen_to_wpforms' ), 20, 3);
+        add_action('wpforms_process', [$this, 'listen_to_wpforms'], 20, 3);
     }
 
     /**
@@ -43,13 +42,13 @@ class NL4WP_WPForms_Integration extends NL4WP_Integration
      */
     public function get_ui_elements()
     {
-        return array();
+        return [];
     }
 
     public function listen_to_wpforms($fields, $entry, $form_data)
     {
         foreach ($fields as $field_id => $field) {
-            if ($field['type'] === 'newsletter' && $field['value_raw'] == 1) {
+            if ($field['type'] === 'newsletter' && (int) $field['value_raw'] === 1) {
                 return $this->subscribe_from_wpforms($field_id, $fields, $form_data);
             }
         }
@@ -63,12 +62,23 @@ class NL4WP_WPForms_Integration extends NL4WP_Integration
             }
         }
 
-        $newsletter_list_id = $form_data['fields'][$checkbox_field_id]['newsletter_list'];
-        $this->options['lists'] = array( $newsletter_list_id );
+        $field_config      = $form_data['fields'][$checkbox_field_id];
+        $newsletter_list_id = $field_config['newsletter_list'];
+        $double_optin      = isset($field_config['newsletter_double_optin']) ? $field_config['newsletter_double_optin'] : $this->options['double_optin'];
 
+        // Override integration settings with per-field options
+        $orig_options                  = $this->options;
+        $this->options['lists']        = [$newsletter_list_id];
+        $this->options['double_optin'] = $double_optin;
+
+        $result = false;
         if (! empty($email_address)) {
-            return $this->subscribe(array( 'EMAIL' => $email_address ), $form_data['id']);
+            $result = $this->subscribe(['EMAIL' => $email_address], $form_data['id']);
         }
+
+        // Restore original options to avoid side effects
+        $this->options = $orig_options;
+        return $result;
     }
 
     /**

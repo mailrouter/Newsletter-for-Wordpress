@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 if (function_exists('nl4wp_refresh_newsletter_lists')) {
     nl4wp_refresh_newsletter_lists();

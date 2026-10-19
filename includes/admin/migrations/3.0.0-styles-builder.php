@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 // move stylebuilders file to bundle
 $file = (string) get_option('nl4wp_custom_css_file', '');
@@ -11,12 +11,12 @@ if (empty($file)) {
 $uploads = wp_upload_dir();
 
 // figure out absolute file path
-$prefix = str_replace('http:', '', $uploads['baseurl']);
+$prefix        = str_replace('http:', '', $uploads['baseurl']);
 $relative_path = str_replace($prefix, '', $file);
 
 // get part before ?
 if (strpos($relative_path, '?') !== false) {
-    $parts = explode('?', $relative_path);
+    $parts         = explode('?', $relative_path);
     $relative_path = array_shift($parts);
 }
 
@@ -24,18 +24,17 @@ if (strpos($relative_path, '?') !== false) {
 $file = $uploads['basedir'] . $relative_path;
 
 if (file_exists($file)) {
-
     // create directory, if necessary
     $dir = $uploads['basedir'] . '/nl4wp-stylesheets';
     if (! file_exists($dir)) {
-        @mkdir($dir, 0755);
+        wp_mkdir_p($dir);
     }
 
-    @chmod($dir, 0755);
+    @chmod($dir, 0755); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod
 
     // Move file to new location
     $new_file = $dir . '/bundle.css';
-    $success = rename($file, $new_file);
+    $success  = rename($file, $new_file); // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename
 }
 
 // remove old option

@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Adds NL4WP_Widget widget.
@@ -9,14 +9,13 @@ defined('ABSPATH') or exit;
  */
 class NL4WP_Form_Widget extends WP_Widget
 {
-
     /**
      * @var array
      */
-    private $default_instance_settings = array(
-        'title' => '',
-        'form_id' => ''
-    );
+    private $default_instance_settings = [
+        'title'   => '',
+        'form_id' => '',
+    ];
 
     /**
      * Register widget with WordPress.
@@ -30,9 +29,9 @@ class NL4WP_Form_Widget extends WP_Widget
         parent::__construct(
             'nl4wp_form_widget', // Base ID
             __('Newsletter Sign-Up Form', 'newsletter-for-wp'), // Name
-            array(
+            [
                 'description' => __('Displays your Newsletter for WordPress sign-up form', 'newsletter-for-wp'),
-            )
+            ]
         );
     }
 
@@ -49,20 +48,23 @@ class NL4WP_Form_Widget extends WP_Widget
 
         // ensure $instance_settings is an array
         if (! is_array($instance_settings)) {
-            $instance_settings = array();
+            $instance_settings = [];
         }
 
         $instance_settings = array_merge($this->default_instance_settings, $instance_settings);
-        $title = apply_filters('widget_title', $instance_settings['title']);
+        $title             = apply_filters('widget_title', $instance_settings['title'], $instance_settings, $this->id_base);
 
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core/theme widget wrappers are trusted HTML.
         echo $args['before_widget'];
 
         if (! empty($title)) {
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Widget title and wrappers intentionally allow filtered markup.
             echo $args['before_title'] . $title . $args['after_title'];
         }
 
         nl4wp_show_form($instance_settings['form_id']);
 
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core/theme widget wrappers are trusted HTML.
         echo $args['after_widget'];
     }
 
@@ -79,25 +81,36 @@ class NL4WP_Form_Widget extends WP_Widget
     {
         $settings = array_merge($this->default_instance_settings, (array) $settings); ?>
         <p>
-			<label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:', 'newsletter-for-wp'); ?></label>
-			<input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($settings['title']); ?>" />
+            <label for="<?php echo esc_attr($this->get_field_id('title')); ?>"><?php esc_html_e('Title:', 'newsletter-for-wp'); ?></label>
+            <input class="widefat" id="<?php echo esc_attr($this->get_field_id('title')); ?>" name="<?php echo esc_attr($this->get_field_name('title')); ?>" type="text" value="<?php echo esc_attr($settings['title']); ?>" />
         </p>
 
 
-		<?php
+        <?php
+        $widget = $this;
         /**
          * Runs right after the widget settings form is outputted
          *
          * @param array $settings
-         * @param NL4WP_Form_Widget $this
+         * @param NL4WP_Form_Widget $widget
          * @ignore
          */
-        do_action('nl4wp_form_widget_form', $settings, $this); ?>
+        do_action('nl4wp_form_widget_form', $settings, $widget);
+        ?>
 
-        <p class="help">
-			<?php printf(__('You can edit your sign-up form in the <a href="%s">Newsletter for WordPress form settings</a>.', 'newsletter-for-wp'), admin_url('admin.php?page=newsletter-for-wp-forms')); ?>
+        <p class="description">
+            <?php
+            echo wp_kses(
+                sprintf(
+                    // translators: %s is the URL to the plugin form settings page.
+                    __('You can edit your sign-up form in the <a href="%s">Newsletter for WordPress form settings</a>.', 'newsletter-for-wp'),
+                    esc_url(admin_url('admin.php?page=newsletter-for-wp-forms'))
+                ),
+                [ 'a' => [ 'href' => [] ] ]
+            );
+            ?>
         </p>
-		<?php
+        <?php
     }
 
     /**
@@ -128,4 +141,4 @@ class NL4WP_Form_Widget extends WP_Widget
 
         return $new_settings;
     }
-} // class NL4WP_Widget
+}

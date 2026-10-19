@@ -1,22 +1,10 @@
 <?php
 
-/**
- * Checkbox field.
- *
- * @package    WPForms
- * @author     WPForms
- * @since      1.0.0
- * @license    GPL-2.0+
- * @copyright  Copyright (c) 2016, WPForms LLC
- */
+defined('ABSPATH') || exit;
+
+
 class NL4WP_WPForms_Field extends WPForms_Field
 {
-
-    /**
-     * @var NL4WP_Newsletter
-     */
-    private $newsletter;
-
     /**
      * Primary class constructor.
      *
@@ -24,19 +12,24 @@ class NL4WP_WPForms_Field extends WPForms_Field
      */
     public function init()
     {
-
-        // Define field type information
-        $this->name = 'Newsletter';
-        $this->type = 'newsletter';
-        $this->icon = 'fa-envelope-o';
-        $this->order = 21;
-        $this->defaults = array(
-            0 => array(
-                'label' => __('Sign-up to our newsletter?', 'newsletter-for-wp'),
-                'value' => '1',
+        $this->name     = 'Newsletter';
+        $this->type     = 'newsletter';
+        $this->icon     = 'fa-envelope-o';
+        $this->order    = 500;
+        $this->defaults = [
+            [
+                'label'   => 'Sign-up to our newsletter?',
+                'value'   => '1',
                 'default' => '',
-            )
-        );
+            ],
+        ];
+
+        add_action('init', [$this, 'translate_label']);
+    }
+
+    public function translate_label(): void
+    {
+        $this->defaults[0]['label'] = __('Sign-up to our newsletter?', 'newsletter-for-wp');
     }
 
     /**
@@ -53,10 +46,13 @@ class NL4WP_WPForms_Field extends WPForms_Field
         //--------------------------------------------------------------------//
 
         // Options open markup
-        $this->field_option('basic-options', $field, array('markup' => 'open'));
+        $this->field_option('basic-options', $field, ['markup' => 'open']);
 
         // Newsletter list
         $this->field_option_newsletter_list($field);
+
+        // Double opt-in
+        $this->field_option_double_optin($field);
 
         // Choices
         $this->field_option_choices($field);
@@ -68,20 +64,20 @@ class NL4WP_WPForms_Field extends WPForms_Field
         $this->field_option('required', $field);
 
         // Options close markup
-        $this->field_option('basic-options', $field, array('markup' => 'close'));
+        $this->field_option('basic-options', $field, ['markup' => 'close']);
 
         //--------------------------------------------------------------------//
         // Advanced field options
         //--------------------------------------------------------------------//
 
         // Options open markup
-        $this->field_option('advanced-options', $field, array('markup' => 'open'));
+        $this->field_option('advanced-options', $field, ['markup' => 'open']);
 
         // Custom CSS classes
         $this->field_option('css', $field);
 
         // Options close markup
-        $this->field_option('advanced-options', $field, array('markup' => 'close'));
+        $this->field_option('advanced-options', $field, ['markup' => 'close']);
     }
 
     private function field_option_newsletter_list($field)
@@ -89,60 +85,96 @@ class NL4WP_WPForms_Field extends WPForms_Field
         $newsletter = new NL4WP_Newsletter();
 
         // Field option label
-        $tooltip = __('Select the Newsletter list to subscribe to.', 'newsletter-for-wp');
+        $tooltip      = __('Select the Newsletter list to subscribe to.', 'newsletter-for-wp');
         $option_label = $this->field_element(
             'label',
             $field,
-            array(
-                'slug' => 'newsletter-list',
-                'value' => __('Newsletter list', 'newsletter-for-wp'),
+            [
+                'slug'    => 'newsletter-list',
+                'value'   => __('Newsletter list', 'newsletter-for-wp'),
                 'tooltip' => $tooltip,
-            ),
+            ],
             false
         );
 
         $option_select = sprintf('<select name="fields[%s][newsletter_list]" data-field-id="%d" data-field-type="%s">', $field['id'], $field['id'], $this->type);
-        $lists = $newsletter->get_cached_lists();
+        $lists         = $newsletter->get_lists();
         foreach ($lists as $list) {
             $option_select .= sprintf('<option value="%s" %s>%s</option>', $list->id, selected($list->id, $field['newsletter_list'], false), $list->name);
         }
         $option_select .= '</select>';
 
-
         // Field option row (markup) including label and input.
-        $output = $this->field_element(
+        $this->field_element(
             'row',
             $field,
-            array(
-                'slug' => 'newsletter-list',
+            [
+                'slug'    => 'newsletter-list',
                 'content' => $option_label . $option_select,
-            )
+            ]
+        );
+    }
+
+    /**
+     * Renders the "Double opt-in?" select field option in the form builder.
+     *
+     * @since 4.9
+     * @param array $field Field data.
+     */
+    private function field_option_double_optin($field)
+    {
+        $tooltip      = __('Select "yes" if you want people to confirm their email address before being subscribed (recommended).', 'newsletter-for-wp');
+        $option_label = $this->field_element(
+            'label',
+            $field,
+            [
+                'slug'    => 'newsletter-double-optin',
+                'value'   => __('Double opt-in?', 'newsletter-for-wp'),
+                'tooltip' => $tooltip,
+            ],
+            false
+        );
+
+        $current_value  = isset($field['newsletter_double_optin']) ? $field['newsletter_double_optin'] : '1';
+        $option_select  = sprintf('<select name="fields[%s][newsletter_double_optin]" data-field-id="%d" data-field-type="%s">', $field['id'], $field['id'], $this->type);
+        $option_select .= sprintf('<option value="1" %s>%s</option>', selected('1', $current_value, false), __('Yes', 'newsletter-for-wp'));
+        $option_select .= sprintf('<option value="0" %s>%s</option>', selected('0', $current_value, false), __('No', 'newsletter-for-wp'));
+        $option_select .= '</select>';
+
+        // Field option row (markup) including label and input.
+        $this->field_element(
+            'row',
+            $field,
+            [
+                'slug'    => 'newsletter-double-optin',
+                'content' => $option_label . $option_select,
+            ]
         );
     }
 
     private function field_option_choices($field)
     {
         $tooltip = __('Set your sign-up label text and whether it should be pre-checked.', 'newsletter-for-wp');
-        $values = !empty($field['choices']) ? $field['choices'] : $this->defaults;
-        $class = !empty($field['show_values']) && $field['show_values'] == '1' ? 'show-values' : '';
-        $class .= !empty($dynamic) ? ' wpforms-hidden' : '';
+        $values  = ! empty($field['choices']) ? $field['choices'] : $this->defaults;
+        $class   = ! empty($field['show_values']) && (int) $field['show_values'] === 1 ? 'show-values' : '';
+        $class  .= ! empty($dynamic) ? ' wpforms-hidden' : '';
 
         // Field option label
         $option_label = $this->field_element(
             'label',
             $field,
-            array(
-                'slug' => 'newsletter-checkbox',
-                'value' => __('Sign-up checkbox', 'newsletter-for-wp'),
+            [
+                'slug'    => 'newsletter-checkbox',
+                'value'   => __('Sign-up checkbox', 'newsletter-for-wp'),
                 'tooltip' => $tooltip,
-            ),
+            ],
             false
         );
 
         // Field option choices inputs
         $option_choices = sprintf('<ul class="choices-list %s" data-field-id="%d" data-field-type="%s">', $class, $field['id'], $this->type);
         foreach ($values as $key => $value) {
-            $default = !empty($value['default']) ? $value['default'] : '';
+            $default         = ! empty($value['default']) ? $value['default'] : '';
             $option_choices .= sprintf('<li data-key="%d">', $key);
             $option_choices .= sprintf('<input type="checkbox" name="fields[%s][choices][%s][default]" class="default" value="1" %s>', $field['id'], $key, checked('1', $default, false));
             $option_choices .= sprintf('<input type="text" name="fields[%s][choices][%s][label]" value="%s" class="label">', $field['id'], $key, esc_attr($value['label']));
@@ -152,13 +184,13 @@ class NL4WP_WPForms_Field extends WPForms_Field
         $option_choices .= '</ul>';
 
         // Field option row (markup) including label and input.
-        $output = $this->field_element(
+        $this->field_element(
             'row',
             $field,
-            array(
-                'slug' => 'choices',
+            [
+                'slug'    => 'choices',
                 'content' => $option_label . $option_choices,
-            )
+            ]
         );
     }
 
@@ -170,22 +202,20 @@ class NL4WP_WPForms_Field extends WPForms_Field
      */
     public function field_preview($field)
     {
-        $values = !empty($field['choices']) ? $field['choices'] : $this->defaults;
+        $values = ! empty($field['choices']) ? $field['choices'] : $this->defaults;
 
         // Field checkbox elements
         echo '<ul class="primary-input">';
 
         // Notify if currently empty
         if (empty($values)) {
-            $values = array('label' => __('(empty)', 'wpforms'));
+            $values = ['label' => __('(empty)', 'newsletter-for-wp')];
         }
 
         // Individual checkbox options
         foreach ($values as $key => $value) {
             $default = isset($value['default']) ? $value['default'] : '';
-            $selected = checked('1', $default, false);
-
-            printf('<li><input type="checkbox" %s disabled>%s</li>', $selected, $value['label']);
+            printf('<li><input type="checkbox" %s disabled>%s</li>', checked('1', $default, false), esc_html($value['label']));
         }
 
         echo '</ul>';
@@ -193,7 +223,15 @@ class NL4WP_WPForms_Field extends WPForms_Field
         // Dynamic population is enabled and contains more than 20 items
         if (isset($total) && $total > 20) {
             echo '<div class="wpforms-alert-dynamic wpforms-alert wpforms-alert-warning">';
-            printf(__('Showing the first 20 choices.<br> All %d choices will be displayed when viewing the form.', 'wpforms'), absint($total));
+            // translators: %d is the total number of choices available.
+            echo wp_kses(
+                sprintf(
+                    /* translators: %d is the total number of choices available. */
+                    __('Showing the first 20 choices.<br> All %d choices will be displayed when viewing the form.', 'newsletter-for-wp'),
+                    absint($total)
+                ),
+                [ 'br' => [] ]
+            );
             echo '</div>';
         }
 
@@ -205,42 +243,50 @@ class NL4WP_WPForms_Field extends WPForms_Field
      * Field display on the form front-end.
      *
      * @since 1.0.0
-     * @param array $field
+     * @param null $field (deprecated)
      * @param array $form_data
      */
     public function field_display($field, $field_atts, $form_data)
     {
+        // Setup some defaults because WPForms broke their integration in v1.8.1.1
+        $field_atts = array_merge([
+            'input_class' => [],
+            'input_id' => [],
+        ], is_array($field_atts) ? $field_atts : []);
 
         // Setup and sanitize the necessary data
-        $field_required = !empty($field['required']) ? ' required' : '';
-        $field_class = implode(' ', array_map('sanitize_html_class', $field_atts['input_class']));
-        $field_id = implode(' ', array_map('sanitize_html_class', $field_atts['input_id']));
-        $form_id = $form_data['id'];
-        $choices = $field['choices'];
-
+        $field_required = ! empty($field['required']);
+        $field_class    = implode(' ', array_map('sanitize_html_class', (array) $field_atts['input_class']));
+        $field_id       = implode(' ', array_map('sanitize_html_class', (array) $field_atts['input_id']));
+        $form_id        = absint($form_data['id']);
+        $field_id_int   = absint($field['id']);
+        $choices        = (array) $field['choices'];
 
         // List
-        printf('<ul id="%s" class="%s">', $field_id, $field_class);
+        printf('<ul id="%s" class="%s">', esc_attr($field_id), esc_attr($field_class));
 
         foreach ($choices as $key => $choice) {
-            $selected = isset($choice['default']) ? '1' : '0';
-            $depth = isset($choice['depth']) ? absint($choice['depth']) : 1;
+            $selected        = isset($choice['default']) ? '1' : '0';
+            $depth           = isset($choice['depth']) ? absint($choice['depth']) : 1;
+            $key             = absint($key);
+            $list_item_class = sprintf('choice-%d depth-%d', $key, $depth);
 
-            printf('<li class="choice-%d depth-%d">', $key, $depth);
+            echo '<li class="', esc_attr($list_item_class), '">';
+
+            $input_id = sprintf('wpforms-%d-field_%d_%d', $form_id, $field_id_int, $key);
 
             // Checkbox elements
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- checked() and required flag return safe attribute fragments.
             printf(
-                '<input type="checkbox" id="wpforms-%d-field_%d_%d" name="wpforms[fields][%d]" value="%s" %s %s>',
-                $form_id,
-                $field['id'],
-                $key,
-                $field['id'],
+                '<input type="checkbox" id="%s" name="%s" value="%s" %s %s>',
+                esc_attr($input_id),
+                esc_attr(sprintf('wpforms[fields][%d]', $field_id_int)),
                 esc_attr($choice['value']),
                 checked('1', $selected, false),
-                $field_required
+                $field_required ? 'required' : ''
             );
 
-            printf('<label class="wpforms-field-label-inline" for="wpforms-%d-field_%d_%d">%s</label>', $form_id, $field['id'], $key, wp_kses_post($choice['label']));
+            printf('<label class="wpforms-field-label-inline" for="%s">%s</label>', esc_attr($input_id), esc_html($choice['label']));
 
             echo '</li>';
         }
@@ -258,17 +304,17 @@ class NL4WP_WPForms_Field extends WPForms_Field
      */
     public function format($field_id, $field_submit, $form_data)
     {
-        $field = $form_data['fields'][$field_id];
+        $field  = $form_data['fields'][$field_id];
         $choice = array_pop($field['choices']);
-        $name = sanitize_text_field($choice['label']);
+        $name   = sanitize_text_field($choice['label']);
 
-        $data = array(
-            'name' => $name,
-            'value' => empty($field_submit) ? __('No') : __('Yes'),
+        $data = [
+            'name'      => $name,
+            'value'     => empty($field_submit) ? __('No', 'newsletter-for-wp') : __('Yes', 'newsletter-for-wp'),
             'value_raw' => $field_submit,
-            'id' => absint($field_id),
-            'type' => $this->type,
-        );
+            'id'        => absint($field_id),
+            'type'      => $this->type,
+        ];
 
         wpforms()->process->fields[$field_id] = $data;
     }

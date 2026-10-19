@@ -1,12 +1,17 @@
 <?php
-return array(
-    'css' => 0,
-    'double_optin' => 1,
+
+defined('ABSPATH') || exit;
+
+return [
+    'css'                => 0,
+    'double_optin'       => 1,
     'hide_after_success' => 0,
-    'lists' => array(),
-    'redirect' => '',
-    'replace_interests' => 1,
-    'required_fields' => '',
-    'update_existing' => 0,
-    'subscriber_tags' => '',
-);
+    'lists'              => [],
+    'redirect'           => '',
+    'replace_interests'  => 1,
+    'required_fields'    => '',
+    'update_existing'    => 0,
+    'subscriber_tags'    => '',
+    'remove_subscriber_tags' => '',
+    'email_typo_check'   => 0,
+];

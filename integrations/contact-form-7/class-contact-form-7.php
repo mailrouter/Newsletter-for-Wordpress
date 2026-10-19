@@ -1,6 +1,6 @@
 <?php
 
-defined('ABSPATH') or exit;
+defined('ABSPATH') || exit;
 
 /**
  * Class NL4WP_Contact_Form_7_Integration
@@ -9,16 +9,15 @@ defined('ABSPATH') or exit;
  */
 class NL4WP_Contact_Form_7_Integration extends NL4WP_Integration
 {
+    /**
+     * @var string
+     */
+    public $name = 'Contact Form 7';
 
     /**
      * @var string
      */
-    public $name = "Contact Form 7";
-
-    /**
-     * @var string
-     */
-    public $description = "Subscribes people from Contact Form 7 forms.";
+    public $description = 'Subscribes people from Contact Form 7 forms.';
 
 
     /**
@@ -26,9 +25,9 @@ class NL4WP_Contact_Form_7_Integration extends NL4WP_Integration
      */
     public function add_hooks()
     {
-        add_action('wpcf7_init', array( $this, 'init'));
-        add_action('wpcf7_mail_sent', array( $this, 'process' ), 1);
-        add_action('wpcf7_posted_data', array( $this, 'alter_cf7_data'));
+        add_action('wpcf7_init', [ $this, 'init' ]);
+        add_action('wpcf7_mail_sent', [ $this, 'process' ], 1);
+        add_action('wpcf7_posted_data', [ $this, 'alter_cf7_data' ]);
     }
 
     /**
@@ -39,9 +38,9 @@ class NL4WP_Contact_Form_7_Integration extends NL4WP_Integration
     public function init()
     {
         if (function_exists('wpcf7_add_form_tag')) {
-            wpcf7_add_form_tag('nl4wp_checkbox', array( $this, 'shortcode' ));
+            wpcf7_add_form_tag('nl4wp_checkbox', [ $this, 'shortcode' ]);
         } else {
-            wpcf7_add_shortcode('nl4wp_checkbox', array( $this, 'shortcode' ));
+            wpcf7_add_shortcode('nl4wp_checkbox', [ $this, 'shortcode' ]);
         }
 
         return true;
@@ -61,9 +60,8 @@ class NL4WP_Contact_Form_7_Integration extends NL4WP_Integration
     {
         $data = $this->get_data();
 
-
-        return (isset($data[ $this->checkbox_name ]) && $data[ $this->checkbox_name ] == 1)
-            || (isset($data[ 'nl4wp-subscribe' ]) && $data[ 'nl4wp-subscribe' ] == 1);
+        return ( isset($data[ $this->checkbox_name ]) && (int) $data[ $this->checkbox_name ] === 1 )
+            || ( isset($data['nl4wp-subscribe']) && (int) $data['nl4wp-subscribe'] === 1 );
     }
 
     /**
@@ -74,9 +72,9 @@ class NL4WP_Contact_Form_7_Integration extends NL4WP_Integration
     * @param array $data
     * @return array
     */
-    public function alter_cf7_data($data = array())
+    public function alter_cf7_data($data = [])
     {
-        $data['nl4wp_checkbox'] = $this->checkbox_was_checked() ? __('Yes') : __('No');
+        $data['nl4wp_checkbox'] = $this->checkbox_was_checked() ? __('Yes', 'newsletter-for-wp') : __('No', 'newsletter-for-wp');
         return $data;
     }
 
@@ -97,7 +95,7 @@ class NL4WP_Contact_Form_7_Integration extends NL4WP_Integration
         }
 
         $parser = new NL4WP_Field_Guesser($this->get_data());
-        $data = $parser->combine(array( 'guessed', 'namespaced' ));
+        $data   = $parser->combine([ 'guessed', 'namespaced' ]);
 
         // do nothing if no email was found
         if (empty($data['EMAIL'])) {
@@ -113,18 +111,17 @@ class NL4WP_Contact_Form_7_Integration extends NL4WP_Integration
      *
      * @return string
      */
-    public function shortcode($args = array())
+    public function shortcode($args = [])
     {
         if (! empty($args['labels'][0])) {
             $this->options['label'] = $args['labels'][0];
         }
 
         if (isset($args['options'])) {
-
             // check for default:0 or default:1 to set the checked attribute
-            if (in_array('default:1', $args['options'])) {
+            if (in_array('default:1', $args['options'], true)) {
                 $this->options['precheck'] = true;
-            } elseif (in_array('default:0', $args['options'])) {
+            } elseif (in_array('default:0', $args['options'], true)) {
                 $this->options['precheck'] = false;
             }
         }
@@ -149,7 +146,7 @@ class NL4WP_Contact_Form_7_Integration extends NL4WP_Integration
      */
     public function get_ui_elements()
     {
-        return array_diff(parent::get_ui_elements(), array( 'enabled', 'implicit' ));
+        return array_diff(parent::get_ui_elements(), [ 'enabled', 'implicit' ]);
     }
 
     /**
