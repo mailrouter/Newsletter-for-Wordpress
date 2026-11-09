@@ -92,9 +92,6 @@ define('ENS_ERROR_INVALID_FROM', 502);
   }
 
   function service_invoke_auto($method, $service_api_key, $timestamp, $nonce, $hash, $args) {
-    if (!class_exists('xmlrpc_client') && !function_exists('xmlrpc_encode_request') && !function_exists('json_encode'))
-      @include_once('xmlrpc.inc');
-
     if (class_exists('xmlrpc_client') && function_exists('curl_version')) {
       $service_last_result = service_invoke_xmlinc($method, $service_api_key, $timestamp, $nonce, $hash, $args);
 
@@ -118,8 +115,14 @@ define('ENS_ERROR_INVALID_FROM', 502);
   function service_invoke_xmlinc($method, $service_api_key, $timestamp, $nonce, $hash, $args) {
     global $service_host;
 
-    if (!class_exists('xmlrpc_client'))
-      require_once('xmlrpc.inc');
+    // The obsolete bundled XML-RPC library has been removed. Explicit legacy
+    // transports may still use an externally supplied compatible implementation.
+    if (!class_exists('xmlrpc_client') || !function_exists('php_xmlrpc_encode')) {
+      return array(
+        'faultCode' => ENS_ERROR_UNSUPPORTED,
+        'faultString' => 'The bundled XML-RPC transport is no longer available. Remove the xmlinc suffix from the API key or use jsonwp.'
+      );
+    }
 
     $args = array_merge(array($service_api_key, $timestamp, $nonce, $hash), $args);
     // 'xmlrpc.inc' from phpxmlrpc sourceforge library version 4.0 does not support the runtime GLOBAL encoding switch.
@@ -253,7 +256,7 @@ define('ENS_ERROR_INVALID_FROM', 502);
     } else {
       $service_last_result = array(
         'faultCode' => ENS_ERROR_UNKNOWN,
-        'faultString' => 'No usable XMLRPC library found. Please set allow_url_fopen PHP ini directive to 1 (default) or download xmlrpc.inc from http://phpxmlrpc.sourceforge.net/'
+        'faultString' => 'No usable XMLRPC transport found. Use the jsonwp transport in WordPress.'
       );
     }
     return $service_last_result;

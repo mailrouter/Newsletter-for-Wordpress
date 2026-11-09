@@ -1,6 +1,14 @@
 Changelog
 =========
 
+#### 4.14.2 - Nov 9, 2026
+
+- Fix a caching issue affecting additional profile fields.
+- Fix personal data exports missing the names of subscribed lists.
+- Fix list pagination with multiple API keys, reject invalid list IDs, and limit configuration to ten API keys with an explicit error when exceeded.
+- Handle WordPress HTTP transport failures as API connection errors instead of PHP type errors, and support JSONWP calls without a frontend request object or the cURL extension.
+- Remove the obsolete bundled XML-RPC library and use the upstream service container.
+
 #### 4.14.1 - Sep 10, 2026
 
 - Require PHP 7.4 or newer and WordPress 5.3 or newer; the package is tested against the WordPress 7.0 series.

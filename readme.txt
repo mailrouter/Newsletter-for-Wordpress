@@ -3,9 +3,9 @@ Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, newsletter forms, newsletter integrations
 Requires at least: 5.3
 Tested up to: 7.1
-Stable tag: 4.14.1
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Stable tag: 4.14.2
+License: GPL-3.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
 
 Newsletter for WordPress, usa il tuo sito Wordpress per raccogliere iscritti per la tua Newsletter!
@@ -53,6 +53,11 @@ Newsletter for Worpress facilita l'implementazione della procedura di iscrizione
 2. Accedi al pannello di amministrazione di Wordpress, vai su "Plugin", clicca su "Aggiungi nuovo" e successivamente su "Carica Plugin". Seleziona il file dal tuo disco e caricalo nel sito.
 2. Attiva il plugin
 1. Immetti la tua chiave API nella configurazione del plugin.
+
+Puoi configurare fino a 10 chiavi API, separate da una nuova riga. Le connessioni
+usano normalmente il trasporto HTTP di WordPress (JSONWP). La libreria XML-RPC
+legacy non è più inclusa: se una vecchia chiave termina con `-xmlinc`, rimuovi
+quel suffisso per utilizzare il trasporto predefinito.
 
 #### Come configurare il Modulo di iscrizione
 1. Vai su *NL4WP > Modulo*
@@ -115,6 +120,14 @@ Per ogni questione relativa al plugin e al suo funzionamento, fate riferimento a
 
 Changelog
 =========
+
+#### 4.14.2 - Nov 9, 2026
+
+- Fix a caching issue affecting additional profile fields.
+- Fix personal data exports missing the names of subscribed lists.
+- Fix list pagination with multiple API keys, reject invalid list IDs, and limit configuration to ten API keys with an explicit error when exceeded.
+- Handle WordPress HTTP transport failures as API connection errors instead of PHP type errors, and support JSONWP calls without a frontend request object or the cURL extension.
+- Remove the obsolete bundled XML-RPC library and use the upstream service container.
 
 #### 4.14.1 - Sep 10, 2026
 

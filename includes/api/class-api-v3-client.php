@@ -1,8 +1,6 @@
 <?php
 
-if (!function_exists('service_info')) require "wrapper.php";
-
-# TODO verificare come mettere il default a jsonwp invece di auto se rileviamo che c'è curl, json_encode e wp_remote_post
+if (!function_exists('service_info')) require __DIR__ . '/wrapper.php';
 
 function service_invoke_jsonwp($method, $service_api_key, $timestamp, $nonce, $hash, $args) {
     global $service_host;
@@ -21,7 +19,8 @@ function service_invoke_jsonwp($method, $service_api_key, $timestamp, $nonce, $h
         $referer = service_get_referer();
         # in alcuni casi il get_referer non trova l'host, ma su WP si può fare così
         # TODO: per testarlo dovrei togliere il get_referer qui sopra
-        if (empty($referer)) $referer = add_query_arg($GLOBALS['wp']->query_vars, home_url($GLOBALS['wp']->request));
+        // Admin, cron and CLI requests need not have a frontend WP object.
+        if (empty($referer)) $referer = home_url('/');
         if (!empty($referer)) $headers['Referer'] = $referer;
 
         $url = ($GLOBALS['service_wrapper_method'] == 'https' ? 'https://' : 'http://').$service_host.'/'.$GLOBALS['service_wrapper_jsonrpc_url'].'/'.$method;
@@ -36,7 +35,9 @@ function service_invoke_jsonwp($method, $service_api_key, $timestamp, $nonce, $h
         if ( is_wp_error( $service_last_result_raw ) ) {
             //  $service_last_result_raw->get_error_message();
             $service_last_result = array(
-                'faultCode' => $service_last_result_raw->get_error_code(),
+                // The adapter maps code 8 to its connection exception. WP_Error
+                // codes such as http_request_failed are strings, not Exception codes.
+                'faultCode' => 8,
                 'faultString' => $service_last_result_raw->get_error_message(),
             );
         } else {
@@ -56,6 +57,7 @@ function service_invoke_jsonwp($method, $service_api_key, $timestamp, $nonce, $h
 class NL4WP_API_v3_Client {
 /** File da cambiare per il supporto API Newsletter **/
     private const TRACK_ENABLE_TAG = 'TRACK_ENABLE';
+    private const MAX_API_KEYS = 10;
 
     /**
      * @var string
@@ -142,13 +144,13 @@ class NL4WP_API_v3_Client {
     }
 
     private function init($listid) {
-        if (count($this->api_keys) < $listid) {
+        if (!ctype_digit((string) $listid) || (int) $listid < 1 || count($this->api_keys) < (int) $listid) {
             throw new NL4WP_API_Exception( "Unconfigured list: " . $listid, 005 );
         }
         service_init($this->api_keys[$listid - 1]);
 
         // default to jsonwp calls/protocol
-        if ($GLOBALS['service_hint'] == 'auto' && function_exists('json_encode') && function_exists('curl_version')) {
+        if ($GLOBALS['service_hint'] == 'auto' && function_exists('json_encode') && function_exists('wp_remote_post')) {
             $GLOBALS['service_hint'] = 'jsonwp';
         }
     }
@@ -169,6 +171,9 @@ class NL4WP_API_v3_Client {
         // don't bother if no API key was given.
         if(count($this->api_keys) == 0 || empty($this->api_keys[0]))
             throw new NL4WP_API_Exception( "Missing API key", 001 );
+        if (count($this->api_keys) > self::MAX_API_KEYS) {
+            throw new NL4WP_API_Exception('A maximum of ' . self::MAX_API_KEYS . ' API keys is supported.', 005);
+        }
 
         $GLOBALS['service_wrapper_uaprefix'] = 'nl4wp/' . NL4WP_VERSION . ' wp/' . $wp_version . ' php/' . phpversion() . ' ';
 
@@ -209,10 +214,13 @@ class NL4WP_API_v3_Client {
                 $exposecount = in_array('total_items', $ff);
 
                 $ret = (object) array('lists'=> array());
-                for($list_id = 1; $list_id <= count($this->api_keys); $list_id++) {
+                $offset = isset($args['offset']) ? max(0, (int) $args['offset']) : 0;
+                $count = isset($args['count']) ? max(0, (int) $args['count']) : count($this->api_keys);
+                $end = min(count($this->api_keys), $offset + $count);
+                for($list_id = $offset + 1; $list_id <= $end; $list_id++) {
                     $ret->lists[] = $this->fetch_list_data($list_id, $args, $method, $resource);
                 }
-                if ($exposecount) $ret->total_items = count($ret->lists);
+                if ($exposecount) $ret->total_items = count($this->api_keys);
 
                 return $ret;
 
@@ -298,7 +306,7 @@ class NL4WP_API_v3_Client {
 
         $ff = explode(',', !empty($args['fields']) ? $args['fields'] : 'id');
         $exposecount = false;
-        if (empty($args['offset'])) foreach($ff as $f) {
+        foreach($ff as $f) {
             switch($f) {
                 case 'total_items': $exposecount = true; break;
                 case 'id': case 'lists.id': $ret->id = $list_id; break;
@@ -324,7 +332,7 @@ class NL4WP_API_v3_Client {
                     if ($f == 'campaign_defaults.from_email') $ret->campaign_defaults->from_email = 'mittente@example.com';
                     break;
                 case 'lists.marketing_permissions': /* Whether or not the list has marketing permissions (eg. GDPR) enabled. */
-                    // Voxmail has no Newsletter-style, per-contact marketing permissions.
+                    // ESP has no Newsletter-style, per-contact marketing permissions.
                     // Expose the list as a valid audience without GDPR permissions.
                     $ret->marketing_permissions = false;
                     break;
@@ -359,7 +367,9 @@ class NL4WP_API_v3_Client {
                     switch($merge_var['name']) {
                         case 'profile_name': $mv->tag = 'FNAME'; break;
                         case 'profile_surname': $mv->tag = 'LNAME'; break;
-                        default: $mv->tag = $merge_var['name']; break;
+                        // The upstream mapper normalizes submitted keys to uppercase.
+                        // build_user_data converts these tags back to ESP names.
+                        default: $mv->tag = strtoupper($merge_var['name']); break;
                     }
 
                     $mv->helptext = $merge_var['description'];
@@ -381,7 +391,7 @@ class NL4WP_API_v3_Client {
             }
         }
 
-        // Voxmail's enable-tracking switch is not exposed as a profile field.
+        // ESP's enable-tracking switch is not exposed as a profile field.
         // Publish it as a synthetic single-choice field so NL4WP can expose it
         // in forms and integrations. The values must be non-empty strings:
         // NL4WP intentionally drops empty values while mapping submissions.
@@ -445,7 +455,7 @@ class NL4WP_API_v3_Client {
      * Handle the collection endpoint used by Newsletter 4.9.x.
      *
      * Newsletter uses GET /members to discover the marketing permission
-     * definitions and POST /members to create a new subscriber. Voxmail has
+     * definitions and POST /members to create a new subscriber. ESP has
      * no equivalent marketing-permissions model, so the GET response is an
      * empty member collection and the POST path creates the user directly.
      */
@@ -491,7 +501,7 @@ class NL4WP_API_v3_Client {
         $email = !empty($args['email_address']) ? $args['email_address'] : $emailtocheck;
         $data_to = array(
             'mail' => $email,
-            'privacy' => 1, // Voxmail has one general privacy flag, not Newsletter marketing permissions.
+            'privacy' => 1, // ESP has one general privacy flag, not Newsletter marketing permissions.
         );
 
         $merge_fields = !empty($args['merge_fields']) ? (array) $args['merge_fields'] : array();
@@ -533,7 +543,7 @@ class NL4WP_API_v3_Client {
             }
         }
 
-        // There is no separate Voxmail tag model in this adapter. Preserve the
+        // There is no separate ESP tag model in this adapter. Preserve the
         // existing project behaviour by representing active tags as audiences.
         if ($include_tags && !empty($args['tags'])) {
             foreach ((array) $args['tags'] as $value) {
@@ -553,7 +563,7 @@ class NL4WP_API_v3_Client {
             $data_to['-audiences'] = implode(',', array_unique($data_to['-audiences']));
         }
 
-        // marketing_permissions is intentionally ignored: Voxmail has no
+        // marketing_permissions is intentionally ignored: ESP has no
         // equivalent per-contact permission model.
         return $data_to;
     }
@@ -562,7 +572,7 @@ class NL4WP_API_v3_Client {
      * Normalize the synthetic TRACK_ENABLE merge field.
      *
      * Keep the result nullable: an omitted or unknown value must not change
-     * an existing Voxmail subscriber, and an omitted value lets Voxmail apply
+     * an existing ESP subscriber, and an omitted value lets ESP apply
      * its default (tracking enabled).
      *
      * @param mixed $value

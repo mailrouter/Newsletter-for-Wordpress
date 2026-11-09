@@ -27,7 +27,7 @@ class NL4WP_Personal_Data_Exporter
     /**
      * Retrieves subscription data for a given email address.
      *
-     * The search-members endpoint is not available in the Voxmail adapter.
+     * The search-members endpoint is not available in the ESP adapter.
      * Query each configured list through the member endpoint instead.
      *
      * @param string $email_address The email address of the user to search for.
@@ -40,7 +40,7 @@ class NL4WP_Personal_Data_Exporter
         $data_to_export   = [];
 
         try {
-            $lists = $api->get_lists();
+            $lists = $api->get_lists(['fields' => 'lists.id,lists.name']);
 
             foreach ($lists as $list) {
                 if (empty($list->id)) {

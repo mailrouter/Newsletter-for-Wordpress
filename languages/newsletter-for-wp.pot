@@ -1535,11 +1535,11 @@ msgstr ""
 msgid "Unchecked"
 msgstr ""
 
-#: includes/api/class-api-v3-client.php:391
+#: includes/api/class-api-v3-client.php:401
 msgid "Enable tracking"
 msgstr ""
 
-#: includes/api/class-api-v3-client.php:393
+#: includes/api/class-api-v3-client.php:403
 msgid "Select whether email tracking should be enabled for this subscriber."
 msgstr ""
 
