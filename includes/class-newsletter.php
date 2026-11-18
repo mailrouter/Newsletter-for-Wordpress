@@ -93,7 +93,7 @@ class NL4WP_Newsletter
             $tags = [];
             if (isset($args['tags']) && is_array($args['tags'])) {
                 $tags = $args['tags'];
-                unset($args['tags']);
+                if ($args['status'] !== 'pending') { unset($args['tags']); }
             }
 
             if ($existing_member_data) {
@@ -105,7 +105,7 @@ class NL4WP_Newsletter
             }
 
             // update subscriber tags, if supplied
-            $this->update_subscriber_tags($list_id, $email_address, $tags);
+            if ($args['status'] !== 'pending') { $this->update_subscriber_tags($list_id, $email_address, $tags); }
         } catch (NL4WP_API_Exception $e) {
             $this->error_code    = $e->getCode();
             $this->error_message = $e;

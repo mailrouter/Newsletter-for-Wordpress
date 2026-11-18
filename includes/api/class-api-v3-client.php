@@ -250,9 +250,9 @@ class NL4WP_API_v3_Client {
                             return $this->fetch_interest_categories($list_id, $args, $method, $resource);
 
                         // resource "/lists/#LISTID#/interest-categories/1/interests"
-                        } else if (count($respath) == 5 && $respath[3] == 1) {
+                        } else if (count($respath) == 5 && in_array($respath[3], ['1', '2'], true)) {
 
-                            return $this->fetch_interest_categories_interests($list_id, $args, $method, $resource);
+                            return $this->fetch_interest_categories_interests($list_id, $args, $method, $resource, $respath[3]);
 
                         }
 
@@ -391,6 +391,13 @@ class NL4WP_API_v3_Client {
             }
         }
 
+        $info = service_info();
+        $this->optionallyRaiseException($method, $resource, $info, 'service_info', $args);
+        $consent_mode = isset($info['consent_mode']) ? (int) $info['consent_mode'] : 0;
+        if ($consent_mode === 2) {
+            return (object) array('merge_fields' => $merge_vars);
+        }
+
         // ESP's enable-tracking switch is not exposed as a profile field.
         // Publish it as a synthetic single-choice field so NL4WP can expose it
         // in forms and integrations. The values must be non-empty strings:
@@ -402,6 +409,7 @@ class NL4WP_API_v3_Client {
             'tag'      => self::TRACK_ENABLE_TAG,
             'helptext' => __('Select whether email tracking should be enabled for this subscriber.', 'newsletter-for-wp'),
             'type'     => 'radio',
+            'default_value' => $consent_mode === 1 ? 'no' : 'yes',
             'options'  => (object) array(
                 'choices' => array(
                     'yes' => __('Yes', 'newsletter-for-wp'),
@@ -415,27 +423,27 @@ class NL4WP_API_v3_Client {
     }
 
     private function fetch_interest_categories($list_id, &$args, $method, $resource) {
-        $sub = $this->fetch_interest_categories_interests($list_id, $args, $method, $resource);
-
-        $ret = (object) array();
-        if (count($sub->interests)) $ret->categories = array((object) array(
-            'id' => 1, 
-            'title' => "Gruppi", 
-            'type' => 'checkboxes'
-        ));
+        $ret = (object) array('categories' => array());
+        // Keep category 1 stable: saved forms reference INTERESTS[1].
+        foreach (array('1' => array('Gruppi', 'checkboxes'), '2' => array('Gruppi nascosti', 'hidden')) as $id => $definition) {
+            $sub = $this->fetch_interest_categories_interests($list_id, $args, $method, $resource, (string) $id);
+            if (count($sub->interests)) {
+                $ret->categories[] = (object) array('id' => $id, 'title' => $definition[0], 'type' => $definition[1]);
+            }
+        }
 
         return $ret;
     }
 
-    private function fetch_interest_categories_interests($list_id, &$args, $method, $resource) {
+    private function fetch_interest_categories_interests($list_id, &$args, $method, $resource, $category_id = '1') {
         $this->get_log()->debug( sprintf( "CALL service_audience_list for fetch_interest_categories_interests %s", print_r($args, true) ) );
         $this->init($list_id); // inizializzazione API service
         $groups = service_audience_list();
         $this->optionallyRaiseException($method, $resource, $groups, 'service_audience_list', $args);
 
         if (is_array($groups)) {
-            $groups = array_filter($groups, function($v) {
-                return $v["visibility"] == "register"; //visibility register??
+            $groups = array_filter($groups, function($v) use ($category_id) {
+                return $v["visibility"] === ($category_id === '2' ? 'hidden' : 'register');
             });
             
             $interests = array();
@@ -548,6 +556,12 @@ class NL4WP_API_v3_Client {
         if ($include_tags && !empty($args['tags'])) {
             foreach ((array) $args['tags'] as $value) {
                 if (is_array($value)) {
+                    // Removal settings must never become additions to a new
+                    // pending subscription. Existing active contacts keep the
+                    // separate tag-update path, including removals.
+                    if (isset($value['status']) && $value['status'] === 'inactive') {
+                        continue;
+                    }
                     $value = isset($value['name']) ? $value['name'] : '';
                 }
                 if ($value) {
@@ -664,7 +678,7 @@ class NL4WP_API_v3_Client {
                     return (object) (array('id' => $result) + $args);
                 }
 
-                $data_to = $this->build_user_data($args, $emailtocheck, false, true);
+                $data_to = $this->build_user_data($args, $emailtocheck, $status === 'pending', true);
                 if ($status === 'pending') {
                     $result = service_user_subscribe($data_to, $ip);
                     $servicemethod = 'service_user_subscribe';

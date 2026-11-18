@@ -3,7 +3,7 @@ Contributors: Morloi, Bago
 Tags: newsletter, nl4wp, email, marketing, newsletter, subscribe, widget, nl4wp, contact form 7, woocommerce, buddypress, newsletter forms, newsletter integrations
 Requires at least: 5.3
 Tested up to: 7.1
-Stable tag: 4.14.2
+Stable tag: 4.14.3
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
@@ -120,6 +120,12 @@ Per ogni questione relativa al plugin e al suo funzionamento, fate riferimento a
 
 Changelog
 =========
+
+#### 4.14.3 - Nov 18, 2026
+
+- Fix groups configured in "Add groups" not being assigned to subscriptions requiring email confirmation, including hidden groups.
+- Make hidden subscription groups available as hidden fields in the form builder while preserving existing visible-group fields.
+- Use the account's tracking consent settings to preselect Yes or No in new form fields, or hide the consent field from the available fields when consent collection is disabled. After refreshing field data, saved consent controls are also omitted from submissions when consent collection is disabled.
 
 #### 4.14.2 - Nov 9, 2026
 
